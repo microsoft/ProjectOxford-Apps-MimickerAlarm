@@ -17,7 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class AlarmListFragment extends Fragment {
 
@@ -26,6 +31,7 @@ public class AlarmListFragment extends Fragment {
     private Toolbar mToolbar;
     private FloatingActionButton mFab;
     private Callbacks mCallbacks;
+    private List<Alarm> mAlarms;
 
     public interface Callbacks {
         void onAlarmSelected(Alarm alarm);
@@ -75,7 +81,10 @@ public class AlarmListFragment extends Fragment {
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                mAdapter.removeItem(viewHolder.getAdapterPosition());
+                AlarmManagerHelper.cancelAlarms(getContext());
+                AlarmList.get(getActivity()).deleteAlarm(mAlarms.get(viewHolder.getAdapterPosition()));
+                AlarmManagerHelper.setAlarms(getContext());
+                updateUI();
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
@@ -124,13 +133,13 @@ public class AlarmListFragment extends Fragment {
 
     public void updateUI() {
         AlarmList alarmList = AlarmList.get(getActivity());
-        List<Alarm> alarms = alarmList.getAlarms();
+        mAlarms = alarmList.getAlarms();
 
         if (mAdapter == null) {
-            mAdapter = new AlarmAdapter(alarms);
+            mAdapter = new AlarmAdapter(mAlarms);
             mAlarmRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter.setAlarms(alarms);
+            mAdapter.setAlarms(mAlarms);
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -155,8 +164,10 @@ public class AlarmListFragment extends Fragment {
             mAlarmEnabled.setOnClickListener(new View.OnClickListener() {
                  @Override
                  public void onClick(View v) {
+                     AlarmManagerHelper.cancelAlarms(getContext());
                      mAlarm.setIsEnabled(mAlarmEnabled.isChecked());
                      AlarmList.get(getActivity()).updateAlarm(mAlarm);
+                     AlarmManagerHelper.setAlarms(getContext());
                  }
             });
         }
@@ -165,15 +176,20 @@ public class AlarmListFragment extends Fragment {
             mAlarm = alarm;
 
             String title = mAlarm.getTitle();
-            if (title == null || title.isEmpty()){
-                mTitleTextView.setText(getString(R.string.alarm_name_default));
-            } else {
-                mTitleTextView.setText(mAlarm.getTitle());
+            if (title == null) {
+                mAlarm.setTitle(getString(R.string.alarm_name_default));
+                AlarmList.get(getActivity()).updateAlarm(mAlarm);
             }
 
-            int hour = mAlarm.getTimeHour();
-            int minute = mAlarm.getTimeMinute();
-            mTimeTextView.setText(String.format("%tI %tM", (long)hour, (long)minute));
+            mTitleTextView.setText(mAlarm.getTitle());
+
+            Format formatter = new SimpleDateFormat("h:mm aa", Locale.US);
+            Calendar calendar = Calendar.getInstance();
+
+            calendar.set(Calendar.HOUR_OF_DAY, mAlarm.getTimeHour());
+            calendar.set(Calendar.MINUTE, mAlarm.getTimeMinute());
+
+            mTimeTextView.setText(formatter.format(calendar.getTime()));
             mAlarmEnabled.setChecked(mAlarm.isEnabled());
         }
 
@@ -213,9 +229,5 @@ public class AlarmListFragment extends Fragment {
             mAlarms = alarms;
         }
 
-        public void removeItem(int position) {
-            AlarmList.get(getActivity()).deleteAlarm(mAlarms.get(position));
-            notifyItemRemoved(position);
-        }
     }
 }

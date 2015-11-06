@@ -72,9 +72,10 @@ public class AlarmPagerActivity extends AppCompatActivity
         });
 
         for (int i = 0; i < mAlarms.size(); i++) {
-            if (mAlarms.get(i).getId().equals(alarmId)) {
+            Alarm alarm = mAlarms.get(i);
+            if (alarm.getId().equals(alarmId)) {
                 mViewPager.setCurrentItem(i);
-
+                setTitle(alarm.getTitle());
                 break;
             }
         }
@@ -82,6 +83,6 @@ public class AlarmPagerActivity extends AppCompatActivity
 
     @Override
     public void onAlarmUpdated(Alarm alarm) {
-
+        setTitle(alarm.getTitle());
     }
 }

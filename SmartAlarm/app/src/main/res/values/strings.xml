@@ -7,6 +7,8 @@
     <string name="alarm_game_label">Alarm game</string>
     <string name="alarm_edit_title_label">Edit alarm</string>
     <string name="action_learn_more">Learn more</string>
-    <string name="alarm_name_default">Alarm</string>
+    <string name="alarm_name_default">This is an Alarm</string>
     <string name="alarm_title_hint">Enter a title for the alarm</string>
+    <string name="alarm_title_label">Alarm name</string>
+    <string name="alarm_tone_label">Alarm ringtone</string>
 </resources>

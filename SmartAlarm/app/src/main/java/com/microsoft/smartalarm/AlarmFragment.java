@@ -2,6 +2,9 @@ package com.microsoft.smartalarm;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.sql.Time;
@@ -21,6 +26,7 @@ public class AlarmFragment extends Fragment {
 
     private TimePicker mTimePicker;
     private EditText mTitleField;
+    private TextView mToneField;
     private Alarm mAlarm;
     private Callbacks mCallbacks;
 
@@ -72,6 +78,14 @@ public class AlarmFragment extends Fragment {
         mTimePicker = (TimePicker) view.findViewById(R.id.alarm_time);
         mTimePicker.setCurrentHour(mAlarm.getTimeHour());
         mTimePicker.setCurrentMinute(mAlarm.getTimeMinute());
+        mTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+                mAlarm.setTimeHour(hourOfDay);
+                mAlarm.setTimeMinute(minute);
+                updateAlarm();
+            }
+        });
 
         mTitleField = (EditText) view.findViewById(R.id.alarm_title);
         mTitleField.setText(mAlarm.getTitle());
@@ -95,11 +109,41 @@ public class AlarmFragment extends Fragment {
 
             }
         });
+
+        mToneField = (TextView) view.findViewById(R.id.alarm_ringtone);
+        mToneField.setText(RingtoneManager.getRingtone(getContext(), mAlarm.getAlarmTone()).getTitle(getContext()));
+
+        final LinearLayout ringToneContainer = (LinearLayout) view.findViewById(R.id.alarm_ringtone_container);
+        ringToneContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                startActivityForResult(intent, 1);
+            }
+        });
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case 1: {
+                    Uri alarmTone = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                    mAlarm.setAlarmTone(alarmTone);
+                    mToneField.setText(RingtoneManager.getRingtone(getContext(), mAlarm.getAlarmTone()).getTitle(getContext()));
+                    updateAlarm();
+                }
+            }
+        }
+    }
+
     private void updateAlarm() {
+        AlarmManagerHelper.cancelAlarms(getContext());
         AlarmList.get(getActivity()).updateAlarm(mAlarm);
         mCallbacks.onAlarmUpdated(mAlarm);
+        AlarmManagerHelper.setAlarms(getContext());
     }
 }

@@ -21,9 +21,11 @@ public class Alarm {
 
     public Alarm(UUID id) {
         mId = id;
-        mRepeatingDays = new boolean[7];
         mTimeHour = 12;
         mTimeMinute = 0;
+        mRepeatWeekly = true;
+        mRepeatingDays = new boolean[]{ true, true, true, true, true, true, true };
+        mAlarmTone = Uri.parse("content://settings/system/ringtone");
     }
 
     public String getTitle() {
