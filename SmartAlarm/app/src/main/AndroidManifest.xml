@@ -2,12 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.microsoft.smartalarm" >
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
+        <activity
+            android:name=".AlarmPagerActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".AlarmListActivity">
+        </activity>
         <activity
             android:name=".AlarmListActivity"
             android:label="@string/app_name"
@@ -17,6 +28,21 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".AlarmRingingActivity"/>
+
+        <service android:name=".AlarmService"
+            android:enabled="true"/>
+
+        <receiver android:name=".AlarmManagerHelper" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".SnoozerTwister"
+                  android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         </activity>
     </application>
 
