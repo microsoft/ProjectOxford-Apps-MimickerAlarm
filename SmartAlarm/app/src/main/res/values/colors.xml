@@ -5,4 +5,8 @@
     <color name="colorAccent">#FFD700</color>
     <color name="yellow">#FFD700</color>
     <color name="orange">#FFA500</color>
+    <color name="red">#F44336</color>
+    <color name="blue">#3F51B5</color>
+    <color name="grey">#707070</color>
+    <color name="white">#ffffff</color>
 </resources>
