@@ -24,6 +24,7 @@ public class ProgressButton extends ImageView {
     private static float sRadius;
 
     private final static int sRed = Color.parseColor("#F44336");
+
     private final static int sBlue = Color.parseColor("#3F51B5");
     private final static int sGrey = Color.parseColor("#707070");
     private final static int sWhite = Color.parseColor("#ffffff");
