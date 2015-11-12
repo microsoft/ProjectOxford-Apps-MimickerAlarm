@@ -24,7 +24,6 @@ public class AlarmRingingActivity extends Activity {
     private MediaPlayer mPlayer;
 
     private static final int WAKELOCK_TIMEOUT = 60 * 1000;
-    private static final int SNOOZER_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +50,7 @@ public class AlarmRingingActivity extends Activity {
             public void onClick(View view) {
                 mPlayer.stop();
 
-                Intent intent = new Intent(AlarmRingingActivity.this, SnoozerTwister.class);
-                startActivityForResult(intent, SNOOZER_REQUEST_CODE);
+                GameFactory.startRandom(AlarmRingingActivity.this);
             }
         });
 
@@ -121,7 +119,7 @@ public class AlarmRingingActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SNOOZER_REQUEST_CODE) {
+        if (requestCode == GameFactory.START_GAME_REQUEST) {
             if (resultCode == RESULT_OK) {
                 finish();
             }

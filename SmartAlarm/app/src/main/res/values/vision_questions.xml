@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="vision_color_codes">
+        <item>FF0000</item>
+        <item>00FF00</item>
+        <item>0000FF</item>
+        <item>9900FF</item>
+    </string-array>
+
+    <string name="_FF0000">red</string>
+    <string name="_00FF00">green</string>
+    <string name="_0000FF">blue</string>
+    <string name="_9900FF">purple</string>
+</resources>
