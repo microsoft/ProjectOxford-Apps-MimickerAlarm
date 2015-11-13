@@ -38,8 +38,8 @@ public class AlarmListActivity extends SingleFragmentActivity
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
         UpdateManager.register(this, hockeyAppId);
     }
