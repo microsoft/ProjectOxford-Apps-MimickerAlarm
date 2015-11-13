@@ -5,3 +5,8 @@
 .DS_Store
 /build
 /captures
+
+.idea/gradle.xml
+.idea/misc.xml
+
+app/src/main/res/values/subscription_keys.xml

@@ -12,4 +12,5 @@
     <string name="alarm_title_label">Alarm name</string>
     <string name="alarm_tone_label">Alarm ringtone</string>
     <string name="snoozer_twister_prompt">Say the following tongue twister</string>
+    <string name="action_feedback">Feedback</string>
 </resources>

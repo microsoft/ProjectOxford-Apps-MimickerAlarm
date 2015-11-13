@@ -4,7 +4,15 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import net.hockeyapp.android.CrashManager;
+
 public class AlarmService extends Service {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
+        CrashManager.register(this, hockeyAppId);
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
