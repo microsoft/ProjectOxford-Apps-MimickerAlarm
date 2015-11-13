@@ -7,7 +7,7 @@ import java.util.Random;
 
 public final class GameFactory {
     private static Class[] sGames = new Class[]{ GameTwister.class,
-                                                    GameVision.class};
+                                                 GameColorFinderActivity.class};
 
     public static final int START_GAME_REQUEST = 1;
 

@@ -15,13 +15,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
-public class GameVision extends GameCameraBase {
+public class GameColorFinderActivity extends GameWithCameraActivity {
     private VisionServiceRestClient mVisionServiceRestClient;
-    private static String           LOGTAG = "GameVision";
+    private static String           LOGTAG = "GameColorFinderActivity";
     private String                  mQuestionColorName;
     private int                     mQuestionColorCode;
+    private static final int        COLOR_DIFF_ACCEPTANCE = 300;
 
-    public GameVision() {
+    public GameColorFinderActivity() {
         CameraFacing = Camera.CameraInfo.CAMERA_FACING_BACK;
     }
 
@@ -49,7 +50,7 @@ public class GameVision extends GameCameraBase {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
             ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
-            String[] features = {"All"};
+            String[] features = {"Color"};
             AnalyzeResult result = mVisionServiceRestClient.analyzeImage(inputStream, features);
 
             // Service returns a color string in English
@@ -62,7 +63,7 @@ public class GameVision extends GameCameraBase {
             Log.d(LOGTAG, "diff : " + String.valueOf(colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor))));
 
             //TODO: this will not work for languages other than English.
-            if (colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor)) < 300 ||
+            if (colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor)) < COLOR_DIFF_ACCEPTANCE ||
                     result.color.dominantColorForeground.toLowerCase().equals(mQuestionColorName) ||
                     result.color.dominantColorBackground.toLowerCase().equals(mQuestionColorName))
             {

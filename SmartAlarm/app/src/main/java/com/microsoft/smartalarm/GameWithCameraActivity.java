@@ -14,9 +14,9 @@ import android.view.SurfaceView;
 import android.view.View;
 
 @SuppressWarnings("deprecation")
-public abstract class GameCameraBase extends AppCompatActivity{
+public abstract class GameWithCameraActivity extends AppCompatActivity{
 
-    private static final String LOGTAG = "GameCameraBase";
+    private static final String LOGTAG = "GameWithCameraActivity";
     private static final int TIMEOUT_MILLISECONDS = 30000;
     protected static int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
@@ -44,6 +44,7 @@ public abstract class GameCameraBase extends AppCompatActivity{
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    // Camera sensor ranges from -1000 to 1000 regardless of aspect ratio, sizes, resolution, ...
                     int deltaX = (int)(((float)mSize.x - event.getX()) / mSize.x * -2000) + 1000;
                     int deltaY = (int)(((float)mSize.y - event.getY()) / mSize.y * -2000) + 1000;
                     mCameraPreview.onFocus(deltaX, deltaY);
@@ -111,11 +112,11 @@ public abstract class GameCameraBase extends AppCompatActivity{
     private CameraPreview.ImageCallback onCaptureCallback = new CameraPreview.ImageCallback() {
         @Override
         public void run(Bitmap bitmap) {
-            new doOxfordAsync().execute(bitmap);
+            new processOnProjectOxfordAsync().execute(bitmap);
         }
     };
 
-    public class doOxfordAsync extends AsyncTask<Bitmap, String, Boolean> {
+    public class processOnProjectOxfordAsync extends AsyncTask<Bitmap, String, Boolean> {
         private Exception ex = null;
 
         @Override

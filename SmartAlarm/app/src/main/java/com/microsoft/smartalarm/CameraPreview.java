@@ -19,13 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class CameraPreview implements SurfaceHolder.Callback{
-    public interface ImageCallback{
+public class CameraPreview implements SurfaceHolder.Callback {
+    public interface ImageCallback {
         void run(Bitmap bitmap);
     }
 
     private static final String LOGTAG = "CameraPreview";
     private static final int MAX_SIZE = 1080;
+    private static final double ASPECT_RATIO_EPSILON = 0.02;
 
     private SurfaceView mPreviewView;
     private Camera mCamera;
@@ -102,6 +103,8 @@ public class CameraPreview implements SurfaceHolder.Callback{
 
     private class processCaptureImage extends AsyncTask<Object, String, Boolean> {
         @Override
+        // Decode the image data and rotate it to the proper orientation.
+        // then run the callback, if any, on the image to do post processing
         protected Boolean doInBackground(Object... params) {
             byte[] data = (byte[]) params[0];
             Camera camera = (Camera) params[1];
@@ -172,64 +175,62 @@ public class CameraPreview implements SurfaceHolder.Callback{
         Camera cam = null;
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         int cameraCount = Camera.getNumberOfCameras();
+
+        // Find the camera that's facing the right way
         for (int i = 0; i < cameraCount; i++) {
             Camera.getCameraInfo(i, cameraInfo);
             if (cameraInfo.facing == mCameraFacing) {
                 try {
                     cam = Camera.open(i);
-
-                    Camera.Parameters params = cam.getParameters();
-
-                    List<Camera.Size> supportedSizes = params.getSupportedPreviewSizes();
-                    Camera.Size bestSize = supportedSizes.get(0);
-                    final double aspectTolerance = 0.02;
-                    for(Camera.Size size : supportedSizes) {
-                        if (size.width > MAX_SIZE && size.height > MAX_SIZE) {
-                            continue;
-                        }
-                        if (Math.abs(((double)size.width / (double)size.height) - mCameraAspectRatio) < aspectTolerance) {
-                            if (size.width >= bestSize.width)
-                                bestSize = size;
-                        }
-                    }
-                    params.setPreviewSize(bestSize.width, bestSize.height);
-
-                    List<String> supportedFocusModes = params.getSupportedFocusModes();
-                    for (String mode : supportedFocusModes) {
-                        if (mode.equals(Camera.Parameters.FOCUS_MODE_AUTO)) {
-                            params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-                            break;
-                        }
-                    }
-
-                    Camera.CameraInfo info = new Camera.CameraInfo();
-                    Camera.getCameraInfo(i, info);
-                    switch (info.orientation) {
-                        case 0:
-                            break;
-                        case 90:
-                            mCameraRotation = 90;
-                            break;
-                        case 180:
-                            mCameraRotation = 180;
-                            break;
-                        case 270:
-                            mCameraRotation = 270;
-                            break;
-                    }
-
-                    if (mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                        mCameraRotation = (360 - mCameraRotation) % 360;
-                    }
-                    params.setRotation(mCameraRotation);
-
-                    cam.setParameters(params);
-                    cam.setDisplayOrientation(mCameraRotation);
-
                     break;
                 } catch (RuntimeException ex) {
                     Log.e(LOGTAG, "err opening camera", ex);
                 }
+            }
+        }
+
+        // Configure the camera with right resolution, aspect ratio and focus
+        if (cam != null) {
+            try {
+                Camera.Parameters params = cam.getParameters();
+
+                // find a camera configuration of the same size as the phone screen.
+                List<Camera.Size> supportedSizes = params.getSupportedPreviewSizes();
+                Camera.Size bestSize = supportedSizes.get(0);
+                for (Camera.Size size : supportedSizes) {
+                    if (size.width > MAX_SIZE &&
+                            size.height > MAX_SIZE) {
+                        continue;
+                    }
+                    if (Math.abs(((double) size.width / (double) size.height) - mCameraAspectRatio) < ASPECT_RATIO_EPSILON) {
+                        if (size.width >= bestSize.width)
+                            bestSize = size;
+                    }
+                }
+                params.setPreviewSize(bestSize.width, bestSize.height);
+
+                // if available set the autofocus on
+                List<String> supportedFocusModes = params.getSupportedFocusModes();
+                for (String mode : supportedFocusModes) {
+                    if (mode.equals(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                        params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                        break;
+                    }
+                }
+
+                mCameraRotation = cameraInfo.orientation;
+
+                // compensate for the front camera mirror
+                if (mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                    mCameraRotation = (360 - mCameraRotation) % 360;
+                }
+                params.setRotation(mCameraRotation);
+
+                cam.setParameters(params);
+                cam.setDisplayOrientation(mCameraRotation);
+
+            } catch (RuntimeException ex) {
+                Log.e(LOGTAG, "err configuring camera", ex);
             }
         }
 
