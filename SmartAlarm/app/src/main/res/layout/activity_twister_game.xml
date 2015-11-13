@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:layout_weight="1"
-            android:text="@string/snoozer_twister_prompt"
+            android:text="@string/game_twister_prompt"
             android:textSize="16sp"
             android:textAllCaps="true"
             android:textStyle="normal"/>

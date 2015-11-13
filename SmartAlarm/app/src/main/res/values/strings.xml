@@ -11,6 +11,7 @@
     <string name="alarm_title_hint">Enter a title for the alarm</string>
     <string name="alarm_title_label">Alarm name</string>
     <string name="alarm_tone_label">Alarm ringtone</string>
-    <string name="snoozer_twister_prompt">Say the following tongue twister</string>
+    <string name="game_twister_prompt">Say the following tongue twister</string>
+    <string name="game_vision_prompt">Find something %s</string>
     <string name="action_feedback">Feedback</string>
 </resources>
