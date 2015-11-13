@@ -13,4 +13,5 @@
     <string name="alarm_tone_label">Alarm ringtone</string>
     <string name="game_twister_prompt">Say the following tongue twister</string>
     <string name="game_vision_prompt">Find something %s</string>
+    <string name="action_feedback">Feedback</string>
 </resources>

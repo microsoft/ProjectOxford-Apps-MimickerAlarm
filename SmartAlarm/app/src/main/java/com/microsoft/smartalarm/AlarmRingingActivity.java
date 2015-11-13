@@ -16,6 +16,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import net.hockeyapp.android.CrashManager;
+
 public class AlarmRingingActivity extends Activity {
 
     public final String TAG = this.getClass().getSimpleName();
@@ -106,6 +108,8 @@ public class AlarmRingingActivity extends Activity {
             mWakeLock.acquire();
         }
 
+        final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
+        CrashManager.register(this, hockeyAppId);
     }
 
     @Override
