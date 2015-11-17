@@ -1,47 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <SurfaceView
-        android:id="@+id/camera_preview_view"
+
+    <com.microsoft.smartalarm.CountDownTimerView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="20dp"
+        android:id="@+id/countdown_timer"/>
 
-    <RelativeLayout
-        android:id="@+id/camera_preview_overlay"
-        android:orientation="horizontal"
-        android:background="#00ffffff"
+    <TextView
+        android:id="@+id/instruction_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textAllCaps="true"
+        android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/instruction_text"
+    <FrameLayout
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <SurfaceView
+            android:id="@+id/camera_preview_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:padding="20dp"
-            android:background="#55000000"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:textSize="20sp"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:text="Find something blue"/>
+            android:layout_height="match_parent"/>
 
-        <com.microsoft.smartalarm.CountDownTimerView
-            android:layout_alignParentTop="true"
-            android:layout_centerInParent="true"
+        <RelativeLayout
+            android:id="@+id/camera_preview_overlay"
+            android:orientation="horizontal"
+            android:background="#00ffffff"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:id="@+id/countdown_timer"/>
+            android:layout_height="match_parent">
 
-        <com.microsoft.smartalarm.ProgressButton
-            android:id="@+id/capture_button"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="50dp"
-            android:layout_centerInParent="true"
-            android:layout_width="80dp"
-            android:layout_height="80dp"/>
-    </RelativeLayout>
-</FrameLayout>
+            <com.microsoft.smartalarm.ProgressButton
+                android:id="@+id/capture_button"
+                android:layout_alignParentBottom="true"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="20dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"/>
+        </RelativeLayout>
+    </FrameLayout>
+</LinearLayout>

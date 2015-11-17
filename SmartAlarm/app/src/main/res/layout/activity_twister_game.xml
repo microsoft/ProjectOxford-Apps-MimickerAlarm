@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="0dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <com.microsoft.smartalarm.CountDownTimerView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:id="@+id/countdown_timer"/>
 
     <LinearLayout
         android:orientation="vertical"
@@ -42,28 +49,19 @@
             android:textColor="#009688"
             android:padding="16dp"
             android:textSize="16sp"/>
-    </LinearLayout>
 
-    <RelativeLayout
-        android:gravity="center"
-        android:background="#00ffffff"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.microsoft.smartalarm.CountDownTimerView
-            android:layout_alignParentTop="true"
-            android:layout_centerInParent="true"
+        <RelativeLayout
+            android:gravity="center"
+            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:id="@+id/countdown_timer"/>
+            android:layout_height="wrap_content">
 
-        <com.microsoft.smartalarm.ProgressButton
-            android:id="@+id/capture_button"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="50dp"
-            android:layout_centerInParent="true"
-            android:layout_width="80dp"
-            android:layout_height="80dp"/>
+            <com.microsoft.smartalarm.ProgressButton
+                android:id="@+id/capture_button"
+                android:layout_centerInParent="true"
+                android:layout_width="80dp"
+                android:layout_height="80dp"/>
 
-    </RelativeLayout>
-</FrameLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

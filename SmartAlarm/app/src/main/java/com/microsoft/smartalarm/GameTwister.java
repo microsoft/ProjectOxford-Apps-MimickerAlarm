@@ -84,11 +84,11 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
 
     @Override
     public void onFinalResponseReceived(RecognitionResult response) {
-        boolean isFinalDicationMessage = mRecognitionMode == SpeechRecognitionMode.LongDictation &&
+        boolean isFinalDictationMessage = mRecognitionMode == SpeechRecognitionMode.LongDictation &&
                 (response.RecognitionStatus == RecognitionStatus.EndOfDictation ||
                         response.RecognitionStatus == RecognitionStatus.DictationEndSilenceTimeout);
         if (mRecognitionMode == SpeechRecognitionMode.ShortPhrase
-                || isFinalDicationMessage) {
+                || isFinalDictationMessage) {
             mMicClient.endMicAndRecognition();
             mCaptureButton.ready();
             for (RecognizedPhrase res : response.Results) {
@@ -128,10 +128,15 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     private void initialize() {
         mRecognitionMode = SpeechRecognitionMode.ShortPhrase;
 
-        String language = "en-us";
-        String subscriptionKey = getResources().getString(R.string.speech_service_key);
-        if (mMicClient == null) {
-            mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mRecognitionMode, language, this, subscriptionKey);
+        try {
+            String language = "en-us";
+            String subscriptionKey = getResources().getString(R.string.speech_service_key);
+            if (mMicClient == null) {
+                mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mRecognitionMode, language, this, subscriptionKey);
+            }
+        }
+        catch(Exception e){
+            Log.e(LOGTAG, "Speech client failed to initialize " + e);
         }
 
         mCaptureButton = (ProgressButton) findViewById(R.id.capture_button);

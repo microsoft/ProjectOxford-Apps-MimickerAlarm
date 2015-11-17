@@ -9,4 +9,8 @@
     <color name="blue">#3F51B5</color>
     <color name="grey">#707070</color>
     <color name="white">#ffffff</color>
+    <color name="yellow1">#fff278</color>
+    <color name="yellow2">#ffd54e</color>
+    <color name="yellow3">#fcb64e</color>
+    <color name="yellow4">#f37021</color>
 </resources>
