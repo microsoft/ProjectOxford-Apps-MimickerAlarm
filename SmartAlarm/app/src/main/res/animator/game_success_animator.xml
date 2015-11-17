@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+     android:shareInterpolator="false">
+     <objectAnimator
+         xmlns:android="http://schemas.android.com/apk/res/android"
+         android:duration="500"
+         android:propertyName="xPercentage"
+         android:valueFrom="-100"
+         android:valueTo="0"
+         android:valueType="floatType" />
+
+    <objectAnimator
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:duration="500"
+        android:startOffset="2000"
+        android:propertyName="xPercentage"
+        android:valueFrom="0"
+        android:valueTo="100"
+        android:valueType="floatType" />
+</set>

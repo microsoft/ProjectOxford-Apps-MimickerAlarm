@@ -13,4 +13,12 @@
     <color name="yellow2">#ffd54e</color>
     <color name="yellow3">#fcb64e</color>
     <color name="yellow4">#f37021</color>
+    <color name="green1">#afdbd6</color>
+    <color name="green2">#73c9bb</color>
+    <color name="green3">#009788</color>
+    <color name="dark1">#f1f1f1</color>
+    <color name="dark2">#d1d2d3</color>
+    <color name="dark3">#6c6c6c</color>
+    <color name="dark4">#4d4d4d</color>
+    <color name="dark5">#131e1b</color>
 </resources>

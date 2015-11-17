@@ -59,18 +59,38 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     }
 
     protected void gameSuccess() {
-        Intent intent = this.getIntent();
-        this.setResult(RESULT_OK, intent);
-        finish();
+        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
+        String successMessage = getString(R.string.game_success_message);
+        stateBanner.success(successMessage, new GameStateBanner.Command() {
+            @Override
+            public void execute() {
+                Intent intent = GameTwister.this.getIntent();
+                GameTwister.this.setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
     }
     protected void gameFailure(boolean allowRetry) {
+        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         if (allowRetry) {
-            mCaptureButton.ready();
+            String failureMessage = getString(R.string.game_failure_message);
+            stateBanner.failure(failureMessage, new GameStateBanner.Command() {
+                @Override
+                public void execute() {
+                    mCaptureButton.ready();
+                }
+            });
         }
         else {
-            Intent intent = this.getIntent();
-            this.setResult(RESULT_CANCELED, intent);
-            finish();
+            String failureMessage = getString(R.string.game_time_up_message);
+            stateBanner.failure(failureMessage, new GameStateBanner.Command() {
+                @Override
+                public void execute() {
+                    Intent intent = GameTwister.this.getIntent();
+                    GameTwister.this.setResult(RESULT_CANCELED, intent);
+                    finish();
+                }
+            });
         }
     }
 
