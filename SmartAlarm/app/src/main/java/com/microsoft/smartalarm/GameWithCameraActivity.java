@@ -61,6 +61,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
                 mCameraPreview.onCapture(onCaptureCallback);
             }
         });
+        mCaptureButton.readyCamera();
 
         final CountDownTimerView timer = (CountDownTimerView) findViewById(R.id.countdown_timer);
         timer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
@@ -165,12 +166,12 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
         final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         if (allowRetry) {
             mCameraPreview.start();
-            mCaptureButton.ready();
+            mCaptureButton.readyCamera();
             String failureMessage = getString(R.string.game_failure_message);
             stateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
                 public void execute() {
-                    mCaptureButton.ready();
+                    mCaptureButton.readyCamera();
                 }
             });
         }

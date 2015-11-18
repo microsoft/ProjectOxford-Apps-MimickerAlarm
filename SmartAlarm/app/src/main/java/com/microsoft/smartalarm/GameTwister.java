@@ -77,7 +77,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
             stateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
                 public void execute() {
-                    mCaptureButton.ready();
+                    mCaptureButton.readyAudio();
                 }
             });
         }
@@ -110,7 +110,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
         if (mRecognitionMode == SpeechRecognitionMode.ShortPhrase
                 || isFinalDictationMessage) {
             mMicClient.endMicAndRecognition();
-            mCaptureButton.ready();
+            mCaptureButton.readyAudio();
             for (RecognizedPhrase res : response.Results) {
                 Log.d(LOGTAG, String.valueOf(res.Confidence));
                 Log.d(LOGTAG, String.valueOf(res.DisplayText));
@@ -141,7 +141,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     public void onAudioEvent(boolean recording) {
         if (!recording) {
             mMicClient.endMicAndRecognition();
-            mCaptureButton.ready();
+            mCaptureButton.readyAudio();
         }
     }
 
@@ -168,10 +168,11 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
                     mCaptureButton.waiting();
                 } else {
                     mMicClient.endMicAndRecognition();
-                    mCaptureButton.ready();
+                    mCaptureButton.readyAudio();
                 }
             }
         });
+        mCaptureButton.readyAudio();
 
         final CountDownTimerView timer = (CountDownTimerView) findViewById(R.id.countdown_timer);
         timer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
