@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.microsoft.smartalarm.GameStateBanner
+        android:id="@+id/game_state"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_height="80dp"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:visibility="invisible"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.microsoft.smartalarm.CountDownTimerView
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:id="@+id/countdown_timer"/>
+
+        <TextView
+            android:id="@+id/instruction_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textAllCaps="true"
+            android:textStyle="bold"/>
+
+        <FrameLayout
+            android:padding="@dimen/activity_horizontal_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <SurfaceView
+                android:id="@+id/camera_preview_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <RelativeLayout
+                android:id="@+id/camera_preview_overlay"
+                android:orientation="horizontal"
+                android:background="#00ffffff"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.microsoft.smartalarm.ProgressButton
+                    android:id="@+id/capture_button"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="20dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"/>
+            </RelativeLayout>
+        </FrameLayout>
+    </LinearLayout>
+</RelativeLayout>

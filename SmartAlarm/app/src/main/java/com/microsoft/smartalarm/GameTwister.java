@@ -19,22 +19,23 @@ import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionServiceFac
 
 import java.util.Random;
 
-public class SnoozerTwister extends AppCompatActivity implements ISpeechRecognitionServerEvents {
+public class GameTwister extends AppCompatActivity implements ISpeechRecognitionServerEvents {
 
-    private static String LOGTAG = "SnoozerTwister";
+    private static String LOGTAG = "GameTwister";
 
     private MicrophoneRecognitionClient mMicClient = null;
     private SpeechRecognitionMode mRecognitionMode;
     private String mUnderstoodText = null;
     private String mQuestion = null;
+    private ProgressButton mCaptureButton;
 
-    private final static int sTimeoutMilliseconds = 30000;
-    private final static float sSuccessThreshold = 0.5f;
+    private final static int TIMEOUT_MILLISECONDS = 30000;
+    private final static float SUCCESS_THRESHOLD = 0.5f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_snoozer_twister);
+        setContentView(R.layout.activity_twister_game);
 
         generateQuestion();
         initialize();
@@ -57,15 +58,40 @@ public class SnoozerTwister extends AppCompatActivity implements ISpeechRecognit
         instructionTextView.setText(mQuestion);
     }
 
-    protected void snoozeSuccess() {
-        Intent intent = this.getIntent();
-        this.setResult(RESULT_OK, intent);
-        finish();
+    protected void gameSuccess() {
+        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
+        String successMessage = getString(R.string.game_success_message);
+        stateBanner.success(successMessage, new GameStateBanner.Command() {
+            @Override
+            public void execute() {
+                Intent intent = GameTwister.this.getIntent();
+                GameTwister.this.setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
     }
-    protected void snoozeFailure() {
-        Intent intent = this.getIntent();
-        this.setResult(RESULT_CANCELED, intent);
-        finish();
+    protected void gameFailure(boolean allowRetry) {
+        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
+        if (allowRetry) {
+            String failureMessage = getString(R.string.game_failure_message);
+            stateBanner.failure(failureMessage, new GameStateBanner.Command() {
+                @Override
+                public void execute() {
+                    mCaptureButton.readyAudio();
+                }
+            });
+        }
+        else {
+            String failureMessage = getString(R.string.game_time_up_message);
+            stateBanner.failure(failureMessage, new GameStateBanner.Command() {
+                @Override
+                public void execute() {
+                    Intent intent = GameTwister.this.getIntent();
+                    GameTwister.this.setResult(RESULT_CANCELED, intent);
+                    finish();
+                }
+            });
+        }
     }
 
     @Override
@@ -78,14 +104,13 @@ public class SnoozerTwister extends AppCompatActivity implements ISpeechRecognit
 
     @Override
     public void onFinalResponseReceived(RecognitionResult response) {
-        boolean isFinalDicationMessage = mRecognitionMode == SpeechRecognitionMode.LongDictation &&
+        boolean isFinalDictationMessage = mRecognitionMode == SpeechRecognitionMode.LongDictation &&
                 (response.RecognitionStatus == RecognitionStatus.EndOfDictation ||
                         response.RecognitionStatus == RecognitionStatus.DictationEndSilenceTimeout);
         if (mRecognitionMode == SpeechRecognitionMode.ShortPhrase
-                || isFinalDicationMessage) {
+                || isFinalDictationMessage) {
             mMicClient.endMicAndRecognition();
-            final ProgressButton startButton = (ProgressButton) findViewById(R.id.capture_button);
-            startButton.ready();
+            mCaptureButton.readyAudio();
             for (RecognizedPhrase res : response.Results) {
                 Log.d(LOGTAG, String.valueOf(res.Confidence));
                 Log.d(LOGTAG, String.valueOf(res.DisplayText));
@@ -116,39 +141,44 @@ public class SnoozerTwister extends AppCompatActivity implements ISpeechRecognit
     public void onAudioEvent(boolean recording) {
         if (!recording) {
             mMicClient.endMicAndRecognition();
-            ProgressButton startButton = (ProgressButton) findViewById(R.id.capture_button);
-            startButton.ready();
+            mCaptureButton.readyAudio();
         }
     }
 
     private void initialize() {
         mRecognitionMode = SpeechRecognitionMode.ShortPhrase;
 
-        String language = "en-us";
-        String subscriptionKey = getResources().getString(R.string.speech_service_key);
-        if (mMicClient == null) {
-            mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mRecognitionMode, language, this, subscriptionKey);
+        try {
+            String language = "en-us";
+            String subscriptionKey = getResources().getString(R.string.speech_service_key);
+            if (mMicClient == null) {
+                mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mRecognitionMode, language, this, subscriptionKey);
+            }
+        }
+        catch(Exception e){
+            Log.e(LOGTAG, "Speech client failed to initialize " + e);
         }
 
-        final ProgressButton startButton = (ProgressButton) findViewById(R.id.capture_button);
-        startButton.setOnClickListener(new View.OnClickListener() {
+        mCaptureButton = (ProgressButton) findViewById(R.id.capture_button);
+        mCaptureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                if (startButton.isReady()) {
+                if (mCaptureButton.isReady()) {
                     mMicClient.startMicAndRecognition();
-                    startButton.waiting();
+                    mCaptureButton.waiting();
                 } else {
                     mMicClient.endMicAndRecognition();
-                    startButton.ready();
+                    mCaptureButton.readyAudio();
                 }
             }
         });
+        mCaptureButton.readyAudio();
 
         final CountDownTimerView timer = (CountDownTimerView) findViewById(R.id.countdown_timer);
-        timer.init(sTimeoutMilliseconds, new CountDownTimerView.Command() {
+        timer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
             @Override
             public void execute() {
-                snoozeFailure();
+                gameFailure(false);
             }
         });
     }
@@ -207,15 +237,15 @@ public class SnoozerTwister extends AppCompatActivity implements ISpeechRecognit
 
     private void verify() {
         if (mUnderstoodText == null) {
-            snoozeFailure();
+            gameFailure(true);
         }
 
         int distance = levenshteinDistance(mUnderstoodText, mQuestion);
-        if ((float) distance / (float)mQuestion.length() <= sSuccessThreshold) {
-            snoozeSuccess();
+        if ((float) distance / (float)mQuestion.length() <= SUCCESS_THRESHOLD) {
+            gameSuccess();
         }
         else {
-            snoozeFailure();
+            gameFailure(true);
         }
     }
 }

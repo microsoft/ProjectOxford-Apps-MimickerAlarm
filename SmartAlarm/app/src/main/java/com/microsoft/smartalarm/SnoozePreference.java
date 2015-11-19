@@ -24,7 +24,7 @@ public class SnoozePreference extends ListPreference {
         mSnoozeEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Snackbar.make(buttonView, "Snooze functionality not implemented", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(buttonView, "Snooze functionality coming soon!", Snackbar.LENGTH_SHORT).show();
             }
         });
     }

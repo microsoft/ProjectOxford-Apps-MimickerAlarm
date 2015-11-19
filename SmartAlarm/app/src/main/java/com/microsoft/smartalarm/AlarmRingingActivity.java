@@ -18,6 +18,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import net.hockeyapp.android.CrashManager;
+
 public class AlarmRingingActivity extends Activity {
 
     public final String TAG = this.getClass().getSimpleName();
@@ -29,9 +31,6 @@ public class AlarmRingingActivity extends Activity {
 
     private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
     private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
-
-    private static final int SNOOZER_REQUEST_CODE = 1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +56,7 @@ public class AlarmRingingActivity extends Activity {
             @Override
             public void onClick(View view) {
                 mPlayer.stop();
-
-                Intent intent = new Intent(AlarmRingingActivity.this, SnoozerTwister.class);
-                startActivityForResult(intent, SNOOZER_REQUEST_CODE);
+                GameFactory.startRandom(AlarmRingingActivity.this);
             }
         });
 
@@ -79,27 +76,18 @@ public class AlarmRingingActivity extends Activity {
             e.printStackTrace();
         }
 
-        Runnable cancelAlarm = new Runnable() {
+        Runnable alarmCancelTask = new Runnable() {
             @Override
             public void run() {
-                if (mPlayer.isPlaying()) {
+                if (mPlayer.isPlaying())
+                {
                     mPlayer.stop();
-                    finish();
                 }
+                finish();
             }
         };
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String durationPreference = preferences.getString("KEY_RING_DURATION", DEFAULT_RINGING_DURATION_STRING);
-
-        int alarmRingingDuration = DEFAULT_RINGING_DURATION_INTEGER;
-        try {
-            alarmRingingDuration = Integer.parseInt(durationPreference);
-        } catch (NumberFormatException e){
-            e.printStackTrace();
-        }
-
-        new Handler().postDelayed(cancelAlarm, alarmRingingDuration);
+        new Handler().postDelayed(alarmCancelTask, getAlarmRingingDuration());
 
         Runnable releaseWakelock = new Runnable() {
 
@@ -137,6 +125,8 @@ public class AlarmRingingActivity extends Activity {
             mWakeLock.acquire();
         }
 
+        final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
+        CrashManager.register(this, hockeyAppId);
     }
 
     @Override
@@ -150,13 +140,32 @@ public class AlarmRingingActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SNOOZER_REQUEST_CODE) {
+        if (requestCode == GameFactory.START_GAME_REQUEST) {
             if (resultCode == RESULT_OK) {
                 finish();
-            }
-            else{
-                mPlayer.start();
+            } else {
+                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        mp.start();
+                    }
+                });
+                mPlayer.prepareAsync();
             }
         }
+    }
+
+    private int getAlarmRingingDuration() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String durationPreference = preferences.getString("KEY_RING_DURATION", DEFAULT_RINGING_DURATION_STRING);
+
+        int alarmRingingDuration = DEFAULT_RINGING_DURATION_INTEGER;
+        try {
+            alarmRingingDuration = Integer.parseInt(durationPreference);
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+        }
+
+        return alarmRingingDuration;
     }
 }
