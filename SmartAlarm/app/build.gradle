@@ -49,6 +49,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.dogfood
         }
+        debug{
+            applicationIdSuffix '.dev'
+        }
     }
 }
 
