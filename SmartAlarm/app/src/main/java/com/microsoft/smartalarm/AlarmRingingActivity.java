@@ -3,6 +3,7 @@ package com.microsoft.smartalarm;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -25,8 +26,12 @@ public class AlarmRingingActivity extends Activity {
     private MediaPlayer mPlayer;
 
     private static final int WAKELOCK_TIMEOUT = 60 * 1000;
+
     private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
     private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
+
+    private static final int SNOOZER_REQUEST_CODE = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +57,9 @@ public class AlarmRingingActivity extends Activity {
             @Override
             public void onClick(View view) {
                 mPlayer.stop();
-                finish();
+
+                Intent intent = new Intent(AlarmRingingActivity.this, SnoozerTwister.class);
+                startActivityForResult(intent, SNOOZER_REQUEST_CODE);
             }
         });
 
@@ -138,6 +145,18 @@ public class AlarmRingingActivity extends Activity {
 
         if (mWakeLock != null && mWakeLock.isHeld()) {
             mWakeLock.release();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SNOOZER_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
+            else{
+                mPlayer.start();
+            }
         }
     }
 }

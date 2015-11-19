@@ -17,7 +17,7 @@ public class AlarmList {
     private Context mContext;
     private SQLiteDatabase mDatabase;
 
-    public static AlarmList get(Context context){
+    public static AlarmList get(Context context) {
         if (sAlarmList == null) {
             sAlarmList = new AlarmList(context);
         }
