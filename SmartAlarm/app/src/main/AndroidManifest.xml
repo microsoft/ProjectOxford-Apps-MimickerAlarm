@@ -14,7 +14,7 @@
         <activity
             android:name=".AlarmPagerActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".AlarmListActivity">
+            android:parentActivityName=".AlarmListActivity" >
         </activity>
         <activity
             android:name=".AlarmListActivity"
@@ -26,17 +26,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".AlarmRingingActivity" />
 
-        <activity android:name=".AlarmRingingActivity"/>
-
-        <service android:name=".AlarmService"
-            android:enabled="true"/>
+        <service
+            android:name=".AlarmService"
+            android:enabled="true" />
 
         <receiver android:name=".AlarmManagerHelper" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".AlarmGlobalSettingsActivity"
+            android:label="@string/title_activity_alarm_settings"
+            android:parentActivityName=".AlarmListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.microsoft.smartalarm.AlarmListActivity" />
+        </activity>
     </application>
 
 </manifest>

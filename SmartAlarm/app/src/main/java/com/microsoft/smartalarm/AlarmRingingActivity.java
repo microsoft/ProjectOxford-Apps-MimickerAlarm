@@ -2,6 +2,7 @@ package com.microsoft.smartalarm;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.support.v7.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
@@ -23,6 +25,8 @@ public class AlarmRingingActivity extends Activity {
     private MediaPlayer mPlayer;
 
     private static final int WAKELOCK_TIMEOUT = 60 * 1000;
+    private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
+    private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +71,28 @@ public class AlarmRingingActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        Runnable cancelAlarm = new Runnable() {
+            @Override
+            public void run() {
+                if (mPlayer.isPlaying()) {
+                    mPlayer.stop();
+                    finish();
+                }
+            }
+        };
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String durationPreference = preferences.getString("KEY_RING_DURATION", DEFAULT_RINGING_DURATION_STRING);
+
+        int alarmRingingDuration = DEFAULT_RINGING_DURATION_INTEGER;
+        try {
+            alarmRingingDuration = Integer.parseInt(durationPreference);
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+        }
+
+        new Handler().postDelayed(cancelAlarm, alarmRingingDuration);
 
         Runnable releaseWakelock = new Runnable() {
 

@@ -11,4 +11,12 @@
     <string name="alarm_title_hint">Enter a title for the alarm</string>
     <string name="alarm_title_label">Alarm name</string>
     <string name="alarm_tone_label">Alarm ringtone</string>
+    <string name="title_activity_alarm_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+    <!-- Global settings -->
+    <string name="pref_title_ring_duration">Alarm duration</string>
+    <string name="pref_title_snooze_duration">Snooze</string>
+
+
 </resources>

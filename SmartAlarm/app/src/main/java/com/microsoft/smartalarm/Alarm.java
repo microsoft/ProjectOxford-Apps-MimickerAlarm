@@ -2,7 +2,6 @@ package com.microsoft.smartalarm;
 
 import android.net.Uri;
 
-import java.util.Date;
 import java.util.UUID;
 
 public class Alarm {
@@ -26,6 +25,7 @@ public class Alarm {
         mRepeatWeekly = true;
         mRepeatingDays = new boolean[]{ true, true, true, true, true, true, true };
         mAlarmTone = Uri.parse("content://settings/system/ringtone");
+        mIsEnabled = true;
     }
 
     public String getTitle() {

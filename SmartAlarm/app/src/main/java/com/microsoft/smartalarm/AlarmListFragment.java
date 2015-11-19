@@ -1,6 +1,6 @@
 package com.microsoft.smartalarm;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -44,9 +44,9 @@ public class AlarmListFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        mCallbacks = (Callbacks) activity;
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callbacks) context;
     }
 
     @Override
@@ -162,13 +162,13 @@ public class AlarmListFragment extends Fragment {
             mAlarmEnabled = (SwitchCompat) itemView.findViewById(R.id.list_item_alarm_enabled_switch);
 
             mAlarmEnabled.setOnClickListener(new View.OnClickListener() {
-                 @Override
-                 public void onClick(View v) {
-                     AlarmManagerHelper.cancelAlarms(getContext());
-                     mAlarm.setIsEnabled(mAlarmEnabled.isChecked());
-                     AlarmList.get(getActivity()).updateAlarm(mAlarm);
-                     AlarmManagerHelper.setAlarms(getContext());
-                 }
+                @Override
+                public void onClick(View v) {
+                    AlarmManagerHelper.cancelAlarms(getContext());
+                    mAlarm.setIsEnabled(mAlarmEnabled.isChecked());
+                    AlarmList.get(getActivity()).updateAlarm(mAlarm);
+                    AlarmManagerHelper.setAlarms(getContext());
+                }
             });
         }
 
