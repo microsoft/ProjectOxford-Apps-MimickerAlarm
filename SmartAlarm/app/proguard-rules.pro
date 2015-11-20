@@ -15,9 +15,3 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
-
-# TODO Must be removed before release and we need to move back to using 23.1.1 libs
-# TODO as there are so many fixes in PrefernceFragmentCompat
-# TODO Project Oxford VSO task - 6751
--keep public class android.support.v7.preference.Preference { *; }
--keep public class * extends android.support.v7.preference.Preference { *; }
