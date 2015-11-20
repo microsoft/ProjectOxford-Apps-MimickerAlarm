@@ -24,6 +24,7 @@ public class SnoozePreference extends ListPreference {
         mSnoozeEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // TODO - Oxford Apps VSO Task: 5264 Enable snooze functionality on ringing screen
                 Snackbar.make(buttonView, "Snooze functionality coming soon!", Snackbar.LENGTH_SHORT).show();
             }
         });
