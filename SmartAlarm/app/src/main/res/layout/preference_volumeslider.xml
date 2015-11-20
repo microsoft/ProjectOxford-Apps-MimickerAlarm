@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/volume_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Volume"
+        android:textSize="16dp"
+        android:paddingLeft="16dp"
+        android:layout_marginTop="25dp"
+        android:fontFamily="sans-serif"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textStyle="normal"
+        />
+
+    <SeekBar
+        android:id="@+id/volume_level"
+        android:layout_below="@id/volume_label"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingLeft="16dp"/>
+</RelativeLayout>
