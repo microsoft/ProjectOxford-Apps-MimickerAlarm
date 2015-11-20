@@ -2,6 +2,7 @@ package com.microsoft.smartalarm;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.support.v7.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
@@ -26,6 +28,9 @@ public class AlarmRingingActivity extends Activity {
     private MediaPlayer mPlayer;
 
     private static final int WAKELOCK_TIMEOUT = 60 * 1000;
+
+    private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
+    private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +56,6 @@ public class AlarmRingingActivity extends Activity {
             @Override
             public void onClick(View view) {
                 mPlayer.stop();
-
                 GameFactory.startRandom(AlarmRingingActivity.this);
             }
         });
@@ -71,6 +75,19 @@ public class AlarmRingingActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        Runnable alarmCancelTask = new Runnable() {
+            @Override
+            public void run() {
+                if (mPlayer.isPlaying())
+                {
+                    mPlayer.stop();
+                }
+                finish();
+            }
+        };
+
+        new Handler().postDelayed(alarmCancelTask, getAlarmRingingDuration());
 
         Runnable releaseWakelock = new Runnable() {
 
@@ -126,10 +143,29 @@ public class AlarmRingingActivity extends Activity {
         if (requestCode == GameFactory.START_GAME_REQUEST) {
             if (resultCode == RESULT_OK) {
                 finish();
-            }
-            else{
-                mPlayer.start();
+            } else {
+                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        mp.start();
+                    }
+                });
+                mPlayer.prepareAsync();
             }
         }
+    }
+
+    private int getAlarmRingingDuration() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String durationPreference = preferences.getString("KEY_RING_DURATION", DEFAULT_RINGING_DURATION_STRING);
+
+        int alarmRingingDuration = DEFAULT_RINGING_DURATION_INTEGER;
+        try {
+            alarmRingingDuration = Integer.parseInt(durationPreference);
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+        }
+
+        return alarmRingingDuration;
     }
 }

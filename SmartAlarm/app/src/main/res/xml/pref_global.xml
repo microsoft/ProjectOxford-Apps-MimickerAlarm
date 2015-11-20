@@ -1,0 +1,19 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.microsoft.smartalarm.VolumeSliderPreference/>
+
+    <ListPreference
+        android:key="KEY_RING_DURATION"
+        android:title="@string/pref_title_ring_duration"
+        android:entries="@array/pref_ring_duration_labels"
+        android:entryValues="@array/pref_ring_duration_values"
+        android:defaultValue="1800000"/>
+
+    <com.microsoft.smartalarm.SnoozePreference
+        android:key="KEY_SNOOZE_DURATION"
+        android:title="@string/pref_title_snooze_duration"
+        android:entries="@array/pref_snooze_duration_labels"
+        android:entryValues="@array/pref_snooze_duration_values"
+        android:defaultValue="60000"/>
+
+</PreferenceScreen>
