@@ -2,17 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+
     <TextView
         android:id="@+id/volume_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Volume"
-        android:textSize="16dp"
-        android:paddingLeft="16dp"
+        android:text="@string/pref_title_volume"
+        android:textAppearance="?android:attr/textAppearanceListItem"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
         android:layout_marginTop="25dp"
-        android:fontFamily="sans-serif"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textStyle="normal"
         />
 
     <SeekBar
@@ -20,5 +18,6 @@
         android:layout_below="@id/volume_label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:paddingLeft="16dp"/>
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"/>
+
 </RelativeLayout>
