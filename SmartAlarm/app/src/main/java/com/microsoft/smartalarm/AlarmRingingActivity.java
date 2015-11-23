@@ -56,6 +56,7 @@ public class AlarmRingingActivity extends Activity {
             @Override
             public void onClick(View view) {
                 mPlayer.stop();
+                Logger.trackUserAction(Logger.UserAction.ALARM_DISMISS, null, null);
                 GameFactory.startRandom(AlarmRingingActivity.this);
             }
         });
@@ -74,6 +75,7 @@ public class AlarmRingingActivity extends Activity {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Logger.trackException(e);
         }
 
         Runnable alarmCancelTask = new Runnable() {
@@ -105,6 +107,8 @@ public class AlarmRingingActivity extends Activity {
         };
 
         new Handler().postDelayed(releaseWakelock, WAKELOCK_TIMEOUT);
+
+        Logger.init(this);
     }
 
     @Override

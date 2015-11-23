@@ -17,6 +17,8 @@ import com.microsoft.projectoxford.speechrecognition.RecognizedPhrase;
 import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionServiceFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class GameTwister extends AppCompatActivity implements ISpeechRecognitionServerEvents {
@@ -28,6 +30,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     private String mUnderstoodText = null;
     private String mQuestion = null;
     private ProgressButton mCaptureButton;
+    private CountDownTimerView mTimer;
 
     private final static int TIMEOUT_MILLISECONDS = 30000;
     private final static float SUCCESS_THRESHOLD = 0.5f;
@@ -45,8 +48,9 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     protected void onResume() {
         super.onResume();
 
-        final CountDownTimerView timer = (CountDownTimerView) findViewById(R.id.countdown_timer);
-        timer.start();
+        mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
+        mTimer.start();
+        Logger.trackUserAction(Logger.UserAction.GAME_TWISTER, null, null);
     }
 
     private void generateQuestion() {
@@ -59,6 +63,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     }
 
     protected void gameSuccess() {
+        mTimer.stop();
         final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         String successMessage = getString(R.string.game_success_message);
         stateBanner.success(successMessage, new GameStateBanner.Command() {
@@ -82,6 +87,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
             });
         }
         else {
+            Logger.trackUserAction(Logger.UserAction.GAME_TWISTER_TIMEOUT, null, null);
             String failureMessage = getString(R.string.game_time_up_message);
             stateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
@@ -157,6 +163,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
         }
         catch(Exception e){
             Log.e(LOGTAG, "Speech client failed to initialize " + e);
+            Logger.trackException(e);
         }
 
         mCaptureButton = (ProgressButton) findViewById(R.id.capture_button);
@@ -174,13 +181,15 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
         });
         mCaptureButton.readyAudio();
 
-        final CountDownTimerView timer = (CountDownTimerView) findViewById(R.id.countdown_timer);
-        timer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
+        mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
+        mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
             @Override
             public void execute() {
                 gameFailure(false);
             }
         });
+
+        Logger.init(this);
     }
 
 
@@ -238,13 +247,21 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     private void verify() {
         if (mUnderstoodText == null) {
             gameFailure(true);
+            return;
         }
 
-        int distance = levenshteinDistance(mUnderstoodText, mQuestion);
-        if ((float) distance / (float)mQuestion.length() <= SUCCESS_THRESHOLD) {
+        double distance = (double)levenshteinDistance(mUnderstoodText, mQuestion) / (double)mQuestion.length();
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("match-twister", mQuestion);
+        Map<String, Double> metrics = new HashMap<>();
+        metrics.put("percent-different", distance * 100);
+        if (distance <= SUCCESS_THRESHOLD) {
+            Logger.trackUserAction(Logger.UserAction.GAME_TWISTER_SUCCESS, properties, metrics);
             gameSuccess();
         }
         else {
+            Logger.trackUserAction(Logger.UserAction.GAME_TWISTER_FAIL, properties, metrics);
             gameFailure(true);
         }
     }

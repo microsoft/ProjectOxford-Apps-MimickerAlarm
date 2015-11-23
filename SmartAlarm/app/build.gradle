@@ -34,8 +34,8 @@ android {
         release.setRoot('build-types/release')
     }
 
-    signingConfigs{
-        dogfood{
+    signingConfigs {
+        dogfood {
             storeFile file("dogfoodkeystore.jks")
             storePassword 'dogfoodpassword'
             keyAlias 'dogfood'
@@ -49,8 +49,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.dogfood
         }
-        debug{
+        debug {
             applicationIdSuffix '.dev'
+        }
+        all {
+            manifestPlaceholders = [APPINSIGHTS_INSTRUMENTATION_KEY: appinsights_instrumentation_key]
         }
     }
 }
@@ -67,5 +70,6 @@ dependencies {
     compile 'com.microsoft.projectoxford:speechrecognition:0.5.0'
     compile 'com.microsoft.projectoxford:vision:0.5.0'
     compile 'net.hockeyapp.android:HockeySDK:3.7.0-beta.1'
+    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.8'
     compile files('libs/gson-2.3.1.jar')
 }

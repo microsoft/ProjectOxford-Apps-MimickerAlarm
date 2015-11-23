@@ -117,6 +117,10 @@ public class CountDownTimerView extends View {
         mTimer.start();
     }
 
+    public void stop(){
+        mTimer.cancel();
+    }
+
     public void init(int time, Command doOnTimeout) {
         mTotalTime = time;
         mCommand = doOnTimeout;

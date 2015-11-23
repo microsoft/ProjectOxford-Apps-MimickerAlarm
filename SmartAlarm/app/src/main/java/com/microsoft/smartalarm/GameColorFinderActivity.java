@@ -13,6 +13,8 @@ import com.microsoft.projectoxford.vision.contract.AnalyzeResult;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class GameColorFinderActivity extends GameWithCameraActivity {
@@ -42,6 +44,14 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
         int colorNameId = resources.getIdentifier("_" + colorCode, "string", getPackageName());
         mQuestionColorName = resources.getString(colorNameId);
         instruction.setText(String.format(resources.getString(R.string.game_vision_prompt), mQuestionColorName));
+
+        Logger.init(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Logger.trackUserAction(Logger.UserAction.GAME_COLOR, null, null);
     }
 
     @Override
@@ -60,29 +70,49 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
             for (String color : result.color.dominantColors) {
                 Log.d(LOGTAG, "\t dominant colour : " + color);
             }
-            Log.d(LOGTAG, "diff : " + String.valueOf(colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor))));
+            double colorDistance = colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor));
+            Log.d(LOGTAG, "diff : " + String.valueOf(colorDistance));
 
+            bitmap.recycle();
+
+            Map<String, String> properties = new HashMap<>();
+            properties.put("match-color", mQuestionColorName);
+            Map<String, Double> metrics = new HashMap<>();
+            metrics.put("color-distance", colorDistance);
             //TODO: this will not work for languages other than English.
-            if (colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor)) < COLOR_DIFF_ACCEPTANCE ||
+            if (colorDistance < COLOR_DIFF_ACCEPTANCE ||
                     result.color.dominantColorForeground.toLowerCase().equals(mQuestionColorName) ||
                     result.color.dominantColorBackground.toLowerCase().equals(mQuestionColorName))
             {
+                Logger.trackUserAction(Logger.UserAction.GAME_COLOR_SUCCESS, properties, metrics);
                 return true;
             }
 
             for (String color : result.color.dominantColors) {
                 if (color.toLowerCase().equals(mQuestionColorName)) {
+                    Logger.trackUserAction(Logger.UserAction.GAME_COLOR_SUCCESS, properties, metrics);
                     return true;
                 }
             }
 
-            bitmap.recycle();
+            Logger.trackUserAction(Logger.UserAction.GAME_COLOR_FAIL, properties, metrics);
         }
         catch(Exception ex) {
             Log.e(LOGTAG, "Error calling ProjectOxford", ex);
+            Logger.trackException(ex);
         }
 
         return false;
+    }
+
+    @Override
+    protected void gameFailure(boolean allowRetry) {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("match-color", mQuestionColorName);
+        if (!allowRetry){
+            Logger.trackUserAction(Logger.UserAction.GAME_COLOR_TIMEOUT, properties, null);
+        }
+        super.gameFailure(allowRetry);
     }
 
     private int rgbToInt(String c) {

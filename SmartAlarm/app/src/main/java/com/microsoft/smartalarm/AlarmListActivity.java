@@ -36,6 +36,7 @@ public class AlarmListActivity extends SingleFragmentActivity
         final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
         UpdateManager.register(this, hockeyAppId);
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
+        Logger.init(this);
     }
 
     @Override

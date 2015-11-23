@@ -22,6 +22,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
 
     private CameraPreview   mCameraPreview;
     private ProgressButton  mCaptureButton;
+    private CountDownTimerView      mTimer;
 
     private Point mSize;
 
@@ -63,8 +64,8 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
         });
         mCaptureButton.readyCamera();
 
-        final CountDownTimerView timer = (CountDownTimerView) findViewById(R.id.countdown_timer);
-        timer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
+        mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
+        mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
             @Override
             public void execute() {
                 gameFailure(false);
@@ -93,8 +94,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
             Log.e(LOGTAG, "err onResume", ex);
         }
 
-        final CountDownTimerView timer = (CountDownTimerView) findViewById(R.id.countdown_timer);
-        timer.start();
+        mTimer.start();
     }
 
     @Override
@@ -143,14 +143,17 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
             mCaptureButton.stop();
             if (success) {
                 gameSuccess();
+                return;
             }
             else{
                 gameFailure(true);
+                return;
             }
         }
     }
 
     protected void gameSuccess() {
+        mTimer.stop();
         final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         String successMessage = getString(R.string.game_success_message);
         stateBanner.success(successMessage, new GameStateBanner.Command() {
