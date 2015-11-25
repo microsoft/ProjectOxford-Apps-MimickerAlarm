@@ -49,7 +49,7 @@ public class GameEmotionActivity extends GameWithCameraActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Logger.trackUserAction(Logger.UserAction.GAME_COLOR, null, null);
+        Logger.trackUserAction(Logger.UserAction.GAME_EMOTION, null, null);
     }
 
     @Override
