@@ -27,9 +27,14 @@ public class Logger {
     }
 
     private static Boolean sStarted = false;
+    private static Boolean sLogInDebug = false; // Use this to log even if in debug mode
+
+    private static Boolean isLogging(){
+        return !BuildConfig.DEBUG || sLogInDebug;
+    }
 
     public static void init(Activity caller){
-        if (!sStarted) {
+        if (!sStarted && isLogging()) {
             ApplicationInsights.setup(caller.getApplicationContext(), caller.getApplication());
             String android_id = Secure.getString(caller.getContentResolver(), Secure.ANDROID_ID);
             ApplicationInsights.disableAutoCollection();
@@ -42,17 +47,23 @@ public class Logger {
     }
 
     public static void trackException(Exception ex){
-        TelemetryClient.getInstance().trackHandledException(ex);
+        if (isLogging()) {
+            TelemetryClient.getInstance().trackHandledException(ex);
+        }
     }
 
     public static void trackUserAction(String action, @Nullable Map<String, String> properties, @Nullable Map<String, Double> metrics){
-        TelemetryClient.getInstance().trackEvent(action, properties, metrics);
+        if (isLogging()) {
+            TelemetryClient.getInstance().trackEvent(action, properties, metrics);
+        }
     }
 
     public static void trackError(String errorMessage){
-        Map<String, String> properties = new HashMap<String, String>();
-        properties.put("Severity", SeverityLevel.ERROR.toString());
-        properties.put("Message", errorMessage);
-        TelemetryClient.getInstance().trackTrace("Error", properties);
+        if (isLogging()) {
+            Map<String, String> properties = new HashMap<String, String>();
+            properties.put("Severity", SeverityLevel.ERROR.toString());
+            properties.put("Message", errorMessage);
+            TelemetryClient.getInstance().trackTrace("Error", properties);
+        }
     }
 }

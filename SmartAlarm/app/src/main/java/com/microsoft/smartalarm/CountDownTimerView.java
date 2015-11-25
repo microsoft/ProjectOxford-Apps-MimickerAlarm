@@ -20,6 +20,7 @@ public class CountDownTimerView extends View {
     private CountDownTimer mTimer = null;
     private int mWidth, mHeight;
     private long mMillisUntilFinished;
+    private Boolean mIsPaused = false;
 
     private Paint m25PercentPaint, m50PercentPaint, m75PercentPaint, m100PercentPaint;
     private RectF m25PercentRect, m50PercentRect, m75PercentRect, m100PercentRect;
@@ -98,27 +99,43 @@ public class CountDownTimerView extends View {
 
     public void start() {
         if (mTimer == null) {
-            mTimer = new CountDownTimer(mTotalTime, sInterval) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    mMillisUntilFinished = millisUntilFinished;
-                    invalidate();
-                }
-                @Override
-                public void onFinish() {
-                    if (mCommand != null) {
-                        mMillisUntilFinished = 0;
-                        invalidate();
-                        mCommand.execute();
-                    }
-                }
-            };
+            createNewTimer(mTotalTime);
         }
         mTimer.start();
     }
 
-    public void stop(){
+    public void stop() {
         mTimer.cancel();
+    }
+
+    public void pause() {
+        stop();
+        mIsPaused = true;
+    }
+
+    public void resume() {
+        if (mIsPaused) {
+            createNewTimer(mMillisUntilFinished);
+            mTimer.start();
+        }
+    }
+
+    private void createNewTimer(long millisUntilFinished) {
+        mTimer = new CountDownTimer(millisUntilFinished, sInterval) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                mMillisUntilFinished = millisUntilFinished;
+                invalidate();
+            }
+            @Override
+            public void onFinish() {
+                if (mCommand != null) {
+                    mMillisUntilFinished = 0;
+                    invalidate();
+                    mCommand.execute();
+                }
+            }
+        };
     }
 
     public void init(int time, Command doOnTimeout) {

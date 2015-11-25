@@ -58,6 +58,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mTimer.pause();
                 mCaptureButton.loading();
                 mCameraPreview.onCapture(onCaptureCallback);
             }
@@ -174,7 +175,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
             stateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
                 public void execute() {
-                    mCaptureButton.readyCamera();
+                    mTimer.resume();
                 }
             });
         }
