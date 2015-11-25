@@ -56,23 +56,10 @@ android {
             manifestPlaceholders = [APPINSIGHTS_INSTRUMENTATION_KEY: appinsights_instrumentation_key]
         }
     }
-    packagingOptions {
-        pickFirst 'META-INF/maven/commons-io/commons-io/pom.xml'
-        pickFirst 'META-INF/maven/commons-io/commons-io/pom.properties'
-        pickFirst 'META-INF/LICENSE.txt'
-        pickFirst 'META-INF/NOTICE.txt'
-    }
-}
-
-repositories{
-    flatDir{
-        dirs 'libs'
-    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile(name:'emotion', ext:'aar')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
@@ -82,6 +69,7 @@ dependencies {
     compile 'com.android.support:preference-v14:23.1.1'
     compile 'com.microsoft.projectoxford:speechrecognition:0.5.0'
     compile 'com.microsoft.projectoxford:vision:0.5.0'
+    compile 'com.microsoft.projectoxford:emotion:0.4.0'
     compile 'net.hockeyapp.android:HockeySDK:3.7.0-beta.1'
     compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.8'
     compile files('libs/gson-2.3.1.jar')

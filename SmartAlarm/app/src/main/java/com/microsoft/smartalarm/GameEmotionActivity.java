@@ -43,13 +43,13 @@ public class GameEmotionActivity extends GameWithCameraActivity {
         TextView instruction = (TextView) findViewById(R.id.instruction_text);
         instruction.setText(String.format(resources.getString(R.string.game_emotion_prompt), adjectives[randomNumber]));
 
-        //Logger.init(this);
+        Logger.init(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        //Logger.trackUserAction(Logger.UserAction.GAME_COLOR, null, null);
+        Logger.trackUserAction(Logger.UserAction.GAME_COLOR, null, null);
     }
 
     @Override
@@ -97,17 +97,17 @@ public class GameEmotionActivity extends GameWithCameraActivity {
 
             if (success)
             {
-                //Logger.trackUserAction(Logger.UserAction.GAME_EMOTION_SUCCESS, properties, null);
+                Logger.trackUserAction(Logger.UserAction.GAME_EMOTION_SUCCESS, properties, null);
                 return true;
             }
             else {
-                //Logger.trackUserAction(Logger.UserAction.GAME_EMOTION_FAIL, properties, null);
+                Logger.trackUserAction(Logger.UserAction.GAME_EMOTION_FAIL, properties, null);
                 return false;
             }
         }
         catch(Exception ex) {
             Log.e(LOGTAG, "Error calling ProjectOxford", ex);
-            //Logger.trackException(ex);
+            Logger.trackException(ex);
         }
 
         return false;
@@ -118,7 +118,7 @@ public class GameEmotionActivity extends GameWithCameraActivity {
         Map<String, String> properties = new HashMap<>();
         properties.put("match-emotion", mEmotion);
         if (!allowRetry){
-            //Logger.trackUserAction(Logger.UserAction.GAME_EMOTION_TIMEOUT, properties, null);
+            Logger.trackUserAction(Logger.UserAction.GAME_EMOTION_TIMEOUT, properties, null);
         }
         super.gameFailure(allowRetry);
     }
