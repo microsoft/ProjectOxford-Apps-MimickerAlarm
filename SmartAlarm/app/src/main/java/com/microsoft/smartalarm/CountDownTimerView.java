@@ -114,9 +114,13 @@ public class CountDownTimerView extends View {
     }
 
     public void resume() {
-        if (mIsPaused) {
+        if (mIsPaused && mMillisUntilFinished > 0) {
+            if (mTimer != null){
+                mTimer.cancel();
+            }
             createNewTimer(mMillisUntilFinished);
             mTimer.start();
+            mIsPaused = false;
         }
     }
 

@@ -253,9 +253,9 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
         double distance = (double)levenshteinDistance(mUnderstoodText, mQuestion) / (double)mQuestion.length();
 
         Map<String, String> properties = new HashMap<>();
-        properties.put("match-twister", mQuestion);
+        properties.put("twister-text", mQuestion);
         Map<String, Double> metrics = new HashMap<>();
-        metrics.put("percent-different", distance * 100);
+        metrics.put("twister-percent-different", distance * 100);
         if (distance <= SUCCESS_THRESHOLD) {
             Logger.trackUserAction(Logger.UserAction.GAME_TWISTER_SUCCESS, properties, metrics);
             gameSuccess();

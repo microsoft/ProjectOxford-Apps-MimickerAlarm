@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 public class GameColorFinderActivity extends GameWithCameraActivity {
     private VisionServiceRestClient mVisionServiceRestClient;
@@ -61,7 +62,9 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
             ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
             String[] features = {"Color"};
+            UUID loggerIdentifier = Logger.trackDurationStart();
             AnalyzeResult result = mVisionServiceRestClient.analyzeImage(inputStream, features);
+            Logger.trackDurationEnd(loggerIdentifier, Logger.Duration.OXFORD_VISION_ANALYZE, null);
 
             // Service returns a color string in English
             Log.d(LOGTAG, "Dominant fg colour : " + result.color.dominantColorForeground);
@@ -76,7 +79,7 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
             bitmap.recycle();
 
             Map<String, String> properties = new HashMap<>();
-            properties.put("match-color", mQuestionColorName);
+            properties.put("color-match", mQuestionColorName);
             Map<String, Double> metrics = new HashMap<>();
             metrics.put("color-distance", colorDistance);
             //TODO: this will not work for languages other than English.
@@ -108,7 +111,7 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
     @Override
     protected void gameFailure(boolean allowRetry) {
         Map<String, String> properties = new HashMap<>();
-        properties.put("match-color", mQuestionColorName);
+        properties.put("color-match", mQuestionColorName);
         if (!allowRetry){
             Logger.trackUserAction(Logger.UserAction.GAME_COLOR_TIMEOUT, properties, null);
         }
