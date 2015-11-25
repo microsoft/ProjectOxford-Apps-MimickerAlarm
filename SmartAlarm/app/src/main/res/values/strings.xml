@@ -15,6 +15,7 @@
 
     <string name="game_twister_prompt">Say the following tongue twister</string>
     <string name="game_vision_prompt">Find something %s</string>
+    <string name="game_emotion_prompt">Make a %s face</string>
     <string name="action_feedback">Feedback</string>
     <string name="game_time_up_message">Time\'s Up!</string>
     <string name="game_failure_message">That does not look quite right</string>

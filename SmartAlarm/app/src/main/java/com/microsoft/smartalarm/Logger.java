@@ -17,14 +17,21 @@ public class Logger {
     public interface UserAction{
         String ALARM_SNOOZE = "Alarm Snoozed";
         String ALARM_DISMISS = "Alarm Dismissed";
+
         String GAME_COLOR = "Play: Game Color Finder";
         String GAME_COLOR_FAIL = "Fail: Game Color Finder";
         String GAME_COLOR_TIMEOUT = "Timeout: Game Color Finder";
         String GAME_COLOR_SUCCESS = "Success: Game Color Finder";
+
         String GAME_TWISTER = "Play: Game Tongue Twister";
         String GAME_TWISTER_FAIL = "Fail: Game Tongue Twister";
         String GAME_TWISTER_TIMEOUT = "Timeout: Game Tongue Twister";
         String GAME_TWISTER_SUCCESS = "Success: Game Tongue Twister";
+
+        String GAME_EMOTION = "Play: Game Emotion";
+        String GAME_EMOTION_FAIL = "Fail: Game Emotion";
+        String GAME_EMOTION_TIMEOUT = "Timeout: Game Emotion";
+        String GAME_EMOTION_SUCCESS = "Success: Game Emotion";
     }
 
     public interface Duration{

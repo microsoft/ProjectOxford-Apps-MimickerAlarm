@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="emotions">
+        <item>anger</item>
+        <item>contempt</item>
+        <item>disgust</item>
+        <item>fear</item>
+        <item>happiness</item>
+        <item>neutral</item>
+        <item>sadness</item>
+        <item>surprise</item>
+    </string-array>
+
+    <string-array name="emotions_adjectives">
+        <item>angry</item>
+        <item>contemptuous</item>
+        <item>disgusted</item>
+        <item>scared</item>
+        <item>happy</item>
+        <item>neutral</item>
+        <item>sad</item>
+        <item>surprised</item>
+    </string-array>
+</resources>
