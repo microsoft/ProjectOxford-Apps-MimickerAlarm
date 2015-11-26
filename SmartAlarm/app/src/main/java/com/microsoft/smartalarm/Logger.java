@@ -32,6 +32,9 @@ public class Logger {
         String GAME_EMOTION_FAIL = "Fail: Game Emotion";
         String GAME_EMOTION_TIMEOUT = "Timeout: Game Emotion";
         String GAME_EMOTION_SUCCESS = "Success: Game Emotion";
+
+        String FIRST_RUN = "Onboarding";
+        String FIRST_RUN_SKIP = "Onboarding Skip";
     }
 
     public interface Duration{
