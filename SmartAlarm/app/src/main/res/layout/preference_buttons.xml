@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/left_settings_button"
+        android:layout_width="120dp"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/right_settings_button"
+        android:text="Left"
+        />
+    <Button
+        android:id="@+id/right_settings_button"
+        android:layout_width="120dp"
+        android:layout_height="match_parent"
+
+        android:text="Right"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        />
+</RelativeLayout>

@@ -1,23 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/volume_label"
+        android:id="@+id/time_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/pref_title_volume"
         android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead"
         android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
         android:layout_marginTop="25dp"
         />
 
-    <SeekBar
-        android:id="@+id/volume_level"
-        android:layout_below="@id/volume_label"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"/>
-
-</RelativeLayout>
+</LinearLayout>

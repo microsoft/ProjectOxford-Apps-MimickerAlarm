@@ -33,7 +33,7 @@ public class AlarmCursorWrapper extends CursorWrapper {
         alarm.setTimeMinute(timeMinute);
         alarm.setRepeatWeekly(repeatWeekly);
         alarm.setAlarmTone(alarmTone);
-        for (int i = 0; i <repeatingDays.length; i++) {
+        for (int i = 0; i < repeatingDays.length; i++) {
             alarm.setRepeatingDay(i, !repeatingDays[i].equals("false"));
         }
 

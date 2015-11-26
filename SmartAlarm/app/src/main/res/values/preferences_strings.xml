@@ -3,8 +3,8 @@
     <!-- Strings related to Settings -->
     <!-- Global settings -->
     <string name="pref_title_volume">Volume</string>
+
     <string name="pref_title_ring_duration">Alarm duration</string>
-    <string name="pref_title_snooze_duration">Snooze</string>
 
     <string-array name="pref_ring_duration_labels">
         <item>5 minutes</item>
@@ -23,6 +23,8 @@
         <item>7200000</item>
         <item>18000000</item>
     </string-array>
+
+    <string name="pref_title_snooze_duration">Snooze</string>
 
     <string-array name="pref_snooze_duration_labels">
         <item>5 seconds</item>
@@ -59,4 +61,49 @@
         <item>1500000</item>
         <item>1800000</item>
     </string-array>
+
+    <!-- Alarm settings -->
+
+    <string-array name="empty_array"/>
+
+    <string name="pref_title_repeating">Repeat</string>
+
+    <string-array name="pref_ring_repeating_labels">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
+
+    <string-array name="pref_ring_repeating_values">
+        <item>sunday</item>
+        <item>monday</item>
+        <item>tuesday</item>
+        <item>wednesday</item>
+        <item>thursday</item>
+        <item>friday</item>
+        <item>saturday</item>
+    </string-array>
+
+    <string-array name="pref_game_labels">
+        <item>Twist up</item>
+        <item>Color Collector</item>
+    </string-array>
+
+    <string-array name="pref_game_values">
+        <item>twist_up</item>
+        <item>color_collector</item>
+    </string-array>
+
+    <string name="pref_title_name">Alarm name</string>
+    <string name="pref_title_game">Alarm game</string>
+    <string name="pref_title_ringtone">Alarm ringtone</string>
+    <string name="pref_title_vibrate">Vibration</string>
+    <string name="pref_positive_save_button">Save</string>
+    <string name="pref_button_delete">DELETE</string>
+    <string name="pref_button_cancel">CANCEL</string>
+    <string name="pref_button_save">SAVE</string>
 </resources>

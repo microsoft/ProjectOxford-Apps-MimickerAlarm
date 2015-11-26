@@ -18,7 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import java.sql.Time;
 import java.util.UUID;
 
 public class AlarmFragment extends Fragment {

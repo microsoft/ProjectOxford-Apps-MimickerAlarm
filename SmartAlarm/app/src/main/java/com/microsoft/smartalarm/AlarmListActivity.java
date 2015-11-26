@@ -26,7 +26,7 @@ public class AlarmListActivity extends SingleFragmentActivity
     @Override
     public void onAlarmSelected(Alarm alarm) {
 
-        Intent intent = AlarmPagerActivity.newIntent(this, alarm.getId());
+        Intent intent = AlarmSettingsActivity.newIntent(this, alarm.getId());
         startActivity(intent);
     }
 

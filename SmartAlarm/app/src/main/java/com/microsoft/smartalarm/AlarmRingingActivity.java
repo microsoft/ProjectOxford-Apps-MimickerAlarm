@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.Vibrator;
 import android.support.v7.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,6 +28,8 @@ public class AlarmRingingActivity extends Activity {
 
     private WakeLock mWakeLock;
     private MediaPlayer mPlayer;
+    private Vibrator mVibrator;
+    private boolean mShouldVibrate;
 
     private static final int WAKELOCK_TIMEOUT = 60 * 1000;
 
@@ -43,6 +47,7 @@ public class AlarmRingingActivity extends Activity {
         int timeHour = getIntent().getIntExtra(AlarmManagerHelper.TIME_HOUR, 0);
         int timeMinute = getIntent().getIntExtra(AlarmManagerHelper.TIME_MINUTE, 0);
         String tone = getIntent().getStringExtra(AlarmManagerHelper.TONE);
+        mShouldVibrate = getIntent().getBooleanExtra(AlarmManagerHelper.VIBRATE, false);
 
         TextView tvName = (TextView) findViewById(R.id.alarm_screen_name);
         tvName.setText(name);
@@ -57,6 +62,7 @@ public class AlarmRingingActivity extends Activity {
             public void onClick(View view) {
                 mPlayer.stop();
                 Logger.trackUserAction(Logger.UserAction.ALARM_DISMISS, null, null);
+                cancelVibration();
                 GameFactory.startRandom(AlarmRingingActivity.this);
             }
         });
@@ -78,6 +84,8 @@ public class AlarmRingingActivity extends Activity {
             Logger.trackException(e);
         }
 
+        vibrateDeviceIfDesired();
+
         Runnable alarmCancelTask = new Runnable() {
             @Override
             public void run() {
@@ -85,6 +93,7 @@ public class AlarmRingingActivity extends Activity {
                 {
                     mPlayer.stop();
                 }
+                cancelVibration();
                 finish();
             }
         };
@@ -152,6 +161,7 @@ public class AlarmRingingActivity extends Activity {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         mp.start();
+                        vibrateDeviceIfDesired();
                     }
                 });
                 mPlayer.prepareAsync();
@@ -171,5 +181,26 @@ public class AlarmRingingActivity extends Activity {
         }
 
         return alarmRingingDuration;
+    }
+
+    private void vibrateDeviceIfDesired() {
+        if (mShouldVibrate) {
+            mVibrator = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+            // Start immediately
+            // Vibrate for 200 milliseconds
+            // Sleep for 500 milliseconds
+            long[] vibrationPattern = { 0, 200, 500 };
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                mVibrator.vibrate(vibrationPattern, 0, new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build());
+            } else {
+                mVibrator.vibrate(vibrationPattern, 0);
+            }
+        }
+    }
+
+    private void cancelVibration() {
+        if (mVibrator != null) {
+            mVibrator.cancel();
+        }
     }
 }
