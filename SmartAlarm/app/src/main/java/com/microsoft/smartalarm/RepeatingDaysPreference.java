@@ -25,7 +25,9 @@ public class RepeatingDaysPreference extends MultiSelectListPreference {
         setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
-                setRepeatingDays((Set<String>) o);
+                @SuppressWarnings("unchecked")
+                Set<String> repeatingDays = (Set<String>) o;
+                setRepeatingDays(repeatingDays);
                 setDirty(true);
                 return false;
             }

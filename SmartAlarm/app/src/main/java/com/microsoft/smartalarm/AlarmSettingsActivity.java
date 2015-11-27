@@ -1,9 +1,13 @@
 package com.microsoft.smartalarm;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -17,11 +21,16 @@ public class AlarmSettingsActivity extends AppCompatActivity
 
     private static final String ARGS_ALARM_ID = "alarm_id";
     private static final String EDIT_MODE = "edit_mode";
+    private Fragment mFragment;
 
     public static Intent newIntent(Context packageContext, UUID alarmId) {
         Intent intent = new Intent(packageContext, AlarmSettingsActivity.class);
         intent.putExtra(ARGS_ALARM_ID, alarmId);
         return intent;
+    }
+
+    public Fragment getSettingsFragment () {
+        return mFragment;
     }
 
     @Override
@@ -31,8 +40,9 @@ public class AlarmSettingsActivity extends AppCompatActivity
         final UUID alarmId = (UUID) getIntent()
                 .getSerializableExtra(ARGS_ALARM_ID);
 
+        mFragment = AlarmSettingsFragment.newInstance(alarmId.toString());
         getSupportFragmentManager().beginTransaction()
-                .replace(android.R.id.content, AlarmSettingsFragment.newInstance(alarmId.toString()))
+                .replace(android.R.id.content, mFragment)
                 .commit();
 
     }
@@ -92,6 +102,7 @@ public class AlarmSettingsActivity extends AppCompatActivity
             mGamesPreference = (GamesPreference) findPreference("KEY_ALARM_GAME");
 
             mRingtonePreference = (RingtonePreference) findPreference("KEY_ALARM_RINGTONE");
+            mRingtonePreference.setRingtone(mAlarm.getAlarmTone());
 
             mButtonsPreference = (ButtonsPreference) findPreference("KEY_ALARM_BUTTONS");
             mButtonsPreference.setLeftButtonText(getResources().getString(R.string.pref_button_cancel));
@@ -161,6 +172,7 @@ public class AlarmSettingsActivity extends AppCompatActivity
             }
 
             if (mRingtonePreference.isDirty()) {
+                mAlarm.setAlarmTone(mRingtonePreference.getRingtone());
                 dirty = true;
             }
 
@@ -171,6 +183,19 @@ public class AlarmSettingsActivity extends AppCompatActivity
             }
 
             getActivity().finish();
+        }
+
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                if (requestCode == 1) {
+                    if (data != null) {
+                        mRingtonePreference.setRingtone((Uri) data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI));
+                        mRingtonePreference.setDirty(true);
+                    }
+                }
+            }
+
         }
     }
 }
