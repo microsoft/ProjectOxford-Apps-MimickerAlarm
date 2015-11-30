@@ -22,6 +22,8 @@ import android.widget.TextView;
 
 import net.hockeyapp.android.CrashManager;
 
+import java.util.UUID;
+
 public class AlarmRingingActivity extends Activity {
 
     public final String TAG = this.getClass().getSimpleName();
@@ -43,6 +45,7 @@ public class AlarmRingingActivity extends Activity {
         //Setup layout
         this.setContentView(R.layout.activity_alarm_ringing);
 
+        final UUID id = (UUID) getIntent().getSerializableExtra(AlarmManagerHelper.ID);
         String name = getIntent().getStringExtra(AlarmManagerHelper.TITLE);
         int timeHour = getIntent().getIntExtra(AlarmManagerHelper.TIME_HOUR, 0);
         int timeMinute = getIntent().getIntExtra(AlarmManagerHelper.TIME_MINUTE, 0);
@@ -63,7 +66,9 @@ public class AlarmRingingActivity extends Activity {
                 mPlayer.stop();
                 Logger.trackUserAction(Logger.UserAction.ALARM_DISMISS, null, null);
                 cancelVibration();
-                GameFactory.startRandom(AlarmRingingActivity.this);
+                if (!GameFactory.startGame(AlarmRingingActivity.this, id)) {
+                    finish();
+                }
             }
         });
 

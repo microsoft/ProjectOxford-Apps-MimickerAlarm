@@ -37,7 +37,7 @@ public class AlarmList {
     }
 
     public List<Alarm> getAlarms() {
-        List<Alarm> alarms = new ArrayList<Alarm>();
+        List<Alarm> alarms = new ArrayList<>();
 
         AlarmCursorWrapper cursor = queryAlarms(null, null);
 
@@ -98,6 +98,10 @@ public class AlarmList {
             repeatingDays += alarm.getRepeatingDay(i) + ",";
         }
         values.put(AlarmTable.Columns.DAYS, repeatingDays);
+        values.put(AlarmTable.Columns.VIBRATE, alarm.shouldVibrate());
+        values.put(AlarmTable.Columns.TONGUETWISTER, alarm.isTongueTwisterEnabled());
+        values.put(AlarmTable.Columns.COLORCOLLECTOR, alarm.isColorCollectorEnabled());
+        values.put(AlarmTable.Columns.EXPRESSYOURSELF, alarm.isExpressYourselfEnabled());
 
         return values;
     }

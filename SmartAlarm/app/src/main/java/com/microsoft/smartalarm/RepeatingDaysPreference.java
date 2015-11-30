@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 
 import java.util.Set;
 
-
 public class RepeatingDaysPreference extends MultiSelectListPreference {
 
     private boolean mDirty;
@@ -27,9 +26,9 @@ public class RepeatingDaysPreference extends MultiSelectListPreference {
             public boolean onPreferenceChange(Preference preference, Object o) {
                 @SuppressWarnings("unchecked")
                 Set<String> repeatingDays = (Set<String>) o;
-                setRepeatingDays(repeatingDays);
+                setSummaryValues(repeatingDays);
                 setDirty(true);
-                return false;
+                return true;
             }
         });
     }
@@ -42,14 +41,32 @@ public class RepeatingDaysPreference extends MultiSelectListPreference {
         mDirty = dirty;
     }
 
-    private void setRepeatingDays(Set<String> values) {
+    public boolean[] getRepeatingDays() {
         CharSequence[] menuItems = getEntryValues();
+        Set<String> checkedMenuItems = getValues();
         for (int i = 0; i < menuItems.length; i++) {
-            mRepeatingDays[i] = values.contains(menuItems[i].toString());
+            mRepeatingDays[i] = checkedMenuItems.contains(menuItems[i].toString());
         }
+        return mRepeatingDays;
     }
 
-    public boolean[] getRepeatingDays() {
-        return mRepeatingDays;
+    public void setSummaryValues(Set<String> values) {
+        CharSequence[] menuItems = getEntryValues();
+        CharSequence[] menuItemsDisplay = getEntries();
+        String summaryString = "";
+        for (int i = 0; i < menuItems.length; i++) {
+            if (values.contains(menuItems[i].toString())) {
+                String dayName = menuItemsDisplay[i].toString();
+                if (summaryString.isEmpty()) {
+                    summaryString = dayName;
+                } else {
+                    summaryString += ", " + dayName;
+                }
+            }
+        }
+        if (summaryString.isEmpty()) {
+            summaryString = getContext().getString(R.string.pref_no_repeating);
+        }
+        setSummary(summaryString);
     }
 }

@@ -24,7 +24,10 @@ public class AlarmCursorWrapper extends CursorWrapper {
             alarmTone = Uri.parse(alarmToneString);
         }
         String[] repeatingDays = getString(getColumnIndex(AlarmTable.Columns.DAYS)).split(",");
-
+        boolean vibrate = (getInt(getColumnIndex(AlarmTable.Columns.VIBRATE)) != 0);
+        boolean tongueTwister = (getInt(getColumnIndex(AlarmTable.Columns.TONGUETWISTER)) != 0);
+        boolean colorCollector = (getInt(getColumnIndex(AlarmTable.Columns.COLORCOLLECTOR)) != 0);
+        boolean expressYourself = (getInt(getColumnIndex(AlarmTable.Columns.EXPRESSYOURSELF)) != 0);
 
         Alarm alarm = new Alarm(UUID.fromString(uuidString));
         alarm.setTitle(title);
@@ -36,6 +39,10 @@ public class AlarmCursorWrapper extends CursorWrapper {
         for (int i = 0; i < repeatingDays.length; i++) {
             alarm.setRepeatingDay(i, !repeatingDays[i].equals("false"));
         }
+        alarm.setVibrate(vibrate);
+        alarm.setTongueTwisterEnabled(tongueTwister);
+        alarm.setColorCollectorEnabled(colorCollector);
+        alarm.setExpressYourselfEnabled(expressYourself);
 
         return alarm;
     }

@@ -12,7 +12,7 @@ import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
 public class AlarmListActivity extends SingleFragmentActivity
-        implements AlarmListFragment.Callbacks, AlarmFragment.Callbacks {
+        implements AlarmListFragment.Callbacks {
 
     protected Fragment createFragment() {
         return new AlarmListFragment();
@@ -37,14 +37,6 @@ public class AlarmListActivity extends SingleFragmentActivity
         UpdateManager.register(this, hockeyAppId);
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
         Logger.init(this);
-    }
-
-    @Override
-    public void onAlarmUpdated(Alarm alarm) {
-        AlarmListFragment listFragment = (AlarmListFragment)
-                getSupportFragmentManager()
-                        .findFragmentById(R.id.fragment_container);
-        listFragment.updateUI();
     }
 
     @Override

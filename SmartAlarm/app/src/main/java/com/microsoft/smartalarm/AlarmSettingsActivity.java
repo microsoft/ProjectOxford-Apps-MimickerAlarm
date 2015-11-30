@@ -11,13 +11,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.SwitchPreferenceCompat;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class AlarmSettingsActivity extends AppCompatActivity
-    implements AlarmFragment.Callbacks {
+public class AlarmSettingsActivity extends AppCompatActivity {
 
     private static final String ARGS_ALARM_ID = "alarm_id";
     private static final String EDIT_MODE = "edit_mode";
@@ -47,11 +47,6 @@ public class AlarmSettingsActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onAlarmUpdated(Alarm alarm) {
-
-    }
-
     public static class AlarmSettingsFragment extends PreferenceFragmentCompat {
 
         private boolean mEditMode = true;
@@ -63,7 +58,7 @@ public class AlarmSettingsActivity extends AppCompatActivity
         private NamePreference mNamePreference;
         private GamesPreference mGamesPreference;
         private RingtonePreference mRingtonePreference;
-
+        private SwitchPreferenceCompat mVibratePreference;
         private ButtonsPreference mButtonsPreference;
 
         public static AlarmSettingsFragment newInstance(String alarmId) {
@@ -95,14 +90,22 @@ public class AlarmSettingsActivity extends AppCompatActivity
                 }
             }
             mRepeatingDaysPreference.setValues(values);
+            mRepeatingDaysPreference.setSummaryValues(values);
 
             mNamePreference = (NamePreference) findPreference("KEY_ALARM_NAME");
-            mNamePreference.setText(mAlarm.getTitle());
+            mNamePreference.setAlarmName(mAlarm.getTitle());
 
             mGamesPreference = (GamesPreference) findPreference("KEY_ALARM_GAME");
+            mGamesPreference.setTongueTwisterEnabled(mAlarm.isTongueTwisterEnabled());
+            mGamesPreference.setColorCollectorEnabled(mAlarm.isColorCollectorEnabled());
+            mGamesPreference.setExpressYourselfEnabled(mAlarm.isExpressYourselfEnabled());
+            mGamesPreference.setInitialValues();
 
             mRingtonePreference = (RingtonePreference) findPreference("KEY_ALARM_RINGTONE");
             mRingtonePreference.setRingtone(mAlarm.getAlarmTone());
+
+            mVibratePreference = (SwitchPreferenceCompat) findPreference("KEY_ALARM_VIBRATE");
+            mVibratePreference.setChecked(mAlarm.shouldVibrate());
 
             mButtonsPreference = (ButtonsPreference) findPreference("KEY_ALARM_BUTTONS");
             mButtonsPreference.setLeftButtonText(getResources().getString(R.string.pref_button_cancel));
@@ -142,7 +145,10 @@ public class AlarmSettingsActivity extends AppCompatActivity
 
 
 
+
+
         private void setDefaultSummaryValues() {
+
         }
 
         private void handleSettingsExit(boolean persistSettings) {
@@ -168,11 +174,19 @@ public class AlarmSettingsActivity extends AppCompatActivity
             }
 
             if (mGamesPreference.isDirty()) {
+                mAlarm.setTongueTwisterEnabled(mGamesPreference.isTongueTwisterEnabled());
+                mAlarm.setColorCollectorEnabled(mGamesPreference.isColorCollectorEnabled());
+                mAlarm.setExpressYourselfEnabled(mGamesPreference.isExpressYourselfEnabled());
                 dirty = true;
             }
 
             if (mRingtonePreference.isDirty()) {
                 mAlarm.setAlarmTone(mRingtonePreference.getRingtone());
+                dirty = true;
+            }
+
+            if (mAlarm.shouldVibrate() != mVibratePreference.isChecked()) {
+                mAlarm.setVibrate(mVibratePreference.isChecked());
                 dirty = true;
             }
 
@@ -190,12 +204,20 @@ public class AlarmSettingsActivity extends AppCompatActivity
             if (resultCode == Activity.RESULT_OK) {
                 if (requestCode == 1) {
                     if (data != null) {
-                        mRingtonePreference.setRingtone((Uri) data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI));
-                        mRingtonePreference.setDirty(true);
+                        Uri ringtone = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                        if (ringtone == null) {
+                            if (mRingtonePreference.getRingtone() != null) {
+                                mRingtonePreference.setRingtone(null);
+                                mRingtonePreference.setDirty(true);
+                            }
+                        } else if (mAlarm.getAlarmTone() == null ||
+                                mAlarm.getAlarmTone().toString().compareToIgnoreCase(ringtone.toString()) != 0) {
+                            mRingtonePreference.setRingtone(ringtone);
+                            mRingtonePreference.setDirty(true);
+                        }
                     }
                 }
             }
-
         }
     }
 }

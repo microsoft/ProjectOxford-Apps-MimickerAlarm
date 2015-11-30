@@ -1,13 +1,9 @@
 package com.microsoft.smartalarm;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.EditTextPreferenceDialogFragmentCompat;
 import android.support.v7.preference.Preference;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialogFragmentCompat {
@@ -18,13 +14,6 @@ public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialog
         bundle.putString("key", preference.getKey());
         fragment.setArguments(bundle);
         return fragment;
-    }
-
-    @Override
-    protected View onCreateDialogView(Context context) {
-        View view = super.onCreateDialogView(context);
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-        return view;
     }
 
     @Override

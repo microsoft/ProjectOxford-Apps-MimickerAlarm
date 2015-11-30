@@ -67,6 +67,7 @@
     <string-array name="empty_array"/>
 
     <string name="pref_title_repeating">Repeat</string>
+    <string name="pref_no_repeating">Does not repeat</string>
 
     <string-array name="pref_ring_repeating_labels">
         <item>Sunday</item>
@@ -89,18 +90,22 @@
     </string-array>
 
     <string-array name="pref_game_labels">
-        <item>Twist up</item>
+        <item>Twist Up</item>
         <item>Color Collector</item>
+        <item>Express Yourself</item>
     </string-array>
 
     <string-array name="pref_game_values">
-        <item>twist_up</item>
+        <item>tongue_twister</item>
         <item>color_collector</item>
+        <item>express_yourself</item>
     </string-array>
 
     <string name="pref_title_name">Alarm name</string>
     <string name="pref_title_game">Alarm game</string>
+    <string name="pref_no_game">No game selected</string>
     <string name="pref_title_ringtone">Alarm ringtone</string>
+    <string name="pref_no_ringtone">Silent</string>
     <string name="pref_title_vibrate">Vibration</string>
     <string name="pref_positive_save_button">Save</string>
     <string name="pref_button_delete">DELETE</string>

@@ -15,6 +15,10 @@ public class Alarm {
     private boolean mRepeatWeekly;
     private Uri     mAlarmTone;
     private boolean mIsEnabled;
+    private boolean mVibrate;
+    private boolean mTongueTwisterEnabled;
+    private boolean mColorCollectorEnabled;
+    private boolean mExpressYourselfEnabled;
 
     public Alarm () {
         this(UUID.randomUUID());
@@ -29,6 +33,10 @@ public class Alarm {
         mRepeatingDays = new boolean[]{ true, true, true, true, true, true, true };
         mAlarmTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL);
         mIsEnabled = true;
+        mVibrate = true;
+        mTongueTwisterEnabled = true;
+        mColorCollectorEnabled = true;
+        mExpressYourselfEnabled = true;
     }
 
     public String getTitle() {
@@ -90,5 +98,37 @@ public class Alarm {
 
     public boolean getRepeatingDay(int dayOfWeek) {
         return mRepeatingDays[dayOfWeek];
+    }
+
+    public boolean shouldVibrate() {
+        return mVibrate;
+    }
+
+    public void setVibrate(boolean vibrate) {
+        mVibrate = vibrate;
+    }
+
+    public boolean isExpressYourselfEnabled() {
+        return mExpressYourselfEnabled;
+    }
+
+    public void setExpressYourselfEnabled(boolean expressYourselfEnabled) {
+        mExpressYourselfEnabled = expressYourselfEnabled;
+    }
+
+    public boolean isColorCollectorEnabled() {
+        return mColorCollectorEnabled;
+    }
+
+    public void setColorCollectorEnabled(boolean colorCollectorEnabled) {
+        mColorCollectorEnabled = colorCollectorEnabled;
+    }
+
+    public boolean isTongueTwisterEnabled() {
+        return mTongueTwisterEnabled;
+    }
+
+    public void setTongueTwisterEnabled(boolean tongueTwister) {
+        mTongueTwisterEnabled = tongueTwister;
     }
 }

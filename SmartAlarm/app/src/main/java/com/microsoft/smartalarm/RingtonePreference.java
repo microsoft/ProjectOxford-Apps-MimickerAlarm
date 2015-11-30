@@ -45,6 +45,11 @@ public class RingtonePreference extends Preference {
 
     public void setRingtone(Uri ringtone) {
         mRingtone = ringtone;
+        if (mRingtone == null) {
+            setSummary(getContext().getString(R.string.pref_no_ringtone));
+        } else {
+            setSummary(RingtoneManager.getRingtone(getContext(), mRingtone).getTitle(getContext()));
+        }
     }
 
     private void onPrepareRingtonePickerIntent(Intent ringtonePickerIntent) {
