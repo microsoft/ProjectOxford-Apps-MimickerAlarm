@@ -1,5 +1,6 @@
 package com.microsoft.smartalarm;
 
+import android.media.RingtoneManager;
 import android.net.Uri;
 
 import java.util.Calendar;
@@ -26,7 +27,7 @@ public class Alarm {
         mTimeMinute = calendar.getTime().getMinutes();
         mRepeatWeekly = true;
         mRepeatingDays = new boolean[]{ true, true, true, true, true, true, true };
-        mAlarmTone = Uri.parse("content://settings/system/ringtone");
+        mAlarmTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL);
         mIsEnabled = true;
     }
 

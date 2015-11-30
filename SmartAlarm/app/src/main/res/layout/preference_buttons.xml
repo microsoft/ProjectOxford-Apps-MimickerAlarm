@@ -9,15 +9,16 @@
         android:layout_width="120dp"
         android:layout_height="match_parent"
         android:layout_toLeftOf="@+id/right_settings_button"
-        android:text="Left"
+        android:background="@android:color/transparent"
         />
+
     <Button
         android:id="@+id/right_settings_button"
         android:layout_width="120dp"
         android:layout_height="match_parent"
-
-        android:text="Right"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:background="@android:color/transparent"
         />
+
 </RelativeLayout>
