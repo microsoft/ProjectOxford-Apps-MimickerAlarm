@@ -179,6 +179,11 @@ public class AlarmRingingActivity extends Activity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        // Eat the back button
+    }
+
     private int getAlarmRingingDuration() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String durationPreference = preferences.getString("KEY_RING_DURATION", DEFAULT_RINGING_DURATION_STRING);

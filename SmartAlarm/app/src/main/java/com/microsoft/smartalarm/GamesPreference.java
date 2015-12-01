@@ -14,18 +14,18 @@ public class GamesPreference extends MultiSelectListPreference {
     private boolean mTongueTwisterEnabled;
     private boolean mColorCollectorEnabled;
     private boolean mExpressYourselfEnabled;
-    private boolean mDirty;
+    private boolean mChanged;
 
     public GamesPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public boolean isDirty() {
-        return mDirty;
+    public boolean hasChanged() {
+        return mChanged;
     }
 
-    public void setDirty(boolean dirty) {
-        mDirty = dirty;
+    public void setChanged(boolean changed) {
+        mChanged = changed;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class GamesPreference extends MultiSelectListPreference {
                 @SuppressWarnings("unchecked")
                 Set<String> selectedGames = (Set<String>) o;
                 setGamePreferences(selectedGames);
-                setDirty(true);
+                setChanged(true);
                 return true;
             }
         });

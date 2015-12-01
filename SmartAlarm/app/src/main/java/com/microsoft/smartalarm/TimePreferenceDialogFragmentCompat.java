@@ -51,7 +51,7 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
 
             TimePreference preference = (TimePreference) getPreference();
             preference.setTime(hour, minute);
-            preference.setDirty(true);
+            preference.setChanged(true);
         }
     }
 }
