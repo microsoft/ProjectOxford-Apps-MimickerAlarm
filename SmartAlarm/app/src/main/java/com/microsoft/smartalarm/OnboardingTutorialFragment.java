@@ -15,6 +15,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class OnboardingTutorialFragment extends Fragment {
+    private Boolean mStarted = false;
+    private static final int WELCOME_MSG_DURATION = 5000;
+    private static final int WELCOME_MSG_CROSSFADE_DURATION = 1000;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -32,22 +35,31 @@ public class OnboardingTutorialFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        crossfade();
-    }
-
-    private void crossfade(){
         final View welcomePage = getView().findViewById(R.id.onboarding_welcome);
         View tutorialContainer = getView().findViewById(R.id.onboarding_tutorial);
-        tutorialContainer.setAlpha(0f);
-        tutorialContainer.setVisibility(View.VISIBLE);
-        tutorialContainer.animate().alpha(1f).setDuration(1000).setStartDelay(5000).setListener(null);
-
-        welcomePage.animate().alpha(0).setDuration(1000).setStartDelay(5000).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                welcomePage.setVisibility(View.GONE);
-            }
-        });
+        if (!mStarted) {
+            mStarted = true;
+            tutorialContainer.setAlpha(0f);
+            tutorialContainer.setVisibility(View.VISIBLE);
+            tutorialContainer.animate()
+                    .alpha(1f)
+                    .setDuration(WELCOME_MSG_CROSSFADE_DURATION)
+                    .setStartDelay(WELCOME_MSG_DURATION)
+                    .setListener(null);
+            welcomePage.animate()
+                    .alpha(0)
+                    .setDuration(WELCOME_MSG_CROSSFADE_DURATION)
+                    .setStartDelay(WELCOME_MSG_DURATION)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            welcomePage.setVisibility(View.GONE);
+                        }
+                    });
+        }
+        else{
+            tutorialContainer.setAlpha(1f);
+        }
     }
 
     private static class OnboardingPagerAdapter extends FragmentStatePagerAdapter {

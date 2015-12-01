@@ -34,7 +34,6 @@ public class OnboardingActivity extends FragmentActivity{
         super.onResume();
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
             setStatusBarColor();
-            mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
             if (!mStarted) {
                 mStarted = true;
                 Logger.trackUserAction(Logger.UserAction.FIRST_RUN, null, null);
@@ -57,6 +56,7 @@ public class OnboardingActivity extends FragmentActivity{
     }
 
     public void showToS(View view) {
+        mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
         Fragment newFragment = new OnboardingToSFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.onboarding_container, newFragment);
