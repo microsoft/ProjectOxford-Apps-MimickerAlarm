@@ -64,6 +64,14 @@
 
     <!-- Alarm settings -->
 
+    <string name="pref_time_key">KEY_ALARM_TIME</string>
+    <string name="pref_repeating_days_key">KEY_ALARM_REPEATING_DAYS</string>
+    <string name="pref_name_key">KEY_ALARM_NAME</string>
+    <string name="pref_games_key">KEY_ALARM_GAMES</string>
+    <string name="pref_ringtone_key">KEY_ALARM_RINGTONE</string>
+    <string name="pref_vibrate_key">KEY_ALARM_VIBRATE</string>
+    <string name="pref_buttons_key">KEY_ALARM_BUTTONS</string>
+
     <string-array name="empty_array"/>
 
     <string name="pref_title_repeating">Repeat</string>
@@ -95,14 +103,19 @@
         <item>Express Yourself</item>
     </string-array>
 
+    <string name="pref_game_tongue_twister_id">tongue_twister</string>
+    <string name="pref_game_color_collector_id">color_collector</string>
+    <string name="pref_game_express_yourself_id">express_yourself</string>
+
     <string-array name="pref_game_values">
-        <item>tongue_twister</item>
-        <item>color_collector</item>
-        <item>express_yourself</item>
+        <item>@string/pref_game_tongue_twister_id</item>
+        <item>@string/pref_game_color_collector_id</item>
+        <item>@string/pref_game_express_yourself_id</item>
     </string-array>
 
+    <string name="pref_title_edit">Edit alarm</string>
     <string name="pref_title_name">Alarm name</string>
-    <string name="pref_title_game">Alarm game</string>
+    <string name="pref_title_game">Alarm games</string>
     <string name="pref_no_game">No game selected</string>
     <string name="pref_title_ringtone">Alarm ringtone</string>
     <string name="pref_no_ringtone">Silent</string>

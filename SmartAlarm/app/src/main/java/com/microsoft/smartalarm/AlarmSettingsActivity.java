@@ -3,8 +3,6 @@ package com.microsoft.smartalarm;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -45,9 +43,12 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                 .replace(android.R.id.content, mFragment)
                 .commit();
 
+        setTitle(getString(R.string.pref_title_edit));
     }
 
     public static class AlarmSettingsFragment extends PreferenceFragmentCompat {
+
+        private static final String PREFERENCE_DIALOG_FRAGMENT_CLASS = "android.support.v7.preference.PreferenceFragment.DIALOG";
 
         private boolean mEditMode = true;
 
@@ -65,7 +66,6 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             AlarmSettingsFragment fragment = new AlarmSettingsFragment();
             Bundle bundle = new Bundle(1);
             bundle.putString(ARGS_ALARM_ID, alarmId);
-            //bundle.putInt();
             fragment.setArguments(bundle);
             return fragment;
         }
@@ -78,10 +78,10 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             mAlarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
             mAlarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
 
-            mTimePreference = (TimePreference) findPreference("KEY_ALARM_TIME");
+            mTimePreference = (TimePreference) findPreference(getString(R.string.pref_time_key));
             mTimePreference.setTime(mAlarm.getTimeHour(), mAlarm.getTimeMinute());
 
-            mRepeatingDaysPreference = (RepeatingDaysPreference) findPreference("KEY_ALARM_REPEATING_DAYS");
+            mRepeatingDaysPreference = (RepeatingDaysPreference) findPreference(getString(R.string.pref_repeating_days_key));
             CharSequence[] menuItems = mRepeatingDaysPreference.getEntryValues();
             Set<String> values = new HashSet<>();
             for (int i = 0; i < 7; ++i) {
@@ -92,22 +92,22 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             mRepeatingDaysPreference.setValues(values);
             mRepeatingDaysPreference.setSummaryValues(values);
 
-            mNamePreference = (NamePreference) findPreference("KEY_ALARM_NAME");
+            mNamePreference = (NamePreference) findPreference(getString(R.string.pref_name_key));
             mNamePreference.setAlarmName(mAlarm.getTitle());
 
-            mGamesPreference = (GamesPreference) findPreference("KEY_ALARM_GAME");
+            mGamesPreference = (GamesPreference) findPreference(getString(R.string.pref_games_key));
             mGamesPreference.setTongueTwisterEnabled(mAlarm.isTongueTwisterEnabled());
             mGamesPreference.setColorCollectorEnabled(mAlarm.isColorCollectorEnabled());
             mGamesPreference.setExpressYourselfEnabled(mAlarm.isExpressYourselfEnabled());
             mGamesPreference.setInitialValues();
 
-            mRingtonePreference = (RingtonePreference) findPreference("KEY_ALARM_RINGTONE");
+            mRingtonePreference = (RingtonePreference) findPreference(getString(R.string.pref_ringtone_key));
             mRingtonePreference.setRingtone(mAlarm.getAlarmTone());
 
-            mVibratePreference = (SwitchPreferenceCompat) findPreference("KEY_ALARM_VIBRATE");
+            mVibratePreference = (SwitchPreferenceCompat) findPreference(getString(R.string.pref_vibrate_key));
             mVibratePreference.setChecked(mAlarm.shouldVibrate());
 
-            mButtonsPreference = (ButtonsPreference) findPreference("KEY_ALARM_BUTTONS");
+            mButtonsPreference = (ButtonsPreference) findPreference(getString(R.string.pref_buttons_key));
             mButtonsPreference.setLeftButtonText(getResources().getString(R.string.pref_button_cancel));
             mButtonsPreference.setRightButtonText(getResources().getString(R.string.pref_button_save));
 
@@ -118,8 +118,6 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                     return true;
                 }
             });
-
-            setDefaultSummaryValues();
         }
 
         @Override
@@ -127,28 +125,20 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             if (preference instanceof RepeatingDaysPreference) {
                 DialogFragment dialogFragment = MultiSelectListPreferenceDialogFragmentCompat.newInstance(preference);
                 dialogFragment.setTargetFragment(this, 0);
-                dialogFragment.show(getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+                dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);
             } else if (preference instanceof TimePreference) {
                 DialogFragment dialogFragment = TimePreferenceDialogFragmentCompat.newInstance(preference);
                 dialogFragment.setTargetFragment(this, 0);
-                dialogFragment.show(getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+                dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);
             } else if (preference instanceof NamePreference) {
                 DialogFragment dialogFragment = NamePreferenceDialogFragmentCompat.newInstance(preference);
                 dialogFragment.setTargetFragment(this, 0);
-                dialogFragment.show(getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+                dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);
             } else if (preference instanceof GamesPreference) {
                 DialogFragment dialogFragment = MultiSelectListPreferenceDialogFragmentCompat.newInstance(preference);
                 dialogFragment.setTargetFragment(this, 0);
-                dialogFragment.show(getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+                dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);
             } else super.onDisplayPreferenceDialog(preference);
-        }
-
-
-
-
-
-        private void setDefaultSummaryValues() {
-
         }
 
         private void handleSettingsExit(boolean persistSettings) {
@@ -202,20 +192,8 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
             if (resultCode == Activity.RESULT_OK) {
-                if (requestCode == 1) {
-                    if (data != null) {
-                        Uri ringtone = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-                        if (ringtone == null) {
-                            if (mRingtonePreference.getRingtone() != null) {
-                                mRingtonePreference.setRingtone(null);
-                                mRingtonePreference.setDirty(true);
-                            }
-                        } else if (mAlarm.getAlarmTone() == null ||
-                                mAlarm.getAlarmTone().toString().compareToIgnoreCase(ringtone.toString()) != 0) {
-                            mRingtonePreference.setRingtone(ringtone);
-                            mRingtonePreference.setDirty(true);
-                        }
-                    }
+                if (requestCode == RingtonePreference.RINGTONE_PICKER_REQUEST) {
+                   mRingtonePreference.handleRingtonePickerResult(data);
                 }
             }
         }

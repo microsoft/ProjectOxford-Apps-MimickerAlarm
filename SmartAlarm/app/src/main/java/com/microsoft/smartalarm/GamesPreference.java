@@ -70,22 +70,22 @@ public class GamesPreference extends MultiSelectListPreference {
     public void setInitialValues() {
         Set<String> values = new HashSet<>();
         if (isTongueTwisterEnabled()) {
-            values.add("tongue_twister");
+            values.add(getContext().getString(R.string.pref_game_tongue_twister_id));
         }
         if (isColorCollectorEnabled()) {
-            values.add("color_collector");
+            values.add(getContext().getString(R.string.pref_game_color_collector_id));
         }
         if (isExpressYourselfEnabled()) {
-            values.add("express_yourself");
+            values.add(getContext().getString(R.string.pref_game_express_yourself_id));
         }
         setValues(values);
         setSummaryValues(values);
     }
 
     private void setGamePreferences(Set<String> values) {
-        setTongueTwisterEnabled(values.contains("tongue_twister"));
-        setColorCollectorEnabled(values.contains("color_collector"));
-        setExpressYourselfEnabled(values.contains("express_yourself"));
+        setTongueTwisterEnabled(values.contains(getContext().getString(R.string.pref_game_tongue_twister_id)));
+        setColorCollectorEnabled(values.contains(getContext().getString(R.string.pref_game_color_collector_id)));
+        setExpressYourselfEnabled(values.contains(getContext().getString(R.string.pref_game_express_yourself_id)));
         setSummaryValues(values);
     }
 

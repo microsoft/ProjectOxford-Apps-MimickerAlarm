@@ -8,9 +8,11 @@
         android:id="@+id/time_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="20sp"
         android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead"
         android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="15dp"
         />
 
 </LinearLayout>

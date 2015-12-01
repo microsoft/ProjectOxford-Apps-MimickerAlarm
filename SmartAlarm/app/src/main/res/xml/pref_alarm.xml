@@ -2,34 +2,33 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <com.microsoft.smartalarm.TimePreference
-        android:key="KEY_ALARM_TIME" />
+        android:key="@string/pref_time_key" />
 
     <com.microsoft.smartalarm.RepeatingDaysPreference
-        android:key="KEY_ALARM_REPEATING_DAYS"
+        android:key="@string/pref_repeating_days_key"
         android:entries="@array/pref_ring_repeating_labels"
         android:entryValues="@array/pref_ring_repeating_values"
         android:title="@string/pref_title_repeating"/>
 
     <com.microsoft.smartalarm.NamePreference
-        android:key="KEY_ALARM_NAME"
+        android:key="@string/pref_name_key"
         android:title="@string/pref_title_name"/>
 
     <com.microsoft.smartalarm.GamesPreference
-        android:key="KEY_ALARM_GAME"
+        android:key="@string/pref_games_key"
         android:title="@string/pref_title_game"
         android:entries="@array/pref_game_labels"
-        android:entryValues="@array/pref_game_values"
-        android:defaultValue="@array/empty_array" />
+        android:entryValues="@array/pref_game_values" />
 
     <com.microsoft.smartalarm.RingtonePreference
-        android:key="KEY_ALARM_RINGTONE"
+        android:key="@string/pref_ringtone_key"
         android:title="@string/pref_title_ringtone" />
 
     <SwitchPreferenceCompat
-        android:key="KEY_ALARM_VIBRATE"
+        android:key="@string/pref_vibrate_key"
         android:title="@string/pref_title_vibrate" />
 
     <com.microsoft.smartalarm.ButtonsPreference
-        android:key="KEY_ALARM_BUTTONS" />
+        android:key="@string/pref_buttons_key" />
 
 </PreferenceScreen>

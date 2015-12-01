@@ -63,7 +63,9 @@ public class AlarmRingingActivity extends Activity {
 
             @Override
             public void onClick(View view) {
-                mPlayer.stop();
+                if (mPlayer != null) {
+                    mPlayer.stop();
+                }
                 Logger.trackUserAction(Logger.UserAction.ALARM_DISMISS, null, null);
                 cancelVibration();
                 if (!GameFactory.startGame(AlarmRingingActivity.this, id)) {
@@ -72,11 +74,12 @@ public class AlarmRingingActivity extends Activity {
             }
         });
 
-        mPlayer = new MediaPlayer();
+
         try {
             if (tone != null && !tone.equals("")) {
                 Uri toneUri = Uri.parse(tone);
                 if (toneUri != null) {
+                    mPlayer = new MediaPlayer();
                     mPlayer.setDataSource(this, toneUri);
                     mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                     mPlayer.setLooping(true);
@@ -94,7 +97,7 @@ public class AlarmRingingActivity extends Activity {
         Runnable alarmCancelTask = new Runnable() {
             @Override
             public void run() {
-                if (mPlayer.isPlaying())
+                if (mPlayer != null && mPlayer.isPlaying())
                 {
                     mPlayer.stop();
                 }
@@ -162,14 +165,16 @@ public class AlarmRingingActivity extends Activity {
             if (resultCode == RESULT_OK) {
                 finish();
             } else {
-                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mp) {
-                        mp.start();
-                        vibrateDeviceIfDesired();
-                    }
-                });
-                mPlayer.prepareAsync();
+                if (mPlayer != null) {
+                    mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mp) {
+                            mp.start();
+                        }
+                    });
+                    mPlayer.prepareAsync();
+                }
+                vibrateDeviceIfDesired();
             }
         }
     }

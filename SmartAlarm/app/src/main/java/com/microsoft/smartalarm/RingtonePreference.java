@@ -13,6 +13,8 @@ public class RingtonePreference extends Preference {
     private boolean mDirty;
     private Uri mRingtone;
 
+    public static final int RINGTONE_PICKER_REQUEST = 1000;
+
     public RingtonePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -34,7 +36,7 @@ public class RingtonePreference extends Preference {
         if (settingsActivity != null) {
             Fragment owningFragment = settingsActivity.getSettingsFragment();
             if (owningFragment != null) {
-                owningFragment.startActivityForResult(intent, 1);
+                owningFragment.startActivityForResult(intent, RINGTONE_PICKER_REQUEST);
             }
         }
     }
@@ -49,6 +51,22 @@ public class RingtonePreference extends Preference {
             setSummary(getContext().getString(R.string.pref_no_ringtone));
         } else {
             setSummary(RingtoneManager.getRingtone(getContext(), mRingtone).getTitle(getContext()));
+        }
+    }
+
+    public void handleRingtonePickerResult(Intent data) {
+        if (data != null) {
+            Uri ringtone = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            if (ringtone == null) {
+                if (getRingtone() != null) {
+                    setRingtone(null);
+                    setDirty(true);
+                }
+            } else if (getRingtone() == null ||
+                    getRingtone().toString().compareToIgnoreCase(ringtone.toString()) != 0) {
+                setRingtone(ringtone);
+                setDirty(true);
+            }
         }
     }
 
