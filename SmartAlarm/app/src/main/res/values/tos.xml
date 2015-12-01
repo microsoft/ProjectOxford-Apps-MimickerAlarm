@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tos">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus et ante enim. In imperdiet diam id magna sollicitudin semper lacinia vitae tortor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Ut orci sem, pharetra in nunc quis, dictum bibendum nisl. Proin condimentum diam a augue feugiat, non rhoncus lorem malesuada. Donec volutpat, sapien vel consectetur tincidunt, lorem urna porta ex, et luctus tellus enim mollis libero. Duis sed faucibus eros, in fringilla metus. Aliquam quis egestas metus, at sollicitudin ligula. Integer tincidunt enim at diam fermentum, sit amet euismod odio accumsan. Integer quis ex facilisis, ultrices nisl eget, pharetra velit.
+
+Duis id fringilla arcu, sit amet rutrum velit. Proin ac eros velit. Sed quis justo velit. Mauris nec facilisis turpis. Nulla vehicula, leo ac malesuada consequat, eros libero ornare orci, nec gravida dui metus efficitur lorem. Cras viverra, diam vitae tristique vulputate, purus nunc malesuada ante, nec egestas felis felis ut nisi. Vivamus luctus nisi ut magna pellentesque, quis consectetur felis blandit.
+
+Cras id est dolor. In consectetur mauris id tortor consectetur mollis. Donec at enim nibh. Donec dui sapien, ultricies ut orci quis, finibus vulputate mauris. Cras luctus turpis nec diam luctus, vitae volutpat nibh tristique. Ut nibh urna, consequat a vulputate quis, interdum eu massa. Nam sagittis lorem vel felis vulputate, nec posuere leo ullamcorper. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aliquam nec tristique nulla. Nam vitae est sit amet diam luctus fermentum. Sed sollicitudin mi eu pretium iaculis. Vestibulum quis eros sollicitudin, ornare lectus eget, dictum dolor. Maecenas vitae enim vitae tortor porttitor bibendum. Fusce varius lacus lacus, sed efficitur mi convallis et.
+
+Aenean aliquam leo vitae vulputate ornare. Fusce tempus felis sit amet mauris tempor iaculis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur dignissim finibus orci quis sagittis. Quisque venenatis arcu non felis placerat, a auctor leo ultrices. Sed neque ligula, placerat vel mi consequat, lobortis imperdiet sapien. Sed faucibus dapibus sagittis. Nam imperdiet quis odio egestas aliquet.
+
+Vestibulum interdum bibendum lobortis. Sed cursus nec metus vitae interdum. Suspendisse tempor arcu id erat ultrices, ut vulputate ex ornare. Praesent gravida est lacus, eu pulvinar lectus porttitor sit amet. Nulla ante massa, rhoncus nec venenatis ac, bibendum sit amet neque. Nullam finibus lorem non interdum convallis. Duis feugiat justo id dolor sodales efficitur. Aenean dignissim tincidunt dui, eu efficitur ante ultricies et. Cras vitae cursus ante, quis pharetra ex.</string>
+    <string name="tos_prompt_title">One last thing</string>
+    <string name="tos_prompt_text">We need your permission to wake you up and keep you up every morning. On the next screen you can read and accept our terms and conditions to use the application.</string>
+    <string name="tos_prompt_confirm">Got it!</string>
+    <string name="tos_title">Terms and conditions</string>
+    <string name="tos_prompt_reconfirm">Go now</string>
+</resources>

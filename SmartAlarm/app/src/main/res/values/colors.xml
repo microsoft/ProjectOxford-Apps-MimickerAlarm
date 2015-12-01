@@ -21,4 +21,5 @@
     <color name="dark3">#6c6c6c</color>
     <color name="dark4">#4d4d4d</color>
     <color name="dark5">#131e1b</color>
+    <color name="invisible">#00ffffff</color>
 </resources>
