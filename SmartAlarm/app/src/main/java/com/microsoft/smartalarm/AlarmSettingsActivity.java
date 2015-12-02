@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
-import android.support.v7.preference.SwitchPreferenceCompat;
 import android.view.MenuItem;
 
 import java.util.HashSet;
@@ -83,7 +82,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         private NamePreference mNamePreference;
         private GamesPreference mGamesPreference;
         private RingtonePreference mRingtonePreference;
-        private SwitchPreferenceCompat mVibratePreference;
+        private VibratePreference mVibratePreference;
         private ButtonsPreference mButtonsPreference;
 
         public static AlarmSettingsFragment newInstance(String alarmId, boolean newAlarm) {
@@ -150,8 +149,8 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
 
         private void initializeVibratePreference() {
-            mVibratePreference = (SwitchPreferenceCompat) findPreference(getString(R.string.pref_vibrate_key));
-            mVibratePreference.setChecked(mAlarm.shouldVibrate());
+            mVibratePreference = (VibratePreference) findPreference(getString(R.string.pref_vibrate_key));
+            mVibratePreference.setInitialValue(mAlarm.shouldVibrate());
         }
 
         private void initializeButtons() {
@@ -253,17 +252,20 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
 
         private boolean haveSettingsChanged() {
-
-            if (mAlarm.shouldVibrate() != mVibratePreference.isChecked()) {
-                mAlarm.setVibrate(mVibratePreference.isChecked());
-
-            }
-
             return hasTimePreferenceChanged() ||
                     hasRepeatingDaysChanged() ||
                     hasNamePreferenceChanged() ||
                     hasGamesPreferenceChanged() ||
-                    hasRingtonePreferenceChanged();
+                    hasRingtonePreferenceChanged() ||
+                    hasVibratePreferenceChanged();
+        }
+
+        private boolean hasVibratePreferenceChanged() {
+            boolean changed = mVibratePreference.hasChanged();
+            if (changed) {
+                mAlarm.setVibrate(mVibratePreference.isChecked());
+            }
+            return changed;
         }
 
         private boolean hasRingtonePreferenceChanged() {
