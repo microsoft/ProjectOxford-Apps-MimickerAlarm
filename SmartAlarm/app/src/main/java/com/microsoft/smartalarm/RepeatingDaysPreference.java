@@ -8,9 +8,9 @@ import android.util.AttributeSet;
 
 import java.util.Set;
 
-public class RepeatingDaysPreference extends MultiSelectListPreference {
+public class RepeatingDaysPreference extends MultiSelectListPreferenceWithSummary {
 
-    private boolean mDirty;
+    private boolean mChanged;
     private boolean[] mRepeatingDays;
 
     public RepeatingDaysPreference(Context context, AttributeSet attrs) {
@@ -26,19 +26,19 @@ public class RepeatingDaysPreference extends MultiSelectListPreference {
             public boolean onPreferenceChange(Preference preference, Object o) {
                 @SuppressWarnings("unchecked")
                 Set<String> repeatingDays = (Set<String>) o;
-                setSummaryValues(repeatingDays);
-                setDirty(true);
+                setSummaryValues(repeatingDays, R.string.pref_no_repeating);
+                setChanged(true);
                 return true;
             }
         });
     }
 
-    public boolean isDirty() {
-        return mDirty;
+    public boolean hasChanged() {
+        return mChanged;
     }
 
-    public void setDirty(boolean dirty) {
-        mDirty = dirty;
+    public void setChanged(boolean changed) {
+        mChanged = changed;
     }
 
     public boolean[] getRepeatingDays() {
@@ -48,25 +48,5 @@ public class RepeatingDaysPreference extends MultiSelectListPreference {
             mRepeatingDays[i] = checkedMenuItems.contains(menuItems[i].toString());
         }
         return mRepeatingDays;
-    }
-
-    public void setSummaryValues(Set<String> values) {
-        CharSequence[] menuItems = getEntryValues();
-        CharSequence[] menuItemsDisplay = getEntries();
-        String summaryString = "";
-        for (int i = 0; i < menuItems.length; i++) {
-            if (values.contains(menuItems[i].toString())) {
-                String dayName = menuItemsDisplay[i].toString();
-                if (summaryString.isEmpty()) {
-                    summaryString = dayName;
-                } else {
-                    summaryString += ", " + dayName;
-                }
-            }
-        }
-        if (summaryString.isEmpty()) {
-            summaryString = getContext().getString(R.string.pref_no_repeating);
-        }
-        setSummary(summaryString);
     }
 }

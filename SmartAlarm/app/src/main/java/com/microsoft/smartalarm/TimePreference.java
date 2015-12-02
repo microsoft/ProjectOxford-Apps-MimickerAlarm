@@ -16,7 +16,7 @@ public class TimePreference extends DialogPreference {
     private TextView mTimeLabel;
     private int mHour;
     private int mMinute;
-    private boolean mDirty;
+    private boolean mChanged;
 
     public TimePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -54,12 +54,12 @@ public class TimePreference extends DialogPreference {
         mTimeLabel.setText(formatter.format(calendar.getTime()));
     }
 
-    public boolean isDirty() {
-        return mDirty;
+    public boolean hasChanged() {
+        return mChanged;
     }
 
-    public void setDirty(boolean dirty) {
-        mDirty = dirty;
+    public void setChanged(boolean changed) {
+        mChanged = changed;
         setTimeLabel();
     }
 }

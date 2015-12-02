@@ -20,6 +20,8 @@ public class MultiSelectListPreferenceDialogFragmentCompat extends PreferenceDia
     private boolean mDialogContentsChanged;
     private final Set<String> mLatestValues = new HashSet<>();
 
+    private static final String ARGS_KEY = "key";
+
     public MultiSelectListPreferenceDialogFragmentCompat () {
 
     }
@@ -27,7 +29,7 @@ public class MultiSelectListPreferenceDialogFragmentCompat extends PreferenceDia
     public static MultiSelectListPreferenceDialogFragmentCompat newInstance(Preference preference) {
         MultiSelectListPreferenceDialogFragmentCompat fragment = new MultiSelectListPreferenceDialogFragmentCompat();
         Bundle bundle = new Bundle(1);
-        bundle.putString("key", preference.getKey());
+        bundle.putString(ARGS_KEY, preference.getKey());
         fragment.setArguments(bundle);
         return fragment;
     }

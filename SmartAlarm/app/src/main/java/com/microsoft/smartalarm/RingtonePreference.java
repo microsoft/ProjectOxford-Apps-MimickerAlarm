@@ -10,7 +10,7 @@ import android.support.v7.preference.Preference;
 import android.util.AttributeSet;
 
 public class RingtonePreference extends Preference {
-    private boolean mDirty;
+    private boolean mChanged;
     private Uri mRingtone;
 
     public static final int RINGTONE_PICKER_REQUEST = 1000;
@@ -19,12 +19,12 @@ public class RingtonePreference extends Preference {
         super(context, attrs);
     }
 
-    public boolean isDirty() {
-        return mDirty;
+    public boolean hasChanged() {
+        return mChanged;
     }
 
-    public void setDirty(boolean dirty) {
-        mDirty = dirty;
+    public void setChanged(boolean changed) {
+        mChanged = changed;
     }
 
     @Override
@@ -60,12 +60,12 @@ public class RingtonePreference extends Preference {
             if (ringtone == null) {
                 if (getRingtone() != null) {
                     setRingtone(null);
-                    setDirty(true);
+                    setChanged(true);
                 }
             } else if (getRingtone() == null ||
                     getRingtone().toString().compareToIgnoreCase(ringtone.toString()) != 0) {
                 setRingtone(ringtone);
-                setDirty(true);
+                setChanged(true);
             }
         }
     }

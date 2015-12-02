@@ -24,7 +24,7 @@
         android:key="@string/pref_ringtone_key"
         android:title="@string/pref_title_ringtone" />
 
-    <SwitchPreferenceCompat
+    <com.microsoft.smartalarm.VibratePreference
         android:key="@string/pref_vibrate_key"
         android:title="@string/pref_title_vibrate" />
 

@@ -35,7 +35,7 @@ public class AlarmListFragment extends Fragment {
     private List<Alarm> mAlarms;
 
     public interface Callbacks {
-        void onAlarmSelected(Alarm alarm);
+        void onAlarmSelected(Alarm alarm, boolean newAlarm);
     }
 
     @Override
@@ -70,26 +70,9 @@ public class AlarmListFragment extends Fragment {
                 Alarm alarm = new Alarm();
                 AlarmList.get(getActivity()).addAlarm(alarm);
                 updateUI();
-                mCallbacks.onAlarmSelected(alarm);
+                mCallbacks.onAlarmSelected(alarm, true);
             }
         });
-
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT ) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                AlarmManagerHelper.cancelAlarms(getContext());
-                AlarmList.get(getActivity()).deleteAlarm(mAlarms.get(viewHolder.getAdapterPosition()));
-                AlarmManagerHelper.setAlarms(getContext());
-                updateUI();
-            }
-        };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(mAlarmRecyclerView);
 
         mAlarmRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -203,7 +186,7 @@ public class AlarmListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            mCallbacks.onAlarmSelected(mAlarm);
+            mCallbacks.onAlarmSelected(mAlarm, false);
         }
     }
 

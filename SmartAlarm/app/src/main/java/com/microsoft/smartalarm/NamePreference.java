@@ -8,6 +8,8 @@ import android.util.AttributeSet;
 
 public class NamePreference extends EditTextPreference {
 
+    private boolean mChanged;
+
     public NamePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -18,7 +20,11 @@ public class NamePreference extends EditTextPreference {
         setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
-                setSummary((String)o);
+                String changedText = (String) o;
+                if (getText().compareTo(changedText) != 0) {
+                    setChanged(true);
+                    setSummary((String) o);
+                }
                 return true;
             }
         });
@@ -27,5 +33,13 @@ public class NamePreference extends EditTextPreference {
     public void setAlarmName(String alarmName) {
         setText(alarmName);
         setSummary(alarmName);
+    }
+
+    public boolean hasChanged() {
+        return mChanged;
+    }
+
+    public void setChanged(boolean changed) {
+        mChanged = changed;
     }
 }
