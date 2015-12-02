@@ -1,7 +1,10 @@
 package com.microsoft.smartalarm;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +30,31 @@ public final class GameFactory {
         }
 
         if (games.size() > 0) {
-            int rand = new Random().nextInt(games.size());
-            Class game = games.get(rand);
-            Intent intent = new Intent(caller, game);
-            caller.startActivityForResult(intent, START_GAME_REQUEST);
-            return true;
+            if (isNetworkAvailable(caller)) {
+                int rand = new Random().nextInt(games.size());
+                Class game = games.get(rand);
+                Intent intent = new Intent(caller, game);
+                caller.startActivityForResult(intent, START_GAME_REQUEST);
+                return true;
+            }
+            else {
+                noNetworkGame(caller);
+                return true;
+            }
         } else {
             return false;
         }
+    }
+
+    private static boolean isNetworkAvailable(Activity caller) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) caller.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public static void noNetworkGame(Activity caller){
+        Intent intent = new Intent(caller, GameNoNetwork.class);
+        caller.startActivityForResult(intent, START_GAME_REQUEST);
     }
 }

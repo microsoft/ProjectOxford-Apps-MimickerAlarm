@@ -35,4 +35,7 @@
     <string name="onboarding_next">Next</string>
     <string name="onboarding_skip">Skip</string>
     <string name="accept">accept</string>
+    <string name="game_nonetwork_prompt">catch the sleepyhead!</string>
+    <string name="game_nonetwork_prompt2">keep going</string>
+    <string name="game_nonetwork_prompt3">almost there</string>
 </resources>
