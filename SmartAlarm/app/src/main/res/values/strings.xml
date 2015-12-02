@@ -21,4 +21,21 @@
     <string name="game_time_up_message">Time\'s Up!</string>
     <string name="game_failure_message">That does not look quite right</string>
     <string name="game_success_message">You did it!</string>
+
+    <string name="onboarding_tutorial_title_1">Set your alarm</string>
+    <string name="onboarding_tutorial_text_1">Tell us when you want to wake up and leave the rest to us</string>
+    <string name="onboarding_tutorial_title_2">Act when you hear it</string>
+    <string name="onboarding_tutorial_text_2">Decide between waking up or snoozing your alarm</string>
+    <string name="onboarding_tutorial_title_3">Play a game</string>
+    <string name="onboarding_tutorial_text_3">Turn off your alarm by playing a game</string>
+    <string name="onboarding_tutorial_title_4">Wake up</string>
+    <string name="onboarding_tutorial_text_4">And enjoy your morning</string>
+    <string name="onboarding_welcome_title">Welcome to Funrise</string>
+    <string name="onboarding_welcome_text">Play games to wake up and stay up</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="accept">accept</string>
+    <string name="game_nonetwork_prompt">catch the sleepyhead!</string>
+    <string name="game_nonetwork_prompt2">keep going</string>
+    <string name="game_nonetwork_prompt3">almost there</string>
 </resources>
