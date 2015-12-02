@@ -9,14 +9,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <TextView
+            style="@style/Font.Display1"
             android:text="@string/onboarding_welcome_title"
-            style="@style/TextAppearance.AppCompat.Display1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
         </TextView>
         <TextView
+            style="@style/Font.Body"
             android:text="@string/onboarding_welcome_text"
-            style="@style/TextAppearance.AppCompat.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
         </TextView>
@@ -33,7 +33,7 @@
             android:layout_alignParentRight="true"
             android:background="#00ffffff"
             android:text="@string/onboarding_skip"
-            style="@style/TextAppearance.AppCompat.Body2"
+            style="@style/Font.Body"
             android:onClick="showToS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>

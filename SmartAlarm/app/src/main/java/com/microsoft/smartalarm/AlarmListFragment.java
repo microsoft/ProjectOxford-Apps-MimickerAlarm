@@ -131,6 +131,11 @@ public class AlarmListFragment extends Fragment {
             startActivity(intent);
             return true;
         }
+        else if (id == R.id.action_learn_more) {
+            Intent intent = new Intent(getActivity(), LearnMoreActivity.class);
+            startActivity(intent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
