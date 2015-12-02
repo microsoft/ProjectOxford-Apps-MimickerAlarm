@@ -127,7 +127,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                 }
             }
             mRepeatingDaysPreference.setValues(values);
-            mRepeatingDaysPreference.setSummaryValues(values);
+            mRepeatingDaysPreference.setSummaryValues(values, R.string.pref_no_repeating);
         }
 
         private void initializeNamePreference() {

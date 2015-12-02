@@ -10,6 +10,8 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
 
     TimePicker mTimePicker;
 
+    private static final String ARGS_KEY = "key";
+
     public TimePreferenceDialogFragmentCompat() {
 
     }
@@ -17,7 +19,7 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
     public static TimePreferenceDialogFragmentCompat newInstance(Preference preference) {
         TimePreferenceDialogFragmentCompat fragment = new TimePreferenceDialogFragmentCompat();
         Bundle bundle = new Bundle(1);
-        bundle.putString("key", preference.getKey());
+        bundle.putString(ARGS_KEY, preference.getKey());
         fragment.setArguments(bundle);
         return fragment;
     }

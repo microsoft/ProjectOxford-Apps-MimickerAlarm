@@ -14,10 +14,12 @@ public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialog
     private EditText mEditText;
     private static int KEYBOARD_SHOW_DELAY = 500;
 
+    private static final String ARGS_KEY = "key";
+
     public static NamePreferenceDialogFragmentCompat newInstance(Preference preference) {
         NamePreferenceDialogFragmentCompat fragment = new NamePreferenceDialogFragmentCompat();
         Bundle bundle = new Bundle(1);
-        bundle.putString("key", preference.getKey());
+        bundle.putString(ARGS_KEY, preference.getKey());
         fragment.setArguments(bundle);
         return fragment;
     }

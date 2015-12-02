@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GamesPreference extends MultiSelectListPreference {
+public class GamesPreference extends MultiSelectListPreferenceWithSummary {
 
     private boolean mTongueTwisterEnabled;
     private boolean mColorCollectorEnabled;
@@ -79,33 +79,13 @@ public class GamesPreference extends MultiSelectListPreference {
             values.add(getContext().getString(R.string.pref_game_express_yourself_id));
         }
         setValues(values);
-        setSummaryValues(values);
+        setSummaryValues(values, R.string.pref_no_game);
     }
 
     private void setGamePreferences(Set<String> values) {
         setTongueTwisterEnabled(values.contains(getContext().getString(R.string.pref_game_tongue_twister_id)));
         setColorCollectorEnabled(values.contains(getContext().getString(R.string.pref_game_color_collector_id)));
         setExpressYourselfEnabled(values.contains(getContext().getString(R.string.pref_game_express_yourself_id)));
-        setSummaryValues(values);
-    }
-
-    public void setSummaryValues(Set<String> values) {
-        CharSequence[] menuItems = getEntryValues();
-        CharSequence[] menuItemsDisplay = getEntries();
-        String summaryString = "";
-        for (int i = 0; i < menuItems.length; i++) {
-            if (values.contains(menuItems[i].toString())) {
-                String gameName = menuItemsDisplay[i].toString();
-                if (summaryString.isEmpty()) {
-                    summaryString = gameName;
-                } else {
-                    summaryString += ", " + gameName;
-                }
-            }
-        }
-        if (summaryString.isEmpty()) {
-            summaryString = getContext().getString(R.string.pref_no_game);
-        }
-        setSummary(summaryString);
+        setSummaryValues(values, R.string.pref_no_game);
     }
 }
