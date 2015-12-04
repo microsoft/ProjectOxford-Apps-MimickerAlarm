@@ -3,6 +3,8 @@ package com.microsoft.smartalarm;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -10,13 +12,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.Format;
@@ -28,7 +32,10 @@ import java.util.Locale;
 public class AlarmListFragment extends Fragment {
 
     private RecyclerView mAlarmRecyclerView;
+    private RelativeLayout mEmptyView;
     private AlarmAdapter mAdapter;
+    private CollapsingToolbarLayout mCollapsingLayout;
+    private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
     private FloatingActionButton mFab;
     private Callbacks mCallbacks;
@@ -57,6 +64,7 @@ public class AlarmListFragment extends Fragment {
 
         mAlarmRecyclerView = (RecyclerView) view
                 .findViewById(R.id.alarm_recycler_view);
+        mAlarmRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
         mToolbar = (Toolbar) view
                 .findViewById(R.id.toolbar);
@@ -73,6 +81,12 @@ public class AlarmListFragment extends Fragment {
                 mCallbacks.onAlarmSelected(alarm, true);
             }
         });
+
+        mEmptyView = (RelativeLayout) view.findViewById(R.id.empty_view);
+
+        mCollapsingLayout = (CollapsingToolbarLayout) view.findViewById(R.id.toolbar_layout);
+
+        mAppBarLayout = (AppBarLayout) view.findViewById(R.id.app_bar);
 
         mAlarmRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -128,6 +142,28 @@ public class AlarmListFragment extends Fragment {
             mAdapter.setAlarms(mAlarms);
             mAdapter.notifyDataSetChanged();
         }
+
+        if (mAlarms.isEmpty()) {
+            mAlarmRecyclerView.setVisibility(View.GONE);
+            mEmptyView.setVisibility(View.VISIBLE);
+            enableCollapsingBehaviour(false);
+        } else {
+            mAlarmRecyclerView.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.GONE);
+            enableCollapsingBehaviour(true);
+        }
+    }
+
+    private void enableCollapsingBehaviour(boolean enableCollapse) {
+        if (!enableCollapse) {
+            mAppBarLayout.setExpanded(true);
+        }
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mCollapsingLayout.getLayoutParams();
+        int scrollFlags = enableCollapse ?
+                            AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED | AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL :
+                            AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP;
+        params.setScrollFlags(scrollFlags);
+        mCollapsingLayout.setLayoutParams(params);
     }
 
     private class AlarmHolder extends RecyclerView.ViewHolder

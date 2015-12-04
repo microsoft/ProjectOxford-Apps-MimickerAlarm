@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="110dp">
+                android:layout_height="110dp"
+                android:background="?android:attr/selectableItemBackground">
 
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/list_item_alarm_enabled_switch"
@@ -27,9 +27,5 @@
         android:layout_toLeftOf="@id/list_item_alarm_enabled_switch"
         android:layout_below="@id/list_item_alarm_title_text_view"
         android:paddingLeft="16dp"/>
-
-    <View
-        android:layout_alignParentBottom="true"
-        style="@style/Divider" />
 
 </RelativeLayout>

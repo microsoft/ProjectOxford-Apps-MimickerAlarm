@@ -14,7 +14,7 @@
         android:fitsSystemWindows="true"
         android:layout_height="@dimen/app_bar_height"
         android:layout_width="match_parent"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:background="@drawable/sunrise_header">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
@@ -22,14 +22,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="?attr/colorPrimary">
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Headline">
 
-            <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
-                                               android:layout_height="?attr/actionBarSize"
-                                               android:layout_width="match_parent"
-                                               app:layout_collapseMode="pin"
-                                               app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                                               app:theme="@style/ThemeOverlay.AppCompat.Light"/>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_width="match_parent"
+                app:layout_collapseMode="pin" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -42,6 +42,7 @@
         android:id="@+id/alarm_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context=".AlarmListActivity"/>
 
@@ -53,5 +54,39 @@
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
         android:src="@drawable/ic_add_black_18dp" />
+
+    <RelativeLayout
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/app_bar_height">
+
+        <TextView
+            android:id="@+id/empty_view_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="72dp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/empty_alarm_list_text" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="15dp"
+            android:layout_toRightOf="@id/empty_view_text"
+            android:layout_alignBottom="@id/empty_view_text"
+            android:src="@drawable/no_alarm_arrow" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="40dp"
+            android:layout_below="@+id/empty_view_text"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/no_alarm_clock" />
+
+    </RelativeLayout>
+
 
 </android.support.design.widget.CoordinatorLayout>

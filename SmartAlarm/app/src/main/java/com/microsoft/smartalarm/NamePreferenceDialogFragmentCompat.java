@@ -12,7 +12,7 @@ public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialog
         implements View.OnFocusChangeListener {
 
     private EditText mEditText;
-    private static int KEYBOARD_SHOW_DELAY = 500;
+    private static int KEYBOARD_SHOW_DELAY = 100;
 
     private static final String ARGS_KEY = "key";
 
