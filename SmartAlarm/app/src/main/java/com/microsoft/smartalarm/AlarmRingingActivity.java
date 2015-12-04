@@ -22,6 +22,9 @@ import android.widget.TextView;
 
 import net.hockeyapp.android.CrashManager;
 
+import java.text.DateFormat;
+import java.text.Format;
+import java.util.Calendar;
 import java.util.UUID;
 
 public class AlarmRingingActivity extends Activity {
@@ -55,8 +58,14 @@ public class AlarmRingingActivity extends Activity {
         TextView tvName = (TextView) findViewById(R.id.alarm_screen_name);
         tvName.setText(name);
 
+        Format formatter = DateFormat.getTimeInstance(DateFormat.SHORT);
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, timeHour);
+        calendar.set(Calendar.MINUTE, timeMinute);
+
         TextView tvTime = (TextView) findViewById(R.id.alarm_screen_time);
-        tvTime.setText(String.format("%02d : %02d", timeHour, timeMinute));
+        tvTime.setText(formatter.format(calendar.getTime()));
 
         Button dismissButton = (Button) findViewById(R.id.alarm_screen_button);
         dismissButton.setOnClickListener(new OnClickListener() {

@@ -7,35 +7,41 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
+import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 public class RepeatingDaysPreference extends Preference{
 
+    private boolean mLayoutInitialized;
     private boolean mChanged;
     private DayView[] mDayViews;
 
     public RepeatingDaysPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-        String[] entryLabels = context.getResources().getStringArray(R.array.pref_ring_repeating_labels);
-        mDayViews = new DayView[entryLabels.length];
-        for(int d = 0; d < entryLabels.length; d++){
+        mDayViews = new DayView[Calendar.SATURDAY];
+        for(int d = Calendar.SUNDAY, i = 0; d <= Calendar.SATURDAY; d++, i++){
             DayView dayView = new DayView(getContext(), this);
-            dayView.setText(entryLabels[d]);
-            mDayViews[d] = dayView;
+            dayView.setText(DateUtils.getDayOfWeekString(d, DateUtils.LENGTH_SHORT).toUpperCase());
+            mDayViews[i] = dayView;
         }
     }
 
     @Override
     public void onBindViewHolder(PreferenceViewHolder holder) {
-        LinearLayout container = (LinearLayout) holder.findViewById(R.id.pref_repeating_container);
-        for(DayView day : mDayViews){
-            day.setLayoutParams(new LinearLayout.LayoutParams(0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-            container.addView(day);
+        if (!mLayoutInitialized) {
+            LinearLayout container = (LinearLayout) holder.findViewById(R.id.pref_repeating_container);
+            for(DayView day : mDayViews){
+                day.setLayoutParams(new LinearLayout.LayoutParams(0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+                container.addView(day);
+            }
+            mLayoutInitialized = true;
         }
         super.onBindViewHolder(holder);
     }
@@ -107,12 +113,12 @@ public class RepeatingDaysPreference extends Preference{
 
         public void setRepeating(boolean repeating){
             mRepeating = repeating;
-            mParent.setChanged(true);
             invalidate();
         }
 
         public void toggleRepeating(){
             setRepeating(!getRepeating());
+            mParent.setChanged(true);
         }
 
         public boolean getRepeating() {

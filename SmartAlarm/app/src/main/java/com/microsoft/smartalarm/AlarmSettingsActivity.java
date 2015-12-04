@@ -13,8 +13,6 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.MenuItem;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class AlarmSettingsActivity extends AppCompatActivity {
@@ -151,11 +149,8 @@ public class AlarmSettingsActivity extends AppCompatActivity {
 
         private void initializeButtons() {
             mButtonsPreference = (ButtonsPreference) findPreference(getString(R.string.pref_buttons_key));
-            if (mNewAlarm) {
-                mButtonsPreference.setLeftButtonText(getResources().getString(R.string.pref_button_cancel));
-            } else {
-                mButtonsPreference.setLeftButtonText(getResources().getString(R.string.pref_button_delete));
-            }
+            int resId = mNewAlarm ? android.R.string.cancel : R.string.pref_button_delete;
+            mButtonsPreference.setLeftButtonText(getResources().getString(resId));
             mButtonsPreference.setRightButtonText(getResources().getString(R.string.pref_button_save));
             mButtonsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
@@ -174,7 +169,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                             onCancel();
                         } else {
                             // Delete button was pressed
-                            deleteSettingsAndExit();
+                            onDelete();
                         }
                     }
                     return true;
@@ -225,8 +220,27 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             }
         }
 
+        private void onDelete() {
+            new AlertDialog.Builder(getContext())
+                    .setMessage(R.string.pref_dialog_delete_alarm_message)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deleteSettingsAndExit();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Do nothing
+                        }
+                    })
+                    .show();
+        }
+
         private void saveSettingsAndExit() {
             AlarmManagerHelper.cancelAlarms(getContext());
+            populateUpdatedSettings();
             AlarmList.get(getActivity()).updateAlarm(mAlarm);
             AlarmManagerHelper.setAlarms(getContext());
             getActivity().finish();
@@ -244,66 +258,63 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
 
         private boolean haveSettingsChanged() {
-            return hasTimePreferenceChanged() ||
-                    hasRepeatingDaysChanged() ||
-                    hasNamePreferenceChanged() ||
-                    hasGamesPreferenceChanged() ||
-                    hasRingtonePreferenceChanged() ||
-                    hasVibratePreferenceChanged();
+            return mTimePreference.hasChanged() ||
+                    mRepeatingDaysPreference.hasChanged() ||
+                    mNamePreference.hasChanged() ||
+                    mGamesPreference.hasChanged() ||
+                    mRingtonePreference.hasChanged() ||
+                    mVibratePreference.hasChanged();
         }
 
-        private boolean hasVibratePreferenceChanged() {
-            boolean changed = mVibratePreference.hasChanged();
-            if (changed) {
+        private void populateUpdatedSettings() {
+            updateTimeSetting();
+            updateRepeatingDaysSetting();
+            updateNameSetting();
+            updateGamesSetting();
+            updateRingtoneSetting();
+            updateVibrateSetting();
+        }
+
+        private void updateVibrateSetting() {
+            if (mVibratePreference.hasChanged()) {
                 mAlarm.setVibrate(mVibratePreference.isChecked());
             }
-            return changed;
         }
 
-        private boolean hasRingtonePreferenceChanged() {
-            boolean changed = mRingtonePreference.hasChanged();
-            if (changed) {
+        private void updateRingtoneSetting() {
+            if (mRingtonePreference.hasChanged()) {
                 mAlarm.setAlarmTone(mRingtonePreference.getRingtone());
             }
-            return changed;
         }
 
-        private boolean hasGamesPreferenceChanged() {
-            boolean changed = mGamesPreference.hasChanged();
-            if (changed) {
+        private void updateGamesSetting() {
+            if (mGamesPreference.hasChanged()) {
                 mAlarm.setTongueTwisterEnabled(mGamesPreference.isTongueTwisterEnabled());
                 mAlarm.setColorCollectorEnabled(mGamesPreference.isColorCollectorEnabled());
                 mAlarm.setExpressYourselfEnabled(mGamesPreference.isExpressYourselfEnabled());
             }
-            return changed;
         }
 
-        private boolean hasNamePreferenceChanged() {
-            boolean changed = mNamePreference.hasChanged();
-            if (changed) {
+        private void updateNameSetting() {
+            if (mNamePreference.hasChanged()) {
                 mAlarm.setTitle(mNamePreference.getText());
             }
-            return changed;
         }
 
-        private boolean hasRepeatingDaysChanged() {
-            boolean changed = mRepeatingDaysPreference.hasChanged();
-            if (changed) {
+        private void updateRepeatingDaysSetting() {
+            if (mRepeatingDaysPreference.hasChanged()) {
                 boolean[] repeatingDays = mRepeatingDaysPreference.getRepeatingDays();
                 for (int i = 0; i < repeatingDays.length; i++) {
                     mAlarm.setRepeatingDay(i, repeatingDays[i]);
                 }
             }
-            return changed;
         }
 
-        private boolean hasTimePreferenceChanged() {
-            boolean changed = mTimePreference.hasChanged();
-            if (changed) {
+        private void updateTimeSetting() {
+            if (mTimePreference.hasChanged()) {
                 mAlarm.setTimeHour(mTimePreference.getHour());
                 mAlarm.setTimeMinute(mTimePreference.getMinute());
             }
-            return changed;
         }
 
         public void onActivityResult(int requestCode, int resultCode, Intent data) {

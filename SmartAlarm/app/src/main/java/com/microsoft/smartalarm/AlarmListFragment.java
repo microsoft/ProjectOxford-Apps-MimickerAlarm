@@ -18,16 +18,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 public class AlarmListFragment extends Fragment {
 
@@ -210,7 +207,7 @@ public class AlarmListFragment extends Fragment {
 
             mTitleTextView.setText(mAlarm.getTitle());
 
-            Format formatter = new SimpleDateFormat("h:mm aa", Locale.US);
+            Format formatter = DateFormat.getTimeInstance(DateFormat.SHORT);
             Calendar calendar = Calendar.getInstance();
 
             calendar.set(Calendar.HOUR_OF_DAY, mAlarm.getTimeHour());

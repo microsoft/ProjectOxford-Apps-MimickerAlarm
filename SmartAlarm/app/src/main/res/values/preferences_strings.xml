@@ -77,16 +77,6 @@
     <string name="pref_title_repeating">Repeat</string>
     <string name="pref_no_repeating">Does not repeat</string>
 
-    <string-array name="pref_ring_repeating_labels">
-        <item>SU</item>
-        <item>MO</item>
-        <item>TU</item>
-        <item>WE</item>
-        <item>TH</item>
-        <item>FR</item>
-        <item>SA</item>
-    </string-array>
-
     <string-array name="pref_game_labels">
         <item>Twist Up</item>
         <item>Color Collector</item>
@@ -113,9 +103,10 @@
     <string name="pref_title_vibrate">Vibration</string>
     <string name="pref_positive_save_button">Save</string>
     <string name="pref_button_delete">Delete</string>
-    <string name="pref_button_cancel">Cancel</string>
     <string name="pref_button_save">Save</string>
     <string name="pref_dialog_save_changes_message">Your changes were not saved. Would you like to save them?</string>
     <string name="pref_dialog_save_changes_negative_button">Discard changes</string>
     <string name="pref_dialog_save_changes_positive_button">Save</string>
+    <string name="pref_dialog_delete_alarm_message">Are you sure that you want to delete this alarm?</string>
+
 </resources>

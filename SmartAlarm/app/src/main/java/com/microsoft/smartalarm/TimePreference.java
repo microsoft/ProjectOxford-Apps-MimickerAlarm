@@ -6,10 +6,9 @@ import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 public class TimePreference extends DialogPreference {
 
@@ -45,7 +44,7 @@ public class TimePreference extends DialogPreference {
     }
 
     private void setTimeLabel() {
-        Format formatter = new SimpleDateFormat("h:mm aa", Locale.US);
+        Format formatter = DateFormat.getTimeInstance(DateFormat.SHORT);
         Calendar calendar = Calendar.getInstance();
 
         calendar.set(Calendar.HOUR_OF_DAY, mHour);
