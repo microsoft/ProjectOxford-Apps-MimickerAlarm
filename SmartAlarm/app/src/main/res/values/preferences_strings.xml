@@ -78,23 +78,13 @@
     <string name="pref_no_repeating">Does not repeat</string>
 
     <string-array name="pref_ring_repeating_labels">
-        <item>Sunday</item>
-        <item>Monday</item>
-        <item>Tuesday</item>
-        <item>Wednesday</item>
-        <item>Thursday</item>
-        <item>Friday</item>
-        <item>Saturday</item>
-    </string-array>
-
-    <string-array name="pref_ring_repeating_values">
-        <item>sunday</item>
-        <item>monday</item>
-        <item>tuesday</item>
-        <item>wednesday</item>
-        <item>thursday</item>
-        <item>friday</item>
-        <item>saturday</item>
+        <item>SU</item>
+        <item>MO</item>
+        <item>TU</item>
+        <item>WE</item>
+        <item>TH</item>
+        <item>FR</item>
+        <item>SA</item>
     </string-array>
 
     <string-array name="pref_game_labels">

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <TextView
+        android:id="@android:id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pref_title_repeating"
+        android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+        android:layout_marginTop="25dp"
+        />
+
+    <LinearLayout
+        android:layout_below="@android:id/title"
+        android:id="@+id/pref_repeating_container"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </LinearLayout>
+
+</RelativeLayout>
