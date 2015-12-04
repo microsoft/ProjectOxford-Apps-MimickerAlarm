@@ -11,6 +11,7 @@
     <string name="alarm_name_default">This is an Alarm</string>
     <string name="title_activity_alarm_settings">Settings</string>
     <string name="empty_alarm_list_text">You don\'t have any alarms set!\nUse the button to add alarms</string>
+    <string name="title_activity_learn_more">Learn more</string>
 
     <string name="game_twister_prompt">Say the following tongue twister</string>
     <string name="game_vision_prompt">Find something %s</string>
@@ -28,7 +29,7 @@
     <string name="onboarding_tutorial_text_3">Turn off your alarm by playing a game</string>
     <string name="onboarding_tutorial_title_4">Wake up</string>
     <string name="onboarding_tutorial_text_4">And enjoy your morning</string>
-    <string name="onboarding_welcome_title">Welcome to Funrise</string>
+    <string name="onboarding_welcome_title">Welcome to Mimicker!</string>
     <string name="onboarding_welcome_text">Play games to wake up and stay up</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_skip">Skip</string>
@@ -36,4 +37,10 @@
     <string name="game_nonetwork_prompt">catch the sleepyhead!</string>
     <string name="game_nonetwork_prompt2">keep going</string>
     <string name="game_nonetwork_prompt3">almost there</string>
+    <string name="learn_more_text">balhbalhalbhalhblhblahb asdlfja sdj askldj faj aklsdjkl asdkljfkla sdfasd lklasd jflasjdfl asdlfj alsdfkasjdlf ajslkdfj lasdjflk ajdsfl</string>
+    <string name="learn_more_oxford_link"><a href="http://www.projectoxford.ai/">Get started with Project Oxford</a></string>
+    <string name="learn_more_terms_link"><a href="http://go.microsoft.com/fwlink/?LinkID=206977">Terms of Use</a></string>
+    <string name="learn_more_privacy_link"><a href="http://go.microsoft.com/fwlink/?LinkId=521839">Privacy Statement</a></string>
+    <string name="learn_more_contact_link"><a href="http://www.uservoice.com">Contact us</a></string>
+    <string name="learn_more_other_link">Other links</string>
 </resources>

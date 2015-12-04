@@ -119,15 +119,11 @@ public class AlarmSettingsActivity extends AppCompatActivity {
 
         private void initializeRepeatingDaysPreference() {
             mRepeatingDaysPreference = (RepeatingDaysPreference) findPreference(getString(R.string.pref_repeating_days_key));
-            CharSequence[] menuItems = mRepeatingDaysPreference.getEntryValues();
-            Set<String> values = new HashSet<>();
             for (int i = 0; i < 7; ++i) {
                 if (mAlarm.getRepeatingDay(i)) {
-                    values.add(menuItems[i].toString());
+                    mRepeatingDaysPreference.setRepeatingDay(i, true);
                 }
             }
-            mRepeatingDaysPreference.setValues(values);
-            mRepeatingDaysPreference.setSummaryValues(values, R.string.pref_no_repeating);
         }
 
         private void initializeNamePreference() {
@@ -188,11 +184,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
 
         @Override
         public void onDisplayPreferenceDialog(Preference preference) {
-            if (preference instanceof RepeatingDaysPreference) {
-                DialogFragment dialogFragment = MultiSelectListPreferenceDialogFragmentCompat.newInstance(preference);
-                dialogFragment.setTargetFragment(this, 0);
-                dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);
-            } else if (preference instanceof TimePreference) {
+            if (preference instanceof TimePreference) {
                 DialogFragment dialogFragment = TimePreferenceDialogFragmentCompat.newInstance(preference);
                 dialogFragment.setTargetFragment(this, 0);
                 dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);

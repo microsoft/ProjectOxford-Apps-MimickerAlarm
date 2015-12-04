@@ -6,8 +6,7 @@
 
     <com.microsoft.smartalarm.RepeatingDaysPreference
         android:key="@string/pref_repeating_days_key"
-        android:entries="@array/pref_ring_repeating_labels"
-        android:entryValues="@array/pref_ring_repeating_values"
+        android:layout="@layout/preference_repeatingdays"
         android:title="@string/pref_title_repeating"/>
 
     <com.microsoft.smartalarm.NamePreference

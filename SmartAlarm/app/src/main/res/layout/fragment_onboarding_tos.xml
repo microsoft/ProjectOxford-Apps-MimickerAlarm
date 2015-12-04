@@ -10,13 +10,13 @@
 
         <TextView
             android:text="@string/tos_prompt_title"
-            style="@style/Base.TextAppearance.AppCompat.Display1"
+            style="@style/Font.Headline"
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView
             android:text="@string/tos_prompt_text"
-            style="@style/TextAppearance.AppCompat.Body2"
+            style="@style/Font.Body"
             android:gravity="center"
             android:layout_marginBottom="20dp"
             android:layout_width="match_parent"
@@ -35,6 +35,7 @@
             android:id="@+id/onboarding_tos_gotit"
             android:textColor="@color/white"
             android:background="@color/yellow4"
+            style="@style/Font.Button"
             android:layout_gravity="center_horizontal"
             android:layout_width="150dp"
             android:layout_height="wrap_content"/>
@@ -49,8 +50,8 @@
         android:layout_height="match_parent">
         <TextView
             android:text="@string/tos_title"
-            android:layout_gravity="center_horizontal"
-            style="@style/Base.TextAppearance.AppCompat.Display1"
+            android:gravity="center"
+            style="@style/Font.Headline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <ScrollView
@@ -59,6 +60,7 @@
             android:layout_height="0dp">
             <TextView
                 android:text="@string/tos"
+                style="@style/Font.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </ScrollView>
@@ -70,6 +72,7 @@
             <Button
                 android:id="@+id/onboarding_tos_cancel"
                 android:text="@android:string/cancel"
+                style="@style/Font.Action"
                 android:background="@color/invisible"
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -77,6 +80,7 @@
             <Button
                 android:id="@+id/onboarding_tos_accept"
                 android:text="@string/accept"
+                style="@style/Font.Action"
                 android:background="@color/invisible"
                 android:textColor="@color/yellow4"
                 android:textAllCaps="true"
@@ -94,31 +98,32 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:text="@string/tos_prompt_title"
-            style="@style/Base.TextAppearance.AppCompat.Display1"
+            android:text="@string/tos_prompt_ohoh"
+            style="@style/Font.Headline"
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <ImageView
             android:src="@drawable/onboarding_tutorial_6"
             android:layout_gravity="center_horizontal"
-            android:scaleType="fitStart"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="0dp"/>
 
         <TextView
             android:text="@string/tos_prompt_text"
-            style="@style/TextAppearance.AppCompat.Body2"
+            style="@style/Font.Body"
             android:gravity="center"
+            android:layout_weight="0.5"
             android:layout_marginBottom="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="0dp"/>
 
         <Button
             android:text="@string/tos_prompt_reconfirm"
             android:id="@+id/onboarding_tos_gonow"
             android:textColor="@color/white"
+            style="@style/Font.Button"
             android:background="@color/yellow4"
             android:layout_gravity="center_horizontal"
             android:layout_width="150dp"

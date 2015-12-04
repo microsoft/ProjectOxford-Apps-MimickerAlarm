@@ -17,10 +17,10 @@
         <TextView android:id="@android:id/text1"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  style="@style/TextAppearance.AppCompat.Headline"
+                  style="@style/Font.Title"
                   android:gravity="center"/>
         <TextView android:id="@android:id/text2"
-                  style="@style/TextAppearance.AppCompat.Body2"
+                  style="@style/Font.Body"
                   android:paddingLeft="@dimen/text_margin"
                   android:paddingRight="@dimen/text_margin"
                   android:layout_width="match_parent"
@@ -35,6 +35,7 @@
         android:textColor="@color/white"
         android:background="@color/yellow4"
         android:text="@string/onboarding_next"
+        style="@style/Font.Button"
         android:layout_width="150dp"
         android:layout_height="wrap_content"/>
 </LinearLayout>
