@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.microsoft.projectoxford.vision.VisionServiceRestClient;
@@ -13,14 +12,10 @@ import com.microsoft.projectoxford.vision.contract.AnalyzeResult;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
 
 public class GameColorFinderActivity extends GameWithCameraActivity {
     private VisionServiceRestClient mVisionServiceRestClient;
-    private static String           LOGTAG = "GameColorFinderActivity";
     private String                  mQuestionColorName;
     private int                     mQuestionColorCode;
     private static final int        COLOR_DIFF_ACCEPTANCE = 300;
@@ -47,12 +42,8 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
         instruction.setText(String.format(resources.getString(R.string.game_vision_prompt), mQuestionColorName));
 
         Logger.init(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Logger.trackUserAction(Logger.UserAction.GAME_COLOR, null, null);
+        Loggable playGameEvent = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR);
+        Logger.track(playGameEvent);
     }
 
     @Override
@@ -62,47 +53,38 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
             ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
             String[] features = {"Color"};
-            UUID loggerIdentifier = Logger.trackDurationStart();
             AnalyzeResult result = mVisionServiceRestClient.analyzeImage(inputStream, features);
-            Logger.trackDurationEnd(loggerIdentifier, Logger.Duration.OXFORD_VISION_ANALYZE, null);
-
-            // Service returns a color string in English
-            Log.d(LOGTAG, "Dominant fg colour : " + result.color.dominantColorForeground);
-            Log.d(LOGTAG, "Dominant bg colour : " + result.color.dominantColorBackground);
-            Log.d(LOGTAG, "accent colour : " + result.color.accentColor);
-            for (String color : result.color.dominantColors) {
-                Log.d(LOGTAG, "\t dominant colour : " + color);
-            }
-            double colorDistance = colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor));
-            Log.d(LOGTAG, "diff : " + String.valueOf(colorDistance));
-
             bitmap.recycle();
 
-            Map<String, String> properties = new HashMap<>();
-            properties.put("color-match", mQuestionColorName);
-            Map<String, Double> metrics = new HashMap<>();
-            metrics.put("color-distance", colorDistance);
+            double colorDistance = colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor));
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR_SUCCESS);
+            userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestionColorName);
+            userAction.putProp(Loggable.Key.PROP_DIFF, colorDistance);
+
+            boolean success = false;
             //TODO: this will not work for languages other than English.
             if (colorDistance < COLOR_DIFF_ACCEPTANCE ||
                     result.color.dominantColorForeground.toLowerCase().equals(mQuestionColorName) ||
                     result.color.dominantColorBackground.toLowerCase().equals(mQuestionColorName))
             {
-                Logger.trackUserAction(Logger.UserAction.GAME_COLOR_SUCCESS, properties, metrics);
-                return true;
+                success = true;
             }
 
             for (String color : result.color.dominantColors) {
                 if (color.toLowerCase().equals(mQuestionColorName)) {
-                    Logger.trackUserAction(Logger.UserAction.GAME_COLOR_SUCCESS, properties, metrics);
-                    return true;
+                    success = true;
+                    break;
                 }
             }
 
-            Logger.trackUserAction(Logger.UserAction.GAME_COLOR_FAIL, properties, metrics);
+            if (!success) {
+                userAction.Name = Loggable.Key.ACTION_GAME_COLOR_FAIL;
+            }
+
+            Logger.track(userAction);
+            return success;
         }
         catch(Exception ex) {
-            Log.e(LOGTAG, "Error calling ProjectOxford", ex);
-            Logger.trackException(ex);
         }
 
         return false;
@@ -110,10 +92,10 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
 
     @Override
     protected void gameFailure(boolean allowRetry) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("color-match", mQuestionColorName);
         if (!allowRetry){
-            Logger.trackUserAction(Logger.UserAction.GAME_COLOR_TIMEOUT, properties, null);
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR_TIMEOUT);
+            userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestionColorName);
+            Logger.track(userAction);
         }
         super.gameFailure(allowRetry);
     }

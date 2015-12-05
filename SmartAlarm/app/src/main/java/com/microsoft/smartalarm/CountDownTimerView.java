@@ -2,7 +2,6 @@ package com.microsoft.smartalarm;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.CountDownTimer;
@@ -29,15 +28,14 @@ public class CountDownTimerView extends View {
 
     public CountDownTimerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        ContextCompat contextCompat = new ContextCompat();
         m25PercentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        m25PercentPaint.setColor(contextCompat.getColor(context, R.color.yellow4));
+        m25PercentPaint.setColor(ContextCompat.getColor(context, R.color.yellow4));
         m50PercentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        m50PercentPaint.setColor(contextCompat.getColor(context, R.color.yellow3));
+        m50PercentPaint.setColor(ContextCompat.getColor(context, R.color.yellow3));
         m75PercentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        m75PercentPaint.setColor(contextCompat.getColor(context, R.color.yellow2));
+        m75PercentPaint.setColor(ContextCompat.getColor(context, R.color.yellow2));
         m100PercentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        m100PercentPaint.setColor(contextCompat.getColor(context, R.color.yellow1));
+        m100PercentPaint.setColor(ContextCompat.getColor(context, R.color.yellow1));
 
         m25PercentRect = new RectF(0, 0, 0, 0);
         m50PercentRect = new RectF(0, 0, 0, 0);
@@ -117,6 +115,7 @@ public class CountDownTimerView extends View {
         if (mIsPaused && mMillisUntilFinished > 0) {
             if (mTimer != null){
                 mTimer.cancel();
+                mTimer = null;
             }
             createNewTimer(mMillisUntilFinished);
             mTimer.start();

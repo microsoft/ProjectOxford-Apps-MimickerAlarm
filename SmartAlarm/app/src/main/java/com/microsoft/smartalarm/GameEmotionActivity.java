@@ -44,12 +44,13 @@ public class GameEmotionActivity extends GameWithCameraActivity {
         instruction.setText(String.format(resources.getString(R.string.game_emotion_prompt), adjectives[randomNumber]));
 
         Logger.init(this);
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_EMOTION);
+        Logger.track(userAction);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Logger.trackUserAction(Logger.UserAction.GAME_EMOTION, null, null);
     }
 
     @Override
@@ -61,9 +62,6 @@ public class GameEmotionActivity extends GameWithCameraActivity {
             List<RecognizeResult> result = mEmotionServiceRestClient.recognizeImage(inputStream);
 
             bitmap.recycle();
-
-            Map<String, String> properties = new HashMap<>();
-            properties.put("match-emotion", mEmotion);
 
             Boolean success = false;
             for (RecognizeResult r : result) {
@@ -95,13 +93,16 @@ public class GameEmotionActivity extends GameWithCameraActivity {
                 }
             }
 
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_EMOTION_SUCCESS);
+            userAction.putProp(Loggable.Key.PROP_QUESTION, mEmotion);
             if (success)
             {
-                Logger.trackUserAction(Logger.UserAction.GAME_EMOTION_SUCCESS, properties, null);
+                Logger.track(userAction);
                 return true;
             }
             else {
-                Logger.trackUserAction(Logger.UserAction.GAME_EMOTION_FAIL, properties, null);
+                userAction.Name = Loggable.Key.ACTION_GAME_EMOTION_FAIL;
+                Logger.track(userAction);
                 return false;
             }
         }
@@ -115,10 +116,10 @@ public class GameEmotionActivity extends GameWithCameraActivity {
 
     @Override
     protected void gameFailure(boolean allowRetry) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("match-emotion", mEmotion);
         if (!allowRetry){
-            Logger.trackUserAction(Logger.UserAction.GAME_EMOTION_TIMEOUT, properties, null);
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_EMOTION_TIMEOUT);
+            userAction.putProp(Loggable.Key.PROP_QUESTION, mEmotion);
+            Logger.track(userAction);
         }
         super.gameFailure(allowRetry);
     }
