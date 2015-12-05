@@ -13,7 +13,7 @@ import java.util.Collections;
 
 public class Logger {
 
-    private final static Boolean LOG_IN_DEBUG = true; // Use this to log even if in debug mode
+    private final static Boolean LOG_IN_DEBUG = false; // Use this to log even if in debug mode
     private static Boolean sStarted = false;
     private static Context sContext;
     private static String sMixpanelToken;
