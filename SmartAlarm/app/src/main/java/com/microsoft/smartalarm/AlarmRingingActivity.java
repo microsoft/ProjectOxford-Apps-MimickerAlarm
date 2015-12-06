@@ -14,6 +14,7 @@ import android.os.PowerManager.WakeLock;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
@@ -36,14 +37,15 @@ public class AlarmRingingActivity extends AppCompatActivity {
     private Vibrator mVibrator;
     private boolean mShouldVibrate;
 
-    private static final int WAKELOCK_TIMEOUT = 60 * 1000;
-
     private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
     private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
+    private static final int WAKE_LOCK_RELEASE_BUFFER = 3 * 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "Creating activity!");
 
         //Setup layout
         this.setContentView(R.layout.activity_alarm_ringing);
@@ -79,7 +81,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
                 Logger.track(userAction);
                 cancelVibration();
                 if (!GameFactory.startGame(AlarmRingingActivity.this, id)) {
-                    finish();
+                    finishActivity();
                 }
             }
         });
@@ -129,19 +131,29 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
                 if (mWakeLock != null && mWakeLock.isHeld()) {
                     mWakeLock.release();
+                    Log.d(TAG, "Released WAKE_LOCK!");
                 }
             }
         };
 
-        new Handler().postDelayed(releaseWakelock, WAKELOCK_TIMEOUT);
+        new Handler().postDelayed(releaseWakelock, getAlarmRingingDuration() - WAKE_LOCK_RELEASE_BUFFER);
+
+        setTitle(null);
 
         Logger.init(this);
-        setTitle(null);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.d(TAG, "OnNewIntent - Received a new intent!");
+        // TODO Figure out what the behaviour is for when two alarms overlap
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        Log.d(TAG, "Entered onResume!");
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -155,6 +167,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         if (!mWakeLock.isHeld()) {
             mWakeLock.acquire();
+            Log.d(TAG, "Acquired WAKE_LOCK!");
         }
 
         final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
@@ -165,8 +178,11 @@ public class AlarmRingingActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+        Log.d(TAG, "Entered onPause!");
+
         if (mWakeLock != null && mWakeLock.isHeld()) {
             mWakeLock.release();
+            Log.d(TAG, "Released WAKE_LOCK!");
         }
     }
 
@@ -174,7 +190,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GameFactory.START_GAME_REQUEST) {
             if (resultCode == RESULT_OK) {
-                finish();
+                finishActivity();
             } else {
                 if (mPlayer != null) {
                     mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -228,5 +244,12 @@ public class AlarmRingingActivity extends AppCompatActivity {
         if (mVibrator != null) {
             mVibrator.cancel();
         }
+    }
+
+    private void finishActivity() {
+        if (mPlayer != null) {
+            mPlayer.release();
+        }
+        finish();
     }
 }

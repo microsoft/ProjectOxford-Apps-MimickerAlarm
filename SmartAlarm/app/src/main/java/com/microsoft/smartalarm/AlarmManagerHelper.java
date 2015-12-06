@@ -97,7 +97,7 @@ public class AlarmManagerHelper extends BroadcastReceiver {
     }
 
     private static PendingIntent createPendingIntent(Context context, Alarm alarm) {
-        Intent intent = new Intent(context, AlarmService.class);
+        Intent intent = new Intent(context, AlarmWakeReceiver.class);
         intent.putExtra(ID, alarm.getId());
         intent.putExtra(TITLE, alarm.getTitle());
         intent.putExtra(TIME_HOUR, alarm.getTimeHour());
@@ -107,6 +107,6 @@ public class AlarmManagerHelper extends BroadcastReceiver {
         }
         intent.putExtra(VIBRATE, alarm.shouldVibrate());
 
-        return PendingIntent.getService(context, (int) alarm.getId().getLeastSignificantBits(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(context, (int) alarm.getId().getLeastSignificantBits(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }
