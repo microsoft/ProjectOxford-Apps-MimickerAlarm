@@ -21,15 +21,17 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // When we restart after being killed we get a null intent
+        if (intent != null) {
+            Intent alarmIntent = new Intent(getBaseContext(), AlarmRingingActivity.class);
+            alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            alarmIntent.putExtras(intent);
+            getApplication().startActivity(alarmIntent);
+        }
 
-        Intent alarmIntent = new Intent(getBaseContext(), AlarmRingingActivity.class);
-        alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        alarmIntent.putExtras(intent);
-        getApplication().startActivity(alarmIntent);
+        //AlarmManagerHelper.setAlarms(this);
 
-        AlarmManagerHelper.setAlarms(this);
-
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
 }

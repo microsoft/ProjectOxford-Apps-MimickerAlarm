@@ -1,6 +1,5 @@
 package com.microsoft.smartalarm;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.Intent;
@@ -13,6 +12,7 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.Vibrator;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
@@ -27,7 +27,7 @@ import java.text.Format;
 import java.util.Calendar;
 import java.util.UUID;
 
-public class AlarmRingingActivity extends Activity {
+public class AlarmRingingActivity extends AppCompatActivity {
 
     public final String TAG = this.getClass().getSimpleName();
 
@@ -135,6 +135,7 @@ public class AlarmRingingActivity extends Activity {
         new Handler().postDelayed(releaseWakelock, WAKELOCK_TIMEOUT);
 
         Logger.init(this);
+        setTitle(null);
     }
 
     @Override

@@ -4,21 +4,24 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <Button
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/left_settings_button"
-        android:layout_width="120dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_toLeftOf="@+id/right_settings_button"
-        android:background="@android:color/transparent"
+        android:textAppearance="?android:attr/textAppearanceButton"
+        android:background="@drawable/abc_btn_borderless_material"
         />
 
-    <Button
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/right_settings_button"
-        android:layout_width="120dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:background="@android:color/transparent"
+        android:textAppearance="?android:attr/textAppearanceButton"
+        android:textColor="@color/green3"
+        android:background="@drawable/abc_btn_borderless_material"
         />
 
 </RelativeLayout>

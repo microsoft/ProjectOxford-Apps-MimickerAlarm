@@ -15,6 +15,7 @@ public class ButtonsPreference extends Preference {
     public ButtonsPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setLayoutResource(R.layout.preference_buttons);
+        setEnabled(false);
     }
 
     @Override
@@ -36,6 +37,8 @@ public class ButtonsPreference extends Preference {
                 callChangeListener(true);
             }
         });
+        leftButton.setEnabled(true);
+        rightButton.setEnabled(true);
     }
 
     public void setLeftButtonText(String buttonText) {

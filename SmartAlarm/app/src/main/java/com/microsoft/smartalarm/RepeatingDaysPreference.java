@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import java.util.Calendar;
 
-public class RepeatingDaysPreference extends Preference{
+public class RepeatingDaysPreference extends Preference {
 
     private boolean mLayoutInitialized;
     private boolean mChanged;
