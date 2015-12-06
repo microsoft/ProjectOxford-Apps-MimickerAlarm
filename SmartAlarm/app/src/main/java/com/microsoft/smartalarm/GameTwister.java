@@ -42,6 +42,9 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
 
         generateQuestion();
         initialize();
+        Logger.init(this);
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER);
+        Logger.track(userAction);
     }
 
     @Override
@@ -50,7 +53,6 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
 
         mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
         mTimer.start();
-        Logger.trackUserAction(Logger.UserAction.GAME_TWISTER, null, null);
     }
 
     private void generateQuestion() {
@@ -87,7 +89,9 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
             });
         }
         else {
-            Logger.trackUserAction(Logger.UserAction.GAME_TWISTER_TIMEOUT, null, null);
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER_TIMEOUT);
+            userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
+            Logger.track(userAction);
             String failureMessage = getString(R.string.game_time_up_message);
             stateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
@@ -188,8 +192,6 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
                 gameFailure(false);
             }
         });
-
-        Logger.init(this);
     }
 
 
@@ -252,16 +254,17 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
 
         double distance = (double)levenshteinDistance(mUnderstoodText, mQuestion) / (double)mQuestion.length();
 
-        Map<String, String> properties = new HashMap<>();
-        properties.put("twister-text", mQuestion);
-        Map<String, Double> metrics = new HashMap<>();
-        metrics.put("twister-percent-different", distance * 100);
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER_SUCCESS);
+        userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
+        userAction.putProp(Loggable.Key.PROP_DIFF, distance);
+
         if (distance <= SUCCESS_THRESHOLD) {
-            Logger.trackUserAction(Logger.UserAction.GAME_TWISTER_SUCCESS, properties, metrics);
+            Logger.track(userAction);
             gameSuccess();
         }
         else {
-            Logger.trackUserAction(Logger.UserAction.GAME_TWISTER_FAIL, properties, metrics);
+            userAction.Name = Loggable.Key.ACTION_GAME_TWISTER_FAIL;
+            Logger.track(userAction);
             gameFailure(true);
         }
     }

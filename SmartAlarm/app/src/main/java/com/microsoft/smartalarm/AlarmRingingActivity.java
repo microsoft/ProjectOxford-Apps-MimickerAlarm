@@ -75,7 +75,8 @@ public class AlarmRingingActivity extends AppCompatActivity {
                 if (mPlayer != null) {
                     mPlayer.stop();
                 }
-                Logger.trackUserAction(Logger.UserAction.ALARM_DISMISS, null, null);
+                Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
+                Logger.track(userAction);
                 cancelVibration();
                 if (!GameFactory.startGame(AlarmRingingActivity.this, id)) {
                     finish();

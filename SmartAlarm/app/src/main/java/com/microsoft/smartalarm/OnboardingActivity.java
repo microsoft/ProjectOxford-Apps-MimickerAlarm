@@ -36,7 +36,9 @@ public class OnboardingActivity extends FragmentActivity{
             setStatusBarColor();
             if (!mStarted) {
                 mStarted = true;
-                Logger.trackUserAction(Logger.UserAction.FIRST_RUN, null, null);
+
+                Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING);
+                Logger.track(userAction);
 
                 Fragment newFragment = new OnboardingTutorialFragment();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -53,6 +55,12 @@ public class OnboardingActivity extends FragmentActivity{
             Intent startMainActivity = new Intent(this, AlarmListActivity.class);
             startActivity(startMainActivity);
         }
+    }
+
+    public void skip(View view) {
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING_SKIP);
+        Logger.track(userAction);
+        showToS(view);
     }
 
     public void showToS(View view) {

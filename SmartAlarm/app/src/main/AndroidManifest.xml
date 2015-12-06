@@ -102,8 +102,8 @@
         <activity android:name="net.hockeyapp.android.PaintActivity"/>
 
         <meta-data
-            android:name="com.microsoft.applicationinsights.instrumentationKey"
-            android:value="${APPINSIGHTS_INSTRUMENTATION_KEY}"/>
+            android:name="com.mixpanel.token"
+            android:value="${MIXPANEL_TOKEN}"/>
     </application>
 
 </manifest>
