@@ -6,10 +6,6 @@ import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.text.Format;
-import java.util.Calendar;
-
 public class TimePreference extends DialogPreference {
 
     private TextView mTimeLabel;
@@ -44,13 +40,7 @@ public class TimePreference extends DialogPreference {
     }
 
     private void setTimeLabel() {
-        Format formatter = DateFormat.getTimeInstance(DateFormat.SHORT);
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.HOUR_OF_DAY, mHour);
-        calendar.set(Calendar.MINUTE, mMinute);
-
-        mTimeLabel.setText(formatter.format(calendar.getTime()));
+        mTimeLabel.setText(AlarmUtils.getShortTimeString(mHour, mMinute));
     }
 
     public boolean hasChanged() {

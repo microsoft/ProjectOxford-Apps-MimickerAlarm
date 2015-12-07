@@ -28,25 +28,35 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".AlarmSettingsActivity"
             android:parentActivityName=".AlarmListActivity"
             android:screenOrientation="portrait">
         </activity>
+
         <activity
             android:name=".AlarmListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+
         <activity
             android:name=".AlarmRingingActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
 
+        <receiver
+            android:name=".AlarmWakeReceiver"
+            android:enabled="true"
+            android:exported="false"/>
+
         <service
-            android:name=".AlarmService"
+            android:name=".AlarmRingingService"
             android:enabled="true"/>
 
-        <receiver android:name=".AlarmManagerHelper">
+        <receiver
+            android:name=".AlarmManagerHelper">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.TIMEZONE_CHANGED"/>

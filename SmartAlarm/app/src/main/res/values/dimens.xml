@@ -4,4 +4,6 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="alarm_list_item_height">90dp</dimen>
+    <dimen name="alarm_list_item_height_tall">115dp</dimen>
 </resources>

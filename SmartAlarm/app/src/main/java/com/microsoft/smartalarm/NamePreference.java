@@ -21,9 +21,9 @@ public class NamePreference extends EditTextPreference {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
                 String changedText = (String) o;
-                if (getText().compareTo(changedText) != 0) {
+                if (getText() == null || getText().compareTo(changedText) != 0) {
                     setChanged(true);
-                    setSummary((String) o);
+                    setSummary(changedText);
                 }
                 return true;
             }
@@ -41,5 +41,13 @@ public class NamePreference extends EditTextPreference {
 
     public void setChanged(boolean changed) {
         mChanged = changed;
+    }
+
+    private void setSummary(String alarmName) {
+        if (alarmName == null || alarmName.isEmpty()) {
+            super.setSummary(R.string.pref_title_description_hint);
+        } else {
+            super.setSummary(alarmName);
+        }
     }
 }

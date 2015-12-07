@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import java.util.Calendar;
 
-public class RepeatingDaysPreference extends Preference{
+public class RepeatingDaysPreference extends Preference {
 
     private boolean mLayoutInitialized;
     private boolean mChanged;
@@ -24,10 +24,13 @@ public class RepeatingDaysPreference extends Preference{
 
     public RepeatingDaysPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mDayViews = new DayView[Calendar.SATURDAY];
-        for(int d = Calendar.SUNDAY, i = 0; d <= Calendar.SATURDAY; d++, i++){
+        mDayViews = new DayView[7];
+
+        //TODO How do we handle this better from a locale perspective i.e first day of week
+        String[] dayNames = AlarmUtils.getShortDayNames();
+        for(int i = 0; i < 7; i++) {
             DayView dayView = new DayView(getContext(), this);
-            dayView.setText(DateUtils.getDayOfWeekString(d, DateUtils.LENGTH_SHORT).toUpperCase());
+            dayView.setText(dayNames[i]);
             mDayViews[i] = dayView;
         }
     }
