@@ -32,6 +32,7 @@ public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialog
         mEditText.setSingleLine();
         mEditText.setSelection(mEditText.getText().length());
         mEditText.setOnFocusChangeListener(this);
+        mEditText.setHint(R.string.pref_title_description_hint);
     }
 
     @Override

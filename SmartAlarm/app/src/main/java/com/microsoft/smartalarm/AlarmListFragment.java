@@ -19,11 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.text.Format;
-import java.util.Calendar;
 import java.util.List;
 
 public class AlarmListFragment extends Fragment {
@@ -174,6 +172,7 @@ public class AlarmListFragment extends Fragment {
         private TextView mTitleTextView;
         private TextView mTimeTextView;
         private SwitchCompat mAlarmEnabled;
+        private RelativeLayout mContainer;
 
         private Alarm mAlarm;
 
@@ -184,6 +183,7 @@ public class AlarmListFragment extends Fragment {
             mTitleTextView = (TextView) itemView.findViewById(R.id.list_item_alarm_title_text_view);
             mTimeTextView = (TextView) itemView.findViewById(R.id.list_item_alarm_time_text_view);
             mAlarmEnabled = (SwitchCompat) itemView.findViewById(R.id.list_item_alarm_enabled_switch);
+            mContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
 
             mAlarmEnabled.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -200,21 +200,25 @@ public class AlarmListFragment extends Fragment {
             mAlarm = alarm;
 
             String title = mAlarm.getTitle();
-            if (title == null) {
-                mAlarm.setTitle(getString(R.string.alarm_name_default));
-                AlarmList.get(getActivity()).updateAlarm(mAlarm);
+
+            if (title == null || title.isEmpty()) {
+                mTitleTextView.setVisibility(View.GONE);
+            } else {
+                mTitleTextView.setVisibility(View.VISIBLE);
+                mTitleTextView.setText(mAlarm.getTitle());
             }
 
-            mTitleTextView.setText(mAlarm.getTitle());
-
-            Format formatter = DateFormat.getTimeInstance(DateFormat.SHORT);
-            Calendar calendar = Calendar.getInstance();
-
-            calendar.set(Calendar.HOUR_OF_DAY, mAlarm.getTimeHour());
-            calendar.set(Calendar.MINUTE, mAlarm.getTimeMinute());
-
-            mTimeTextView.setText(formatter.format(calendar.getTime()));
+            mTimeTextView.setText(AlarmUtils.getShortTimeString(mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
             mAlarmEnabled.setChecked(mAlarm.isEnabled());
+        }
+
+        public void setFirstItemDimensions() {
+            int itemHeightTall = getContext().getResources().getDimensionPixelSize(R.dimen.alarm_list_item_height_tall);
+            TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, itemHeightTall);
+            mContainer.setLayoutParams(params);
+
+            int tallItemPadding = itemHeightTall - getContext().getResources().getDimensionPixelSize(R.dimen.alarm_list_item_height);
+            mContainer.setPadding(0, tallItemPadding, 0, 0);
         }
 
         @Override
@@ -241,6 +245,9 @@ public class AlarmListFragment extends Fragment {
         @Override
         public void onBindViewHolder(AlarmHolder holder, int position) {
             Alarm alarm = mAlarms.get(position);
+            if (position == 0) {
+                holder.setFirstItemDimensions();
+            }
             holder.bindAlarm(alarm);
         }
 
