@@ -90,7 +90,12 @@ public class AlarmRingingActivity extends AppCompatActivity {
                         dismissAlarm();
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
-                        mAlarmRingingClock.setVisibility(View.VISIBLE);
+                        mAlarmRingingClock.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAlarmRingingClock.setVisibility(View.VISIBLE);
+                            }
+                        });
                         break;
                     default:
                         break;
@@ -121,7 +126,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     ClipData dragData = ClipData.newPlainText("", "");
                     View.DragShadowBuilder shadow = new View.DragShadowBuilder(mAlarmRingingClock);
-                    mAlarmRingingClock.startDrag(dragData, shadow, mAlarmRingingClock, 0);
+                    mAlarmRingingClock.startDrag(dragData, shadow, null, 0);
                     mAlarmRingingClock.setVisibility(View.INVISIBLE);
                     return true;
                 } else {
