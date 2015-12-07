@@ -11,6 +11,7 @@
     <string name="title_activity_alarm_settings">Settings</string>
     <string name="empty_alarm_list_text">You don\'t have any alarms set!\nUse the button to add alarms</string>
     <string name="title_activity_learn_more">Learn more</string>
+    <string name="alarm_ringing_default_text">Wakey Wakey</string>
 
     <string name="game_twister_prompt">Say the following tongue twister</string>
     <string name="game_vision_prompt">Find something %s</string>

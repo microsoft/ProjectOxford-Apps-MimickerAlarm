@@ -19,12 +19,17 @@ public class AlarmUtils {
         return formatter.format(calendar.getTime());
     }
 
+    public static String getFullDateStringForNow() {
+        Format formatter = DateFormat.getDateInstance(DateFormat.FULL);
+        return formatter.format(Calendar.getInstance().getTime());
+    }
+
     public static String[] getShortDayNames() {
         String[] dayNames = new String[7];
         DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
         for(int d = Calendar.SUNDAY, i = 0; d <= Calendar.SATURDAY; d++, i++) {
             String dayName = dateFormatSymbols.getShortWeekdays()[d].toUpperCase(Locale.getDefault());
-            if (dayName.length() == 3) {
+            if (dayName.length() >= 3) {
                 dayName = dayName.substring(0, 2);
             }
             dayNames[i] = dayName;

@@ -1,5 +1,6 @@
 package com.microsoft.smartalarm;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.Intent;
@@ -12,20 +13,20 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.Vibrator;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
+import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.hockeyapp.android.CrashManager;
 
-import java.text.DateFormat;
-import java.text.Format;
-import java.util.Calendar;
 import java.util.UUID;
 
 public class AlarmRingingActivity extends AppCompatActivity {
@@ -36,6 +37,9 @@ public class AlarmRingingActivity extends AppCompatActivity {
     private MediaPlayer mPlayer;
     private Vibrator mVibrator;
     private boolean mShouldVibrate;
+    private ImageView mAlarmRingingClock;
+    private UUID mAlarmId;
+    private String mAlarmTone;
 
     private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
     private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
@@ -47,63 +51,87 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         Log.d(TAG, "Creating activity!");
 
-        //Setup layout
-        this.setContentView(R.layout.activity_alarm_ringing);
-
-        final UUID id = (UUID) getIntent().getSerializableExtra(AlarmManagerHelper.ID);
+        mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmManagerHelper.ID);
         String name = getIntent().getStringExtra(AlarmManagerHelper.TITLE);
         int timeHour = getIntent().getIntExtra(AlarmManagerHelper.TIME_HOUR, 0);
         int timeMinute = getIntent().getIntExtra(AlarmManagerHelper.TIME_MINUTE, 0);
-        String tone = getIntent().getStringExtra(AlarmManagerHelper.TONE);
+        mAlarmTone = getIntent().getStringExtra(AlarmManagerHelper.TONE);
         mShouldVibrate = getIntent().getBooleanExtra(AlarmManagerHelper.VIBRATE, false);
 
-        TextView tvName = (TextView) findViewById(R.id.alarm_screen_name);
-        tvName.setText(name);
+        setTitle(null);
 
-        Format formatter = DateFormat.getTimeInstance(DateFormat.SHORT);
-        Calendar calendar = Calendar.getInstance();
+        setContentView(R.layout.activity_alarm_ringing);
 
-        calendar.set(Calendar.HOUR_OF_DAY, timeHour);
-        calendar.set(Calendar.MINUTE, timeMinute);
+        TextView timeField = (TextView) findViewById(R.id.alarm_ringing_time);
+        timeField.setText(AlarmUtils.getShortTimeString(timeHour, timeMinute));
 
-        TextView tvTime = (TextView) findViewById(R.id.alarm_screen_time);
-        tvTime.setText(formatter.format(calendar.getTime()));
+        TextView dateField = (TextView) findViewById(R.id.alarm_ringing_date);
+        dateField.setText(AlarmUtils.getFullDateStringForNow());
 
-        Button dismissButton = (Button) findViewById(R.id.alarm_screen_button);
+        if (name == null || name.isEmpty()) {
+            name = getString(R.string.alarm_ringing_default_text);
+        }
+        TextView titleField = (TextView) findViewById(R.id.alarm_ringing_title);
+        titleField.setText(name);
+
+        ImageView dismissButton = (ImageView) findViewById(R.id.alarm_ringing_dismiss);
         dismissButton.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View view) {
-                if (mPlayer != null) {
-                    mPlayer.stop();
-                }
-                Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
-                Logger.track(userAction);
-                cancelVibration();
-                if (!GameFactory.startGame(AlarmRingingActivity.this, id)) {
-                    finishActivity();
-                }
+                dismissAlarm();
             }
         });
 
-
-        try {
-            if (tone != null && !tone.equals("")) {
-                Uri toneUri = Uri.parse(tone);
-                if (toneUri != null) {
-                    mPlayer = new MediaPlayer();
-                    mPlayer.setDataSource(this, toneUri);
-                    mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-                    mPlayer.setLooping(true);
-                    mPlayer.prepare();
-                    mPlayer.start();
+        dismissButton.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                switch(event.getAction()) {
+                    case DragEvent.ACTION_DROP:
+                        dismissAlarm();
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        mAlarmRingingClock.setVisibility(View.VISIBLE);
+                        break;
+                    default:
+                        break;
                 }
+                return true;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Logger.trackException(e);
-        }
+        });
 
+        ImageView snoozeButton = (ImageView) findViewById(R.id.alarm_ringing_snooze);
+        snoozeButton.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                switch(event.getAction()) {
+                    case DragEvent.ACTION_DROP:
+                        snoozeAlarm();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+
+        mAlarmRingingClock = (ImageView) findViewById(R.id.alarm_ringing_clock);
+        mAlarmRingingClock.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    ClipData dragData = ClipData.newPlainText("", "");
+                    View.DragShadowBuilder shadow = new View.DragShadowBuilder(mAlarmRingingClock);
+                    mAlarmRingingClock.startDrag(dragData, shadow, mAlarmRingingClock, 0);
+                    mAlarmRingingClock.setVisibility(View.INVISIBLE);
+                    return true;
+                } else {
+                    return false;
+                }
+
+            }
+        });
+
+        playAlarmSound();
         vibrateDeviceIfDesired();
 
         Runnable alarmCancelTask = new Runnable() {
@@ -138,9 +166,48 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         new Handler().postDelayed(releaseWakelock, getAlarmRingingDuration() - WAKE_LOCK_RELEASE_BUFFER);
 
-        setTitle(null);
-
         Logger.init(this);
+    }
+
+    private void playAlarmSound() {
+        try {
+            if (mAlarmTone != null && !mAlarmTone.isEmpty()) {
+                Uri toneUri = Uri.parse(mAlarmTone);
+                if (toneUri != null) {
+                    mPlayer = new MediaPlayer();
+                    mPlayer.setDataSource(this, toneUri);
+                    mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                    mPlayer.setLooping(true);
+                    mPlayer.prepare();
+                    mPlayer.start();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Logger.trackException(e);
+        }
+    }
+
+    private void dismissAlarm() {
+        if (mPlayer != null) {
+            mPlayer.stop();
+        }
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
+        Logger.track(userAction);
+        cancelVibration();
+        if (!GameFactory.startGame(AlarmRingingActivity.this, mAlarmId)) {
+            finishActivity();
+        }
+    }
+
+    private void snoozeAlarm() {
+        // TODO - Oxford Apps VSO Task: 5264 Enable snooze functionality on ringing screen
+        mAlarmRingingClock.post(new Runnable() {
+            @Override
+            public void run() {
+                Snackbar.make(mAlarmRingingClock, "Snooze functionality coming soon!", Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

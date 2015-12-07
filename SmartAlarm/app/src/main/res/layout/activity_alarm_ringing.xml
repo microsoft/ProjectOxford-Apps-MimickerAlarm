@@ -1,46 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/material_grey">
 
     <TextView
-        android:id="@+id/alarm_screen_title"
+        android:id="@+id/alarm_ringing_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="28dp"
-        android:text="Alarm!"
-        android:textSize="38dp" />
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
     <TextView
-        android:id="@+id/alarm_screen_time"
+        android:id="@+id/alarm_ringing_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/alarm_screen_button"
-        android:layout_below="@+id/alarm_screen_title"
-        android:layout_marginTop="28dp"
-        android:text="00 : 00"
-        android:textSize="52dp" />
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
 
     <TextView
-        android:id="@+id/alarm_screen_name"
+        android:id="@+id/alarm_ringing_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/alarm_screen_time"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="28dp"
-        android:text="Alarm name" />
+        android:layout_gravity="center"
+        android:layout_marginTop="75dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
-    <Button
-        android:id="@+id/alarm_screen_button"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="106dp"
-        android:text="Dismiss"
-        android:textSize="38dp" />
+        android:layout_marginTop="75dp">
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/alarm_ringing_snooze"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/snooze_button" />
+
+        <ImageView
+            android:id="@+id/alarm_ringing_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/alarm_ring_button" />
+
+        <ImageView
+            android:id="@+id/alarm_ringing_dismiss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/dismiss_button" />
+    </RelativeLayout>
+
+
+</LinearLayout>

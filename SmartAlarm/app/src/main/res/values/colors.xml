@@ -22,4 +22,5 @@
     <color name="dark4">#4d4d4d</color>
     <color name="dark5">#131e1b</color>
     <color name="invisible">#00ffffff</color>
+    <color name="material_grey">#fafafa</color>
 </resources>
