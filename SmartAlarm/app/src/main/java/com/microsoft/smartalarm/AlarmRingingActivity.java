@@ -44,11 +44,13 @@ public class AlarmRingingActivity extends AppCompatActivity {
     private UUID mAlarmId;
     private String mAlarmTone;
     private boolean mShowClockOnDragEnd = true;
+    private Handler mHandler;
+    private Runnable mAlarmCancelTask;
 
     private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
     private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
-    private static final int WAKE_LOCK_RELEASE_BUFFER = 3 * 1000;
     private static final int CLOCK_ANIMATION_DURATION = 1500;
+    private static final int SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,12 +99,12 @@ public class AlarmRingingActivity extends AppCompatActivity {
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
                         if (mShowClockOnDragEnd) {
-                            mAlarmRingingClock.post(new Runnable() {
+                            mAlarmRingingClock.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
                                     mAlarmRingingClock.setVisibility(View.VISIBLE);
                                 }
-                            });
+                            }, SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY);
                         }
                         break;
                     default:
@@ -144,77 +146,32 @@ public class AlarmRingingActivity extends AppCompatActivity {
             }
         });
 
-        ObjectAnimator animateClock = ObjectAnimator.ofFloat(mAlarmRingingClock, "translationY", -35f, 0f);
-        animateClock.setDuration(CLOCK_ANIMATION_DURATION);
-        animateClock.setInterpolator(new BounceInterpolator());
-        animateClock.setRepeatCount(ValueAnimator.INFINITE);
-        animateClock.start();
-
+        animateClock();
         playAlarmSound();
         vibrateDeviceIfDesired();
 
-        Runnable alarmCancelTask = new Runnable() {
+        mAlarmCancelTask = new Runnable() {
             @Override
             public void run() {
-                if (mPlayer != null && mPlayer.isPlaying())
-                {
-                    mPlayer.stop();
-                }
+                cancelAlarmSound();
                 cancelVibration();
-                finish();
+                clearLockScreenFlags();
+                releaseWakeLock();
+                finishActivity();
             }
         };
 
-        new Handler().postDelayed(alarmCancelTask, getAlarmRingingDuration());
-
-        Runnable releaseWakelock = new Runnable() {
-
-            @Override
-            public void run() {
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-
-                if (mWakeLock != null && mWakeLock.isHeld()) {
-                    mWakeLock.release();
-                    Log.d(TAG, "Released WAKE_LOCK!");
-                }
-            }
-        };
-
-        new Handler().postDelayed(releaseWakelock, getAlarmRingingDuration() - WAKE_LOCK_RELEASE_BUFFER);
-    }
-
-    private void playAlarmSound() {
-        try {
-            if (mAlarmTone != null && !mAlarmTone.isEmpty()) {
-                Uri toneUri = Uri.parse(mAlarmTone);
-                if (toneUri != null) {
-                    mPlayer = new MediaPlayer();
-                    mPlayer.setDataSource(this, toneUri);
-                    mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-                    mPlayer.setLooping(true);
-                    mPlayer.prepare();
-                    mPlayer.start();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Logger.trackException(e);
-        }
+        mHandler = new Handler();
+        mHandler.postDelayed(mAlarmCancelTask, getAlarmRingingDuration());
     }
 
     private void dismissAlarm() {
         mShowClockOnDragEnd = false;
 
-        if (mPlayer != null) {
-            mPlayer.stop();
-        }
-
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
         Logger.track(userAction);
 
+        cancelAlarmSound();
         cancelVibration();
 
         if (!GameFactory.startGame(AlarmRingingActivity.this, mAlarmId)) {
@@ -244,20 +201,8 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         Log.d(TAG, "Entered onResume!");
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        if (mWakeLock == null) {
-            mWakeLock = pm.newWakeLock((PowerManager.FULL_WAKE_LOCK | PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), TAG);
-        }
-
-        if (!mWakeLock.isHeld()) {
-            mWakeLock.acquire();
-            Log.d(TAG, "Acquired WAKE_LOCK!");
-        }
+        setLockScreenFlags();
+        acquireWakeLock();
 
         final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
         CrashManager.register(this, hockeyAppId);
@@ -269,10 +214,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         Log.d(TAG, "Entered onPause!");
 
-        if (mWakeLock != null && mWakeLock.isHeld()) {
-            mWakeLock.release();
-            Log.d(TAG, "Released WAKE_LOCK!");
-        }
+        releaseWakeLock();
     }
 
     @Override
@@ -281,16 +223,10 @@ public class AlarmRingingActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 finishActivity();
             } else {
-                if (mPlayer != null) {
-                    mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mp) {
-                            mp.start();
-                        }
-                    });
-                    mPlayer.prepareAsync();
-                }
+                restartAlarmSound();
                 vibrateDeviceIfDesired();
+                mShowClockOnDragEnd = true;
+                mAlarmRingingClock.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -335,10 +271,93 @@ public class AlarmRingingActivity extends AppCompatActivity {
         }
     }
 
+    private void playAlarmSound() {
+        try {
+            if (mAlarmTone != null && !mAlarmTone.isEmpty()) {
+                Uri toneUri = Uri.parse(mAlarmTone);
+                if (toneUri != null) {
+                    mPlayer = new MediaPlayer();
+                    mPlayer.setDataSource(this, toneUri);
+                    mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                    mPlayer.setLooping(true);
+                    mPlayer.prepare();
+                    mPlayer.start();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Logger.trackException(e);
+        }
+    }
+
+    private void restartAlarmSound() {
+        if (mPlayer != null) {
+            mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start();
+                }
+            });
+            mPlayer.prepareAsync();
+        }
+    }
+
+    private void cancelAlarmSound() {
+        if (mPlayer != null && mPlayer.isPlaying())
+        {
+            mPlayer.stop();
+        }
+    }
+
+    private void acquireWakeLock() {
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        if (mWakeLock == null) {
+            mWakeLock = pm.newWakeLock((PowerManager.FULL_WAKE_LOCK | PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), TAG);
+        }
+
+        if (!mWakeLock.isHeld()) {
+            mWakeLock.acquire();
+            Log.d(TAG, "Acquired WAKE_LOCK!");
+        }
+    }
+
+    private void releaseWakeLock() {
+        if (mWakeLock != null && mWakeLock.isHeld()) {
+            mWakeLock.release();
+            Log.d(TAG, "Released WAKE_LOCK!");
+        }
+    }
+
+    private void setLockScreenFlags() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+    }
+
+    private void clearLockScreenFlags() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+    }
+
+    private void animateClock() {
+        ObjectAnimator animateClock = ObjectAnimator.ofFloat(mAlarmRingingClock, "translationY", -35f, 0f);
+        animateClock.setDuration(CLOCK_ANIMATION_DURATION);
+        animateClock.setInterpolator(new BounceInterpolator());
+        animateClock.setRepeatCount(ValueAnimator.INFINITE);
+        animateClock.start();
+    }
+
     private void finishActivity() {
         if (mPlayer != null) {
             mPlayer.release();
+            mPlayer = null;
         }
+
+        mHandler.removeCallbacks(mAlarmCancelTask);
+
         finish();
     }
 }
