@@ -255,12 +255,12 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
 
         private void saveSettingsAndExit() {
+            AlarmManagerHelper.cancelAlarms(getContext());
+            populateUpdatedSettings();
+
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE);
             userAction.putJSON(Loggable.Key.PROP_ALARM, mAlarm.toJSON());
             Logger.track(userAction);
-
-            AlarmManagerHelper.cancelAlarms(getContext());
-            populateUpdatedSettings();
             AlarmList.get(getActivity()).updateAlarm(mAlarm);
             AlarmManagerHelper.setAlarms(getContext());
             getActivity().finish();
