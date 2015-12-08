@@ -163,12 +163,19 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         mHandler = new Handler();
         mHandler.postDelayed(mAlarmCancelTask, getAlarmRingingDuration());
+
+        Loggable.AppAction appAction = new Loggable.AppAction(Loggable.Key.APP_ALARM_RINGING);
+        Alarm alarm = AlarmList.get(this).getAlarm(mAlarmId);
+        appAction.putJSON(alarm.toJSON());
+        Logger.track(appAction);
     }
 
     private void dismissAlarm() {
         mShowClockOnDragEnd = false;
 
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
+        Alarm alarm = AlarmList.get(this).getAlarm(mAlarmId);
+        userAction.putJSON(alarm.toJSON());
         Logger.track(userAction);
 
         cancelAlarmSound();

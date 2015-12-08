@@ -41,7 +41,17 @@ public class Loggable {
         }
     }
 
+    public static class AppAction extends Loggable {
+        public AppAction (String name) {
+            Name = name;
+            Type = "App Action";
+            Properties = new JSONObject();
+        }
+    }
+
     public interface Key {
+        String APP_ALARM_RINGING = "An alarm rang";
+
         String ACTION_ALARM_SNOOZE = "Snoozed an alarm";
         String ACTION_ALARM_DISMISS = "Dismissed an alarm";
         String ACTION_ALARM_EDIT = "Editing an alarm";
@@ -67,6 +77,8 @@ public class Loggable {
 
         String ACTION_ONBOARDING = "Started onboarding";
         String ACTION_ONBOARDING_SKIP = "Skipped onboarding";
+        String ACTION_ONBOARDING_TOS_ACCEPT = "Accepted ToS";
+        String ACTION_ONBOARDING_TOS_DECLINE = "Declined ToS";
 
         String ACTION_LEARN_MORE = "Reading Learn More";
 
