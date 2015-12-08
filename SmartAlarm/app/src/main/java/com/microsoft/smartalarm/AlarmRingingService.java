@@ -14,8 +14,8 @@ public class AlarmRingingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
-        CrashManager.register(this, hockeyAppId);
+        final String hockeyappToken = Util.getToken(this, "hockeyapp");
+        CrashManager.register(this, hockeyappToken);
     }
 
     @Override

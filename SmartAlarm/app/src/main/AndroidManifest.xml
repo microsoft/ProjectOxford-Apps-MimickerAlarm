@@ -112,8 +112,20 @@
         <activity android:name="net.hockeyapp.android.PaintActivity"/>
 
         <meta-data
-            android:name="com.mixpanel.token"
+            android:name="com.microsoft.smartalarm.token.mixpanel"
             android:value="${MIXPANEL_TOKEN}"/>
+        <meta-data
+            android:name="com.microsoft.smartalarm.token.speech"
+            android:value="${SPEECH_TOKEN}"/>
+        <meta-data
+            android:name="com.microsoft.smartalarm.token.vision"
+            android:value="${VISION_TOKEN}"/>
+        <meta-data
+            android:name="com.microsoft.smartalarm.token.emotion"
+            android:value="${EMOTION_TOKEN}"/>
+        <meta-data
+            android:name="com.microsoft.smartalarm.token.hockeyapp"
+            android:value="${HOCKEYAPP_TOKEN}"/>
     </application>
 
 </manifest>

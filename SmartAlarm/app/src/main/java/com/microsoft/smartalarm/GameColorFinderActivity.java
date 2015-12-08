@@ -30,7 +30,7 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
 
         Resources resources = getResources();
 
-        String subscriptionKey = resources.getString(R.string.vision_service_key);
+        String subscriptionKey = Util.getToken(this, "vision");
         mVisionServiceRestClient = new VisionServiceRestClient(subscriptionKey);
 
         String[] questions = resources.getStringArray(R.array.vision_color_codes);

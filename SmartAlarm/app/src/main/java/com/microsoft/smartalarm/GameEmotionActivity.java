@@ -33,7 +33,7 @@ public class GameEmotionActivity extends GameWithCameraActivity {
 
         Resources resources = getResources();
 
-        String subscriptionKey = resources.getString(R.string.emotion_service_key);
+        String subscriptionKey = Util.getToken(this, "emotion");
         mEmotionServiceRestClient = new EmotionServiceRestClient(subscriptionKey);
 
         String[] emotions = resources.getStringArray(R.array.emotions);

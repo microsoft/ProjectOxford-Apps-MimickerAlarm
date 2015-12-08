@@ -204,8 +204,8 @@ public class AlarmRingingActivity extends AppCompatActivity {
         setLockScreenFlags();
         acquireWakeLock();
 
-        final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
-        CrashManager.register(this, hockeyAppId);
+        final String hockeyappToken = Util.getToken(this, "hockeyapp");
+        CrashManager.register(this, hockeyappToken);
     }
 
     @Override

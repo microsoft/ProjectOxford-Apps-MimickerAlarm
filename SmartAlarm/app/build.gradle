@@ -53,7 +53,7 @@ android {
             applicationIdSuffix '.dev'
         }
         all {
-            manifestPlaceholders = [MIXPANEL_TOKEN: mixpanel_token]
+            manifestPlaceholders = [MIXPANEL_TOKEN: mixpanel_token, SPEECH_TOKEN: speech_token, VISION_TOKEN: vision_token, EMOTION_TOKEN: emotion_token, HOCKEYAPP_TOKEN: hockeyapp_token]
         }
     }
 }

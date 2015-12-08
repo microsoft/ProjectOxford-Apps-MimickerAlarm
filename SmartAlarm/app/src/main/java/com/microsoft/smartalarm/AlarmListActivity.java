@@ -32,8 +32,8 @@ public class AlarmListActivity extends SingleFragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
-        UpdateManager.register(this, hockeyAppId);
+        final String hockeyappToken = Util.getToken(this, "hockeyapp");
+        UpdateManager.register(this, hockeyappToken);
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
         Logger.init(this);
         setTitle(R.string.alarm_list_title);
@@ -42,8 +42,8 @@ public class AlarmListActivity extends SingleFragmentActivity
     @Override
     protected void onResume() {
         super.onResume();
-        final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
-        CrashManager.register(this, hockeyAppId);
+        final String hockeyappToken = Util.getToken(this, "hockeyapp");
+        CrashManager.register(this, hockeyappToken);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class AlarmListActivity extends SingleFragmentActivity
     }
 
     public void showFeedback(MenuItem item){
-        final String hockeyAppId = getResources().getString(R.string.hockeyapp_id);
-        FeedbackManager.register(this, hockeyAppId, null);
+        final String hockeyappToken = Util.getToken(this, "hockeyapp");
+        FeedbackManager.register(this, hockeyappToken, null);
         FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
         FeedbackManager.showFeedbackActivity(this);
     }
