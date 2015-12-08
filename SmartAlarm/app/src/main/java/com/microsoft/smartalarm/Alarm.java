@@ -3,6 +3,10 @@ package com.microsoft.smartalarm;
 import android.media.RingtoneManager;
 import android.net.Uri;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -130,5 +134,23 @@ public class Alarm {
 
     public void setTongueTwisterEnabled(boolean tongueTwister) {
         mTongueTwisterEnabled = tongueTwister;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("Time Hour", getTimeHour());
+            json.put("Time Minute", getTimeMinute());
+
+            JSONArray repeating = new JSONArray();
+            for (int i = 0; i < mRepeatingDays.length; i++) {
+                repeating.put(mRepeatingDays[i]);
+            }
+            json.put("Repeat", repeating);
+        }
+        catch (JSONException ex) {
+            Logger.trackException(ex);
+        }
+        return json;
     }
 }

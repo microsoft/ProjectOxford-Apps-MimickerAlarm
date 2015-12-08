@@ -56,6 +56,7 @@ public class AlarmListActivity extends SingleFragmentActivity
     protected void onDestroy() {
         super.onDestroy();
         FeedbackManager.unregister();
+        Logger.flush();
     }
 
     public void showFeedback(MenuItem item){

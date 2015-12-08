@@ -35,11 +35,21 @@ public class AlarmSettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Logger.init(this);
 
         final UUID alarmId = (UUID) getIntent()
                 .getSerializableExtra(ARGS_ALARM_ID);
 
         boolean newAlarm = getIntent().getBooleanExtra(ARGS_NEW_ALARM, false);
+
+        Loggable.UserAction userAction;
+        if (newAlarm) {
+            userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_CREATE);
+        }
+        else {
+            userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_EDIT);
+        }
+        Logger.track(userAction);
 
         mFragment = AlarmSettingsFragment.newInstance(alarmId.toString(), newAlarm);
         getSupportFragmentManager().beginTransaction()
@@ -51,6 +61,12 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         } else {
             setTitle(R.string.pref_title_edit);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Logger.flush();
     }
 
     @Override
@@ -239,6 +255,10 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
 
         private void saveSettingsAndExit() {
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE);
+            userAction.putJSON(Loggable.Key.PROP_ALARM, mAlarm.toJSON());
+            Logger.track(userAction);
+
             AlarmManagerHelper.cancelAlarms(getContext());
             populateUpdatedSettings();
             AlarmList.get(getActivity()).updateAlarm(mAlarm);
@@ -247,6 +267,10 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
 
         private void deleteSettingsAndExit() {
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DELETE);
+            userAction.putJSON(Loggable.Key.PROP_ALARM, mAlarm.toJSON());
+            Logger.track(userAction);
+
             AlarmManagerHelper.cancelAlarms(getContext());
             AlarmList.get(getActivity()).deleteAlarm(mAlarm);
             AlarmManagerHelper.setAlarms(getContext());
@@ -254,6 +278,10 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
 
         private void discardSettingsAndExit() {
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE_DISCARD);
+            userAction.putJSON(Loggable.Key.PROP_ALARM, mAlarm.toJSON());
+            Logger.track(userAction);
+
             getActivity().finish();
         }
 

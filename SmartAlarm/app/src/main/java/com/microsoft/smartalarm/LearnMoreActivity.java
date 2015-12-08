@@ -23,6 +23,16 @@ public class LearnMoreActivity extends AppCompatActivity {
                 stripUnderlines(child);
             }
         }
+
+        Logger.init(this);
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_LEARN_MORE);
+        Logger.track(userAction);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Logger.flush();
     }
 
     // OMG WHY ANDROID !?!?!

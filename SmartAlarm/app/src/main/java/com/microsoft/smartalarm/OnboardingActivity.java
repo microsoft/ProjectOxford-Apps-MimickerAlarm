@@ -57,6 +57,12 @@ public class OnboardingActivity extends FragmentActivity{
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Logger.flush();
+    }
+
     public void skip(View view) {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING_SKIP);
         Logger.track(userAction);

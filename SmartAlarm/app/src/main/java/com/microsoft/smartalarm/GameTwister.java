@@ -55,6 +55,12 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
         mTimer.start();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Logger.flush();
+    }
+
     private void generateQuestion() {
         Resources resources = getResources();
         String[] questions = resources.getStringArray(R.array.tongue_twisters);

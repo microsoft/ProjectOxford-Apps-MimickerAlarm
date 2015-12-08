@@ -109,6 +109,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
         super.onDestroy();
         mCameraPreview.stop();
         mCaptureButton.stop();
+        Logger.flush();
     }
 
     private CameraPreview.ImageCallback onCaptureCallback = new CameraPreview.ImageCallback() {

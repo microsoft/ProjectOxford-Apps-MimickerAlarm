@@ -49,11 +49,6 @@ public class GameEmotionActivity extends GameWithCameraActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     public Boolean verify(Bitmap bitmap) {
         try{
             ByteArrayOutputStream output = new ByteArrayOutputStream();
