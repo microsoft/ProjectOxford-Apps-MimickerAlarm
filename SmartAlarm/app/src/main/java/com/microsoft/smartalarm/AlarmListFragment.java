@@ -209,7 +209,7 @@ public class AlarmListFragment extends Fragment {
                 mTitleTextView.setText(mAlarm.getTitle());
             }
 
-            mTimeTextView.setText(AlarmUtils.getShortTimeString(mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
+            mTimeTextView.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
             mAlarmEnabled.setChecked(mAlarm.isEnabled());
         }
 

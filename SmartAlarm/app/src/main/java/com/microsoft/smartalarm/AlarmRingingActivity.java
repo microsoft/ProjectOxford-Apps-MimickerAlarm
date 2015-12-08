@@ -1,5 +1,7 @@
 package com.microsoft.smartalarm;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -22,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -40,14 +43,18 @@ public class AlarmRingingActivity extends AppCompatActivity {
     private ImageView mAlarmRingingClock;
     private UUID mAlarmId;
     private String mAlarmTone;
+    private boolean mShowClockOnDragEnd = true;
 
     private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
     private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
     private static final int WAKE_LOCK_RELEASE_BUFFER = 3 * 1000;
+    private static final int CLOCK_ANIMATION_DURATION = 1500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Logger.init(this);
 
         Log.d(TAG, "Creating activity!");
 
@@ -63,7 +70,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alarm_ringing);
 
         TextView timeField = (TextView) findViewById(R.id.alarm_ringing_time);
-        timeField.setText(AlarmUtils.getShortTimeString(timeHour, timeMinute));
+        timeField.setText(AlarmUtils.getUserTimeString(getApplicationContext(), timeHour, timeMinute));
 
         TextView dateField = (TextView) findViewById(R.id.alarm_ringing_date);
         dateField.setText(AlarmUtils.getFullDateStringForNow());
@@ -81,21 +88,22 @@ public class AlarmRingingActivity extends AppCompatActivity {
                 dismissAlarm();
             }
         });
-
         dismissButton.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
-                switch(event.getAction()) {
+                switch (event.getAction()) {
                     case DragEvent.ACTION_DROP:
                         dismissAlarm();
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
-                        mAlarmRingingClock.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mAlarmRingingClock.setVisibility(View.VISIBLE);
-                            }
-                        });
+                        if (mShowClockOnDragEnd) {
+                            mAlarmRingingClock.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mAlarmRingingClock.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
                         break;
                     default:
                         break;
@@ -136,6 +144,12 @@ public class AlarmRingingActivity extends AppCompatActivity {
             }
         });
 
+        ObjectAnimator animateClock = ObjectAnimator.ofFloat(mAlarmRingingClock, "translationY", -35f, 0f);
+        animateClock.setDuration(CLOCK_ANIMATION_DURATION);
+        animateClock.setInterpolator(new BounceInterpolator());
+        animateClock.setRepeatCount(ValueAnimator.INFINITE);
+        animateClock.start();
+
         playAlarmSound();
         vibrateDeviceIfDesired();
 
@@ -170,8 +184,6 @@ public class AlarmRingingActivity extends AppCompatActivity {
         };
 
         new Handler().postDelayed(releaseWakelock, getAlarmRingingDuration() - WAKE_LOCK_RELEASE_BUFFER);
-
-        Logger.init(this);
     }
 
     private void playAlarmSound() {
@@ -194,12 +206,17 @@ public class AlarmRingingActivity extends AppCompatActivity {
     }
 
     private void dismissAlarm() {
+        mShowClockOnDragEnd = false;
+
         if (mPlayer != null) {
             mPlayer.stop();
         }
+
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
         Logger.track(userAction);
+
         cancelVibration();
+
         if (!GameFactory.startGame(AlarmRingingActivity.this, mAlarmId)) {
             finishActivity();
         }

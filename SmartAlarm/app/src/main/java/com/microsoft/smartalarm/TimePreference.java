@@ -40,7 +40,7 @@ public class TimePreference extends DialogPreference {
     }
 
     private void setTimeLabel() {
-        mTimeLabel.setText(AlarmUtils.getShortTimeString(mHour, mMinute));
+        mTimeLabel.setText(AlarmUtils.getUserTimeString(getContext(), mHour, mMinute));
     }
 
     public boolean hasChanged() {

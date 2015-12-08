@@ -2,15 +2,14 @@ package com.microsoft.smartalarm;
 
 import android.content.Context;
 
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.Format;
 import java.util.Calendar;
 import java.util.Locale;
 
 public class AlarmUtils {
-    public static String getShortTimeString(int hour, int minute) {
-        Format formatter = DateFormat.getTimeInstance(DateFormat.SHORT);
+    public static String getUserTimeString(Context context, int hour, int minute) {
+        Format formatter = android.text.format.DateFormat.getTimeFormat(context);
         Calendar calendar = Calendar.getInstance();
 
         calendar.set(Calendar.HOUR_OF_DAY, hour);
@@ -20,7 +19,7 @@ public class AlarmUtils {
     }
 
     public static String getFullDateStringForNow() {
-        Format formatter = DateFormat.getDateInstance(DateFormat.FULL);
+        Format formatter = java.text.DateFormat.getDateInstance(java.text.DateFormat.FULL);
         return formatter.format(Calendar.getInstance().getTime());
     }
 

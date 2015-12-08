@@ -3,6 +3,7 @@ package com.microsoft.smartalarm;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceDialogFragmentCompat;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.TimePicker;
 
@@ -29,6 +30,7 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
         super.onBindDialogView(view);
         TimePreference timePreference = (TimePreference) getPreference();
         mTimePicker = (TimePicker) view.findViewById(R.id.pref_time_picker);
+        mTimePicker.setIs24HourView(DateFormat.is24HourFormat(getContext()));
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             mTimePicker.setHour(timePreference.getHour());
             mTimePicker.setMinute(timePreference.getMinute());
@@ -36,7 +38,6 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
             mTimePicker.setCurrentHour(timePreference.getHour());
             mTimePicker.setCurrentMinute(timePreference.getMinute());
         }
-
     }
 
     @Override
