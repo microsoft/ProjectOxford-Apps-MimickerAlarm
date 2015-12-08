@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 public class Loggable {
     String Name;
-    String Type;
     JSONObject Properties;
 
     public void putProp(String property, Object value) {
@@ -36,21 +35,43 @@ public class Loggable {
     public static class UserAction extends Loggable {
         public UserAction (String name) {
             Name = name;
-            Type = "User Action";
             Properties = new JSONObject();
+            try {
+                Properties.put("Type", "User Action");
+            }
+            catch (JSONException jsonEx) {
+            }
         }
     }
 
     public static class AppAction extends Loggable {
         public AppAction (String name) {
             Name = name;
-            Type = "App Action";
             Properties = new JSONObject();
+            try {
+                Properties.put("Type", "App Action");
+            }
+            catch (JSONException jsonEx) {
+            }
+        }
+    }
+
+    public static class AppException extends Loggable {
+        public AppException (String name, Exception ex) {
+            Name = name;
+            Properties = new JSONObject();
+            try {
+                Properties.put("Type", "Exception");
+                Properties.put("Message", ex);
+            }
+            catch (JSONException jsonEx) {
+            }
         }
     }
 
     public interface Key {
         String APP_ALARM_RINGING = "An alarm rang";
+        String APP_EXCEPTION = "Exception caught";
 
         String ACTION_ALARM_SNOOZE = "Snoozed an alarm";
         String ACTION_ALARM_DISMISS = "Dismissed an alarm";

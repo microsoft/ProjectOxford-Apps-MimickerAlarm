@@ -64,8 +64,15 @@ public class Logger {
     }
 
     public static void trackException(Exception ex) {
-       //TODO : IMPLEMENT
         Log.e(TAG, ex.getMessage());
+        if (isLogging()) {
+            try {
+                Loggable.AppException appException = new Loggable.AppException(Loggable.Key.APP_EXCEPTION, ex);
+                MixpanelAPI.getInstance(sContext, sMixpanelToken).track(appException.Name, appException.Properties);
+            } catch (Exception mixpanelEx) {
+                Log.e(TAG, mixpanelEx.getMessage());
+            }
+        }
     }
 
     public static void flush() {
