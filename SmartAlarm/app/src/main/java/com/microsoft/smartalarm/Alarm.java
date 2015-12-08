@@ -139,14 +139,16 @@ public class Alarm {
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         try {
-            json.put("Time Hour", getTimeHour());
-            json.put("Time Minute", getTimeMinute());
+            json.put("Alarm Id", getId());
+            json.put("Alarm Vibrate", shouldVibrate());
+            json.put("Alarm Time Hour", getTimeHour());
+            json.put("Alarm Time Minute", getTimeMinute());
 
             JSONArray repeating = new JSONArray();
-            for (int i = 0; i < mRepeatingDays.length; i++) {
-                repeating.put(mRepeatingDays[i]);
+            for (boolean mRepeatingDay : mRepeatingDays) {
+                repeating.put(mRepeatingDay);
             }
-            json.put("Repeat", repeating);
+            json.put("Alarm Repeat", repeating);
         }
         catch (JSONException ex) {
             Logger.trackException(ex);

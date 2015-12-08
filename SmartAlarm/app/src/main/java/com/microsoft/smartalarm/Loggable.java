@@ -19,13 +19,13 @@ public class Loggable {
         }
     }
 
-    public void putJSON(String prefix, JSONObject json) {
+    public void putJSON(JSONObject json) {
         try {
             Iterator<?> keys = json.keys();
 
             while( keys.hasNext() ) {
                 String key = (String)keys.next();
-                Properties.put(prefix + " " + key, json.get(key));
+                Properties.put(key, json.get(key));
             }
         }
         catch (JSONException ex) {
@@ -72,7 +72,5 @@ public class Loggable {
 
         String PROP_QUESTION = "Question";
         String PROP_DIFF = "Difference";
-
-        String PROP_ALARM = "Alarm";
     }
 }

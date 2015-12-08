@@ -32,8 +32,6 @@ public class AlarmListActivity extends SingleFragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final String hockeyappToken = Util.getToken(this, "hockeyapp");
-        UpdateManager.register(this, hockeyappToken);
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
         Logger.init(this);
         setTitle(R.string.alarm_list_title);
@@ -44,6 +42,7 @@ public class AlarmListActivity extends SingleFragmentActivity
         super.onResume();
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
         CrashManager.register(this, hockeyappToken);
+        UpdateManager.register(this, hockeyappToken);
     }
 
     @Override

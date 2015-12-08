@@ -28,9 +28,7 @@ public class Logger {
         if (!sStarted && isLogging()) {
             String android_id = Secure.getString(caller.getContentResolver(), Secure.ANDROID_ID);
             try {
-                ApplicationInfo ai = caller.getPackageManager().getApplicationInfo(caller.getPackageName(), PackageManager.GET_META_DATA);
-                Bundle bundle = ai.metaData;
-                sMixpanelToken = bundle.getString("com.mixpanel.token");
+                sMixpanelToken = Util.getToken(caller, "mixpanel");
                 sStarted = true;
 
                 MixpanelAPI mixpanel = MixpanelAPI.getInstance(sContext, sMixpanelToken);

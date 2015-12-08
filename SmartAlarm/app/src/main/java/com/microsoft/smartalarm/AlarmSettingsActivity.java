@@ -259,7 +259,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             populateUpdatedSettings();
 
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE);
-            userAction.putJSON(Loggable.Key.PROP_ALARM, mAlarm.toJSON());
+            userAction.putJSON(mAlarm.toJSON());
             Logger.track(userAction);
             AlarmList.get(getActivity()).updateAlarm(mAlarm);
             AlarmManagerHelper.setAlarms(getContext());
@@ -268,7 +268,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
 
         private void deleteSettingsAndExit() {
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DELETE);
-            userAction.putJSON(Loggable.Key.PROP_ALARM, mAlarm.toJSON());
+            userAction.putJSON(mAlarm.toJSON());
             Logger.track(userAction);
 
             AlarmManagerHelper.cancelAlarms(getContext());
@@ -279,7 +279,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
 
         private void discardSettingsAndExit() {
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE_DISCARD);
-            userAction.putJSON(Loggable.Key.PROP_ALARM, mAlarm.toJSON());
+            userAction.putJSON(mAlarm.toJSON());
             Logger.track(userAction);
 
             getActivity().finish();
