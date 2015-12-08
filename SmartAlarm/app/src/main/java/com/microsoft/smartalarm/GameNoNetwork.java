@@ -2,6 +2,8 @@ package com.microsoft.smartalarm;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -14,6 +16,8 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.Random;
 
 public class GameNoNetwork extends AppCompatActivity {
 
@@ -37,6 +41,7 @@ public class GameNoNetwork extends AppCompatActivity {
         });
 
         ((TextView) findViewById(R.id.instruction_text)).setText(R.string.game_nonetwork_prompt);
+
     }
 
     @Override
@@ -199,13 +204,19 @@ public class GameNoNetwork extends AppCompatActivity {
         private RectF mHitbox;
         private int mTapsRemaining = 3;
 
+        private Bitmap mAsset1;
+        private Bitmap mAsset2;
+
         public GameEngine() {
             mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mPaint.setColor(Color.GREEN);
             mBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mBackgroundPaint.setColor(Color.WHITE);
             mX = 0; mY = 0;
-            mHitbox = new RectF(0, 0, 100, 100);
+
+            mAsset1 = BitmapFactory.decodeResource(getResources(), R.drawable.offline_game_1);
+            mAsset2 = BitmapFactory.decodeResource(getResources(), R.drawable.offline_game_2);
+            mHitbox = new RectF(0, 0, mAsset1.getWidth(), mAsset1.getHeight());
         }
 
         public void setDimensions(int width, int height) {
@@ -214,7 +225,9 @@ public class GameNoNetwork extends AppCompatActivity {
                 mY = height / 2;
                 mWidth = width;
                 mHeight = height;
-                mVelocity = new Vector2D(5, 5);
+                mVelocity = new Vector2D(new Random().nextFloat(), new Random().nextFloat());
+                mVelocity.normalize();
+                mVelocity.mult(10f);
                 mInitialized = true;
                 update();
             }
@@ -228,9 +241,9 @@ public class GameNoNetwork extends AppCompatActivity {
                 mVelocity.x(-mVelocity.x());
                 mX = EPSILON;
             }
-            else if (newX > mWidth - EPSILON) {
+            else if (newX > mWidth - mHitbox.width()- EPSILON) {
                 mVelocity.x(-mVelocity.x());
-                mX = mWidth - EPSILON;
+                mX = mWidth - mHitbox.width() - EPSILON;
             }
             else {
                 mX = newX;
@@ -240,28 +253,30 @@ public class GameNoNetwork extends AppCompatActivity {
                 mVelocity.y(-mVelocity.y());
                 mY = EPSILON;
             }
-            else if (newY > mHeight - EPSILON) {
+            else if (newY > mHeight - mHitbox.height() - EPSILON) {
                 mVelocity.y(-mVelocity.y());
-                mY = mHeight - EPSILON;
+                mY = mHeight - mHitbox.height() - EPSILON;
             }
             else {
                 mY = newY;
             }
-            mHitbox.offsetTo(mX - mHitbox.width() / 2, mY - mHitbox.height() / 2);
+            mHitbox.offsetTo(mX, mY);
         }
 
         public void draw(Canvas canvas) {
-            //TODO: replace with actual pictures
             canvas.drawRect(0, 0, mWidth, mHeight, mBackgroundPaint);
-            mPaint.setColor(Color.RED);
-            canvas.drawCircle(mX, mY, 50, mPaint);
-            mPaint.setColor(Color.RED);
-            if (mTapsRemaining >= 1)
-                canvas.drawCircle(mX + 30, mY - 30, 20, mPaint);
-            if (mTapsRemaining >= 2)
-                canvas.drawCircle(mX + 60, mY - 60, 20, mPaint);
-            if (mTapsRemaining >= 3)
-                canvas.drawCircle(mX + 90, mY - 90, 20, mPaint);
+            canvas.save();
+            canvas.translate(mX, mY);
+            canvas.drawBitmap(mAsset1, 0, 0, mPaint);
+            canvas.translate(mAsset1.getWidth(), 0);
+            for (int i = 0; i < mTapsRemaining; i++) {
+                mPaint.setAlpha((int)(Math.pow(0.8, i) * 255));
+                canvas.drawBitmap(mAsset2, 0, 0, mPaint);
+                canvas.scale(0.8f, 0.8f);
+                canvas.translate(75, -50);
+            }
+            mPaint.setAlpha(255);
+            canvas.restore();
         }
 
         public int touch(MotionEvent event) {
@@ -288,12 +303,20 @@ public class GameNoNetwork extends AppCompatActivity {
         public void x(float newX) {
             v[0] = newX;
         }
-        public void y(float newY) {
+            public void y(float newY) {
             v[1] = newY;
         }
 
         public float length() {
             return (float) Math.sqrt(x() * x() +  y() * y());
+        }
+
+        public void normalize() {
+            float length = length();
+            if (length > 0){
+                v[0] = v[0] / length;
+                v[1] = v[1] / length;
+            }
         }
 
         public void mult(float f) {
