@@ -1,6 +1,8 @@
 package com.microsoft.smartalarm;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -166,7 +168,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
 
         try {
             String language = "en-us";
-            String subscriptionKey = getResources().getString(R.string.speech_service_key);
+            String subscriptionKey = Util.getToken(this, "speech");
             if (mMicClient == null) {
                 mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mRecognitionMode, language, this, subscriptionKey);
             }

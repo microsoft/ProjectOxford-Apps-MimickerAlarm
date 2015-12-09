@@ -1,9 +1,6 @@
 package com.microsoft.smartalarm;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
@@ -28,9 +25,7 @@ public class Logger {
         if (!sStarted && isLogging()) {
             String android_id = Secure.getString(caller.getContentResolver(), Secure.ANDROID_ID);
             try {
-                ApplicationInfo ai = caller.getPackageManager().getApplicationInfo(caller.getPackageName(), PackageManager.GET_META_DATA);
-                Bundle bundle = ai.metaData;
-                sMixpanelToken = bundle.getString("com.mixpanel.token");
+                sMixpanelToken = Util.getToken(caller, "mixpanel");
                 sStarted = true;
 
                 MixpanelAPI mixpanel = MixpanelAPI.getInstance(sContext, sMixpanelToken);
@@ -69,8 +64,15 @@ public class Logger {
     }
 
     public static void trackException(Exception ex) {
-       //TODO : IMPLEMENT
         Log.e(TAG, ex.getMessage());
+        if (isLogging()) {
+            try {
+                Loggable.AppException appException = new Loggable.AppException(Loggable.Key.APP_EXCEPTION, ex);
+                MixpanelAPI.getInstance(sContext, sMixpanelToken).track(appException.Name, appException.Properties);
+            } catch (Exception mixpanelEx) {
+                Log.e(TAG, mixpanelEx.getMessage());
+            }
+        }
     }
 
     public static void flush() {

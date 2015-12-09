@@ -93,6 +93,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
             mCameraPreview.start();
         } catch (Exception ex) {
             Log.e(LOGTAG, "err onResume", ex);
+            Logger.trackException(ex);
         }
 
         mTimer.start();
@@ -120,7 +121,6 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
     };
 
     public class processOnProjectOxfordAsync extends AsyncTask<Bitmap, String, Boolean> {
-        private Exception ex = null;
 
         @Override
         protected Boolean doInBackground(Bitmap... bitmaps) {
@@ -132,8 +132,8 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
                 }
             }
             catch (Exception ex) {
-                this.ex = ex;
                 Log.e(LOGTAG, "Error on doInBackground", ex);
+                Logger.trackException(ex);
             }
             return false;
         }

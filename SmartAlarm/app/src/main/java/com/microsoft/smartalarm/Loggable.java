@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 public class Loggable {
     String Name;
-    String Type;
     JSONObject Properties;
 
     public void putProp(String property, Object value) {
@@ -19,13 +18,13 @@ public class Loggable {
         }
     }
 
-    public void putJSON(String prefix, JSONObject json) {
+    public void putJSON(JSONObject json) {
         try {
             Iterator<?> keys = json.keys();
 
             while( keys.hasNext() ) {
                 String key = (String)keys.next();
-                Properties.put(prefix + " " + key, json.get(key));
+                Properties.put(key, json.get(key));
             }
         }
         catch (JSONException ex) {
@@ -36,12 +35,44 @@ public class Loggable {
     public static class UserAction extends Loggable {
         public UserAction (String name) {
             Name = name;
-            Type = "User Action";
             Properties = new JSONObject();
+            try {
+                Properties.put("Type", "User Action");
+            }
+            catch (JSONException jsonEx) {
+            }
+        }
+    }
+
+    public static class AppAction extends Loggable {
+        public AppAction (String name) {
+            Name = name;
+            Properties = new JSONObject();
+            try {
+                Properties.put("Type", "App Action");
+            }
+            catch (JSONException jsonEx) {
+            }
+        }
+    }
+
+    public static class AppException extends Loggable {
+        public AppException (String name, Exception ex) {
+            Name = name;
+            Properties = new JSONObject();
+            try {
+                Properties.put("Type", "Exception");
+                Properties.put("Message", ex);
+            }
+            catch (JSONException jsonEx) {
+            }
         }
     }
 
     public interface Key {
+        String APP_ALARM_RINGING = "An alarm rang";
+        String APP_EXCEPTION = "Exception caught";
+
         String ACTION_ALARM_SNOOZE = "Snoozed an alarm";
         String ACTION_ALARM_DISMISS = "Dismissed an alarm";
         String ACTION_ALARM_EDIT = "Editing an alarm";
@@ -65,14 +96,18 @@ public class Loggable {
         String ACTION_GAME_EMOTION_TIMEOUT = "Timed out on an emotion game";
         String ACTION_GAME_EMOTION_SUCCESS = "Finished an emotion game";
 
+        String ACTION_GAME_NONETWORK = "Played an emotion game";
+        String ACTION_GAME_NONETWORK_TIMEOUT = "Timed out on an emotion game";
+        String ACTION_GAME_NONETWORK_SUCCESS = "Finished an emotion game";
+
         String ACTION_ONBOARDING = "Started onboarding";
         String ACTION_ONBOARDING_SKIP = "Skipped onboarding";
+        String ACTION_ONBOARDING_TOS_ACCEPT = "Accepted ToS";
+        String ACTION_ONBOARDING_TOS_DECLINE = "Declined ToS";
 
         String ACTION_LEARN_MORE = "Reading Learn More";
 
         String PROP_QUESTION = "Question";
         String PROP_DIFF = "Difference";
-
-        String PROP_ALARM = "Alarm";
     }
 }
