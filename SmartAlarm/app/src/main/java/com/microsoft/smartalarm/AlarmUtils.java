@@ -2,12 +2,15 @@ package com.microsoft.smartalarm;
 
 import android.content.Context;
 
-import java.text.DateFormatSymbols;
 import java.text.Format;
 import java.util.Calendar;
 import java.util.Locale;
+import com.ibm.icu.text.SimpleDateFormat;
 
-public class AlarmUtils {
+public final class AlarmUtils {
+
+    private AlarmUtils() {}
+
     public static String getUserTimeString(Context context, int hour, int minute) {
         Format formatter = android.text.format.DateFormat.getTimeFormat(context);
         Calendar calendar = Calendar.getInstance();
@@ -25,13 +28,11 @@ public class AlarmUtils {
 
     public static String[] getShortDayNames() {
         String[] dayNames = new String[7];
-        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
+        Format formatter = new SimpleDateFormat("EEEEEE", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
         for(int d = Calendar.SUNDAY, i = 0; d <= Calendar.SATURDAY; d++, i++) {
-            String dayName = dateFormatSymbols.getShortWeekdays()[d].toUpperCase(Locale.getDefault());
-            if (dayName.length() >= 3) {
-                dayName = dayName.substring(0, 2);
-            }
-            dayNames[i] = dayName;
+            calendar.set(Calendar.DAY_OF_WEEK, d);
+            dayNames[i] = formatter.format(calendar.getTime()).toUpperCase(Locale.getDefault());
         }
         return dayNames;
     }

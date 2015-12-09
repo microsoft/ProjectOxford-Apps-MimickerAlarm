@@ -71,7 +71,7 @@ dependencies {
     compile 'com.microsoft.projectoxford:vision:0.5.0'
     compile 'com.microsoft.projectoxford:emotion:0.4.0'
     compile 'net.hockeyapp.android:HockeySDK:3.7.0-beta.1'
-    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.8'
+    compile 'com.ibm.icu:icu4j:56.1'
 
     compile "com.mixpanel.android:mixpanel-android:4.6.4"
     compile files('libs/gson-2.3.1.jar')
