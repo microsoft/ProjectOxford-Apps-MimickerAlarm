@@ -63,6 +63,7 @@ public class CameraPreview implements SurfaceHolder.Callback {
             mCamera.setPreviewDisplay(mPreviewView.getHolder());
         } catch (IOException e) {
             e.printStackTrace();
+            Logger.trackException(e);
         }
     }
 
@@ -95,6 +96,7 @@ public class CameraPreview implements SurfaceHolder.Callback {
                     initPreview();
                 } catch (Exception ex) {
                     Log.e(LOGTAG, "err starting camera preview", ex);
+                    Logger.trackException(ex);
                 }
             }
             return null;
@@ -168,6 +170,7 @@ public class CameraPreview implements SurfaceHolder.Callback {
             });
         } catch (Exception e) {
             e.printStackTrace();
+            Logger.trackException(e);
         }
     }
 
@@ -185,6 +188,7 @@ public class CameraPreview implements SurfaceHolder.Callback {
                     break;
                 } catch (RuntimeException ex) {
                     Log.e(LOGTAG, "err opening camera", ex);
+                    Logger.trackException(ex);
                 }
             }
         }
@@ -231,6 +235,7 @@ public class CameraPreview implements SurfaceHolder.Callback {
 
             } catch (RuntimeException ex) {
                 Log.e(LOGTAG, "err configuring camera", ex);
+                Logger.trackException(ex);
             }
         }
 

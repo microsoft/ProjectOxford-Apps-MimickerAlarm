@@ -85,6 +85,7 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
             return success;
         }
         catch(Exception ex) {
+            Logger.trackException(ex);
         }
 
         return false;

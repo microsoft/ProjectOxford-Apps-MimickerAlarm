@@ -252,6 +252,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
             alarmRingingDuration = Integer.parseInt(durationPreference);
         } catch (NumberFormatException e){
             e.printStackTrace();
+            Logger.trackException(e);
         }
 
         return alarmRingingDuration;
