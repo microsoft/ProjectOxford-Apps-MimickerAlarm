@@ -96,6 +96,10 @@ public class Loggable {
         String ACTION_GAME_EMOTION_TIMEOUT = "Timed out on an emotion game";
         String ACTION_GAME_EMOTION_SUCCESS = "Finished an emotion game";
 
+        String ACTION_GAME_NONETWORK = "Played an emotion game";
+        String ACTION_GAME_NONETWORK_TIMEOUT = "Timed out on an emotion game";
+        String ACTION_GAME_NONETWORK_SUCCESS = "Finished an emotion game";
+
         String ACTION_ONBOARDING = "Started onboarding";
         String ACTION_ONBOARDING_SKIP = "Skipped onboarding";
         String ACTION_ONBOARDING_TOS_ACCEPT = "Accepted ToS";

@@ -42,6 +42,9 @@ public class GameNoNetwork extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.instruction_text)).setText(R.string.game_nonetwork_prompt);
 
+        Logger.init(this);
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_NONETWORK);
+        Logger.track(userAction);
     }
 
     @Override
@@ -52,8 +55,9 @@ public class GameNoNetwork extends AppCompatActivity {
 
     protected void gameFailure() {
         final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
-        //Logger.trackUserAction(Logger.UserAction.GAME_TWISTER_TIMEOUT, null, null);
         String failureMessage = getString(R.string.game_time_up_message);
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_NONETWORK_TIMEOUT);
+        Logger.track(userAction);
         stateBanner.failure(failureMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
@@ -68,6 +72,8 @@ public class GameNoNetwork extends AppCompatActivity {
         mTimer.stop();
         final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         String successMessage = getString(R.string.game_success_message);
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_NONETWORK_SUCCESS);
+        Logger.track(userAction);
         stateBanner.success(successMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
@@ -146,7 +152,7 @@ public class GameNoNetwork extends AppCompatActivity {
                     retry = false;
                 }
                 catch (InterruptedException e) {
-                    //TODO: log
+                    Logger.trackException(e);
                 }
             }
         }
@@ -181,7 +187,7 @@ public class GameNoNetwork extends AppCompatActivity {
                     Thread.sleep(DELAY);
                 }
                 catch (InterruptedException ex) {
-                    //TODO: Log
+                    Logger.trackException(ex);
                 }
             }
         }
