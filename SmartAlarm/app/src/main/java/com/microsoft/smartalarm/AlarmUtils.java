@@ -1,6 +1,8 @@
 package com.microsoft.smartalarm;
 
 import android.content.Context;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.text.Format;
 import java.util.Calendar;
@@ -35,6 +37,20 @@ public final class AlarmUtils {
             dayNames[i] = formatter.format(calendar.getTime()).toUpperCase(Locale.getDefault());
         }
         return dayNames;
+    }
+
+    public static void setLockScreenFlags(Window window) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+    }
+
+    public static void clearLockScreenFlags(Window window) {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
     }
 
     public static int convertDpToPixels(Context context, int dp) {

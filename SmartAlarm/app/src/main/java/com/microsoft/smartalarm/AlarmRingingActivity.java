@@ -155,7 +155,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
             public void run() {
                 cancelAlarmSound();
                 cancelVibration();
-                clearLockScreenFlags();
+                AlarmUtils.clearLockScreenFlags(getWindow());
                 releaseWakeLock();
                 finishActivity();
             }
@@ -208,7 +208,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         Log.d(TAG, "Entered onResume!");
 
-        setLockScreenFlags();
+        AlarmUtils.setLockScreenFlags(getWindow());
         acquireWakeLock();
 
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
@@ -220,7 +220,6 @@ public class AlarmRingingActivity extends AppCompatActivity {
         super.onPause();
 
         Log.d(TAG, "Entered onPause!");
-
         releaseWakeLock();
     }
 
@@ -334,20 +333,6 @@ public class AlarmRingingActivity extends AppCompatActivity {
             mWakeLock.release();
             Log.d(TAG, "Released WAKE_LOCK!");
         }
-    }
-
-    private void setLockScreenFlags() {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-    }
-
-    private void clearLockScreenFlags() {
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
     }
 
     private void animateClock() {

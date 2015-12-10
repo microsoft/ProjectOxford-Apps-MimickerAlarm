@@ -19,8 +19,6 @@ import com.microsoft.projectoxford.speechrecognition.RecognizedPhrase;
 import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionServiceFactory;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class GameTwister extends AppCompatActivity implements ISpeechRecognitionServerEvents {
@@ -41,7 +39,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_twister_game);
-
+        AlarmUtils.setLockScreenFlags(getWindow());
         generateQuestion();
         initialize();
         Logger.init(this);
@@ -55,6 +53,12 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
 
         mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
         mTimer.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AlarmUtils.clearLockScreenFlags(getWindow());
     }
 
     @Override

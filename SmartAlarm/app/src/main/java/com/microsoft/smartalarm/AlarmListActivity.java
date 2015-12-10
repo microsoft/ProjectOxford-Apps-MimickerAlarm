@@ -1,27 +1,32 @@
 package com.microsoft.smartalarm;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
-public class AlarmListActivity extends SingleFragmentActivity
+public class AlarmListActivity extends AppCompatActivity
         implements AlarmListFragment.Callbacks {
 
-    protected Fragment createFragment() {
-        return new AlarmListFragment();
-    }
-
-    @Override
-    protected int getLayoutResId() {
-        return R.layout.activity_masterdetail;
-    }
+    private boolean mOboardingStarted = false;
+    public final static String SHOULD_ONBOARD = "onboarding";
+    public final static String SHOULD_TOS = "show-tos";
+    private SharedPreferences mPreferences = null;
 
     @Override
     public void onAlarmSelected(Alarm alarm, boolean newAlarm) {
@@ -32,9 +37,11 @@ public class AlarmListActivity extends SingleFragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_fragment);
+        String packageName = getApplicationContext().getPackageName();
+        mPreferences = getSharedPreferences(packageName, MODE_PRIVATE);
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
         Logger.init(this);
-        setTitle(R.string.alarm_list_title);
     }
 
     @Override
@@ -43,6 +50,28 @@ public class AlarmListActivity extends SingleFragmentActivity
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
         CrashManager.register(this, hockeyappToken);
         UpdateManager.register(this, hockeyappToken);
+        if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
+            setStatusBarColor();
+            if (!mOboardingStarted) {
+                mOboardingStarted = true;
+
+                Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING);
+                Logger.track(userAction);
+
+                Fragment newFragment = new OnboardingTutorialFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, newFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        }
+        else if (mPreferences.getBoolean(SHOULD_TOS, true)) {
+            setStatusBarColor();
+            showToS(null);
+        }
+        else {
+            showAlarms(null);
+        }
     }
 
     @Override
@@ -63,5 +92,43 @@ public class AlarmListActivity extends SingleFragmentActivity
         FeedbackManager.register(this, hockeyappToken, null);
         FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
         FeedbackManager.showFeedbackActivity(this);
+    }
+
+    public void skip(View view) {
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING_SKIP);
+        Logger.track(userAction);
+        showToS(view);
+    }
+
+    public void showToS(View view) {
+        mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
+        Fragment newFragment = new OnboardingToSFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, newFragment);
+        if (view != null){
+            transaction.addToBackStack(null);
+        }
+        transaction.commit();
+    }
+
+    public void showAlarms(View view) {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        if (fragment == null) {
+            fragment = new AlarmListFragment();
+            fm.beginTransaction()
+                    .add(R.id.fragment_container, fragment)
+                    .commit();
+        }
+        setTitle(R.string.alarm_list_title);
+    }
+
+    private void setStatusBarColor(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.green1));
+        }
     }
 }
