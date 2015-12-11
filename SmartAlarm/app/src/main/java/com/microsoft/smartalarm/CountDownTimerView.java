@@ -22,6 +22,7 @@ public class CountDownTimerView extends View {
     private Boolean mIsPaused = false;
 
     private Paint m25PercentPaint, m50PercentPaint, m75PercentPaint, m100PercentPaint;
+    private Paint mWhitePaint;
     private RectF m25PercentRect, m50PercentRect, m75PercentRect, m100PercentRect;
 
     private final static int sInterval = 100;
@@ -36,6 +37,8 @@ public class CountDownTimerView extends View {
         m75PercentPaint.setColor(ContextCompat.getColor(context, R.color.yellow2));
         m100PercentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         m100PercentPaint.setColor(ContextCompat.getColor(context, R.color.yellow1));
+        mWhitePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mWhitePaint.setColor(ContextCompat.getColor(context, R.color.white));
 
         m25PercentRect = new RectF(0, 0, 0, 0);
         m50PercentRect = new RectF(0, 0, 0, 0);
@@ -69,6 +72,7 @@ public class CountDownTimerView extends View {
         float millisRemaining = (float)mMillisUntilFinished;
         float percentage = millisRemaining / (float) mTotalTime;
         float width;
+        canvas.drawRect(0, 0, mWidth, mHeight, mWhitePaint);
         if (percentage > 0) {
             width = percentage > 0.25 ? 0.25f * mWidth : percentage * mWidth;
             percentage = percentage - 0.25f;
