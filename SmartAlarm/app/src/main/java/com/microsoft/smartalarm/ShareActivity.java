@@ -20,7 +20,9 @@ public class ShareActivity extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shareable);
-        mShareableUri = getIntent().getExtras().getString(GameFactory.SHAREABLE_URI);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null)
+            mShareableUri = extras.getString(GameFactory.SHAREABLE_URI);
         Logger.init(this);
     }
 

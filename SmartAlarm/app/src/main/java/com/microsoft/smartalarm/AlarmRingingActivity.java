@@ -229,11 +229,14 @@ public class AlarmRingingActivity extends AppCompatActivity {
         if (requestCode == GameFactory.START_GAME_REQUEST) {
             if (resultCode == RESULT_OK) {
                 finishActivity();
-                String shareableUri = intent.getExtras().getString(GameFactory.SHAREABLE_URI);
-                if (shareableUri != null && shareableUri.length() > 0) {
-                    Intent shareActivityIntent = new Intent(this, ShareActivity.class);
-                    shareActivityIntent.putExtra(GameFactory.SHAREABLE_URI, shareableUri);
-                    startActivity(shareActivityIntent);
+                Bundle extras = intent.getExtras();
+                if (extras != null){
+                    String shareableUri = extras.getString(GameFactory.SHAREABLE_URI);
+                    if (shareableUri != null && shareableUri.length() > 0) {
+                        Intent shareActivityIntent = new Intent(this, ShareActivity.class);
+                        shareActivityIntent.putExtra(GameFactory.SHAREABLE_URI, shareableUri);
+                        startActivity(shareActivityIntent);
+                    }
                 }
             } else {
                 restartAlarmSound();
