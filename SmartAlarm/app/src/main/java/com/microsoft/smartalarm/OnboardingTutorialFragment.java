@@ -2,6 +2,7 @@ package com.microsoft.smartalarm;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +20,18 @@ public class OnboardingTutorialFragment extends Fragment {
     private Boolean mStarted = false;
     private static final int WELCOME_MSG_DURATION = 5000;
     private static final int WELCOME_MSG_CROSSFADE_DURATION = 1000;
+    OnOnboardingTutorialListener mCallback;
+
+    public interface OnOnboardingTutorialListener {
+        void onSkip(View view);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallback = (OnOnboardingTutorialListener) context;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -29,6 +43,13 @@ public class OnboardingTutorialFragment extends Fragment {
         BubblePagerIndicator indicator = (BubblePagerIndicator) rootView.findViewById(R.id.onboarding_indicator);
         indicator.setTotalPositions(onboardingPagerAdapter.getCount());
         viewPager.addOnPageChangeListener(indicator);
+        Button skip = (Button) rootView.findViewById(R.id.skip_button);
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCallback.onSkip(v);
+            }
+        });
         return rootView;
     }
 

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,8 +19,10 @@ import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
-public class AlarmListActivity extends AppCompatActivity
-        implements AlarmListFragment.Callbacks {
+public class AlarmMainActivity extends AppCompatActivity
+        implements AlarmListFragment.Callbacks,
+        OnboardingTutorialFragment.OnOnboardingTutorialListener,
+        OnboardingToSFragment.OnOnboardingToSListener {
 
     private boolean mOboardingStarted = false;
     public final static String SHOULD_ONBOARD = "onboarding";
@@ -70,7 +71,7 @@ public class AlarmListActivity extends AppCompatActivity
             showToS(null);
         }
         else {
-            showAlarms(null);
+            showAlarmList();
         }
     }
 
@@ -94,10 +95,17 @@ public class AlarmListActivity extends AppCompatActivity
         FeedbackManager.showFeedbackActivity(this);
     }
 
-    public void skip(View view) {
+    @Override
+    public void onSkip(View view) {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING_SKIP);
         Logger.track(userAction);
         showToS(view);
+    }
+
+    @Override
+    public void onAccept() {
+        resetStatusBarColor();
+        showAlarmList();
     }
 
     public void showToS(View view) {
@@ -111,15 +119,12 @@ public class AlarmListActivity extends AppCompatActivity
         transaction.commit();
     }
 
-    public void showAlarms(View view) {
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        if (fragment == null) {
-            fragment = new AlarmListFragment();
-            fm.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
-                    .commit();
-        }
+    public void showAlarmList() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = new AlarmListFragment();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
         setTitle(R.string.alarm_list_title);
     }
 
@@ -129,6 +134,14 @@ public class AlarmListActivity extends AppCompatActivity
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(this, R.color.green1));
+        }
+    }
+
+    private void resetStatusBarColor(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
     }
 }

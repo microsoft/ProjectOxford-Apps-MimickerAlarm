@@ -86,8 +86,7 @@
                 android:textAllCaps="true"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:onClick="showAlarms"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 

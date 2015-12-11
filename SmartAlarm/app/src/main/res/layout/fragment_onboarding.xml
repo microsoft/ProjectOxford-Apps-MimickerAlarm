@@ -28,13 +28,13 @@
         android:visibility="gone"
         android:orientation="vertical">
         <Button
+            android:id="@+id/skip_button"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:background="#00ffffff"
             android:text="@string/onboarding_skip"
             style="@style/Font.Body"
-            android:onClick="skip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <android.support.v4.view.ViewPager

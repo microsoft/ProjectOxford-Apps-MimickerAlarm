@@ -25,12 +25,12 @@
 
         <activity
             android:name=".AlarmSettingsActivity"
-            android:parentActivityName=".AlarmListActivity"
+            android:parentActivityName=".AlarmMainActivity"
             android:screenOrientation="portrait">
         </activity>
 
         <activity
-            android:name=".AlarmListActivity"
+            android:name=".AlarmMainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
@@ -66,11 +66,11 @@
         <activity
             android:name=".AlarmGlobalSettingsActivity"
             android:label="@string/title_activity_alarm_settings"
-            android:parentActivityName=".AlarmListActivity"
+            android:parentActivityName=".AlarmMainActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.microsoft.smartalarm.AlarmListActivity"/>
+                android:value=".AlarmMainActivity"/>
         </activity>
 
         <activity
@@ -78,7 +78,7 @@
             android:label="@string/title_activity_learn_more">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.microsoft.smartalarm.AlarmListActivity"/>
+                android:value=".AlarmMainActivity"/>
         </activity>
 
         <activity

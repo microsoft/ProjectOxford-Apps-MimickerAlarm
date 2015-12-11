@@ -58,7 +58,6 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     @Override
     protected void onPause() {
         super.onPause();
-        AlarmUtils.clearLockScreenFlags(getWindow());
     }
 
     @Override
@@ -169,7 +168,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
 
     private void initialize() {
         mRecognitionMode = SpeechRecognitionMode.ShortPhrase;
-
+/*
         try {
             String language = "en-us";
             String subscriptionKey = Util.getToken(this, "speech");
@@ -181,7 +180,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
             Log.e(LOGTAG, "Speech client failed to initialize " + e);
             Logger.trackException(e);
         }
-
+*/
         mCaptureButton = (ProgressButton) findViewById(R.id.capture_button);
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
             @Override

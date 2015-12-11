@@ -11,6 +11,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class OnboardingToSFragment extends Fragment {
+    OnOnboardingToSListener mCallback;
+
+    public interface OnOnboardingToSListener {
+        void onAccept();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallback = (OnOnboardingToSListener) context;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -32,9 +44,8 @@ public class OnboardingToSFragment extends Fragment {
                 Logger.track(userAction);
                 String packageName = getActivity().getApplication().getPackageName();
                 SharedPreferences preferences = getActivity().getSharedPreferences(packageName, Context.MODE_PRIVATE);
-                preferences.edit().putBoolean(AlarmListActivity.SHOULD_TOS, false).apply();
-                //Intent startMainActivity = new Intent(getActivity(), AlarmListActivity.class);
-                //startActivity(startMainActivity);
+                preferences.edit().putBoolean(AlarmMainActivity.SHOULD_TOS, false).apply();
+                mCallback.onAccept();
             }
         });
         rootView.findViewById(R.id.onboarding_tos_cancel).setOnClickListener(new View.OnClickListener() {
