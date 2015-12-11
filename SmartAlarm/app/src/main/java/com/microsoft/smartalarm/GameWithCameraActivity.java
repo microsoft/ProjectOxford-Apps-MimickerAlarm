@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -120,31 +121,32 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
         }
     };
 
-    public class processOnProjectOxfordAsync extends AsyncTask<Bitmap, String, Boolean> {
+    public class processOnProjectOxfordAsync extends AsyncTask<Bitmap, String, Uri> {
 
         @Override
-        protected Boolean doInBackground(Bitmap... bitmaps) {
+        protected Uri doInBackground(Bitmap... bitmaps) {
             try{
                 if (bitmaps.length > 0) {
                     if (verify(bitmaps[0])) {
-                        return true;
+                        Uri tempFile = GameFactory.saveShareableBitmap(GameWithCameraActivity.this, bitmaps[0]);
+                        bitmaps[0].recycle();
+                        return tempFile;
                     }
                 }
             }
             catch (Exception ex) {
-                Log.e(LOGTAG, "Error on doInBackground", ex);
                 Logger.trackException(ex);
             }
-            return false;
+            return null;
         }
 
 
         @Override
-        protected void onPostExecute(Boolean success) {
-            super.onPostExecute(success);
+        protected void onPostExecute(Uri shareableUri) {
+            super.onPostExecute(shareableUri);
             mCaptureButton.stop();
-            if (success) {
-                gameSuccess();
+            if (shareableUri != null) {
+                gameSuccess(shareableUri);
                 return;
             }
             else{
@@ -154,7 +156,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
         }
     }
 
-    protected void gameSuccess() {
+    protected void gameSuccess(final Uri shareableUri) {
         mTimer.stop();
         final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         String successMessage = getString(R.string.game_success_message);
@@ -162,6 +164,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
             @Override
             public void execute() {
                 Intent intent = GameWithCameraActivity.this.getIntent();
+                intent.putExtra(GameFactory.SHAREABLE_URI, shareableUri.getPath());
                 GameWithCameraActivity.this.setResult(RESULT_OK, intent);
                 finish();
             }

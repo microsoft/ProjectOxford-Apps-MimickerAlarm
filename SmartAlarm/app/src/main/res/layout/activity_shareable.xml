@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/shareable_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <TextView
+        style="@style/Font.Title"
+        android:layout_marginTop="0dp"
+        android:layout_alignParentTop="true"
+        android:id="@android:id/title"
+        android:text="@string/share_button"
+        android:background="@color/yellow3"
+        android:gravity="center"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:layout_alignRight="@android:id/title"
+        android:text="X"
+        android:onClick="finishShare"
+        style="@style/Font.Title"
+        android:layout_marginTop="0dp"
+        android:background="@color/invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/share_button"
+            android:src="@android:drawable/ic_menu_share"
+            android:background="@color/yellow3"
+            android:layout_weight="1"
+            android:onClick="share"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</RelativeLayout>

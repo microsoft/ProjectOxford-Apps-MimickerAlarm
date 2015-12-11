@@ -107,6 +107,8 @@ public class Loggable {
 
         String ACTION_LEARN_MORE = "Reading Learn More";
 
+        String ACTION_SHARE = "Sharing";
+
         String PROP_QUESTION = "Question";
         String PROP_DIFF = "Difference";
     }

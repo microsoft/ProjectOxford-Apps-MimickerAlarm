@@ -56,8 +56,6 @@ public class GameEmotionActivity extends GameWithCameraActivity {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
             List<RecognizeResult> result = mEmotionServiceRestClient.recognizeImage(inputStream);
 
-            bitmap.recycle();
-
             Boolean success = false;
             for (RecognizeResult r : result) {
                 switch(mEmotion) {

@@ -50,6 +50,9 @@ public class Logger {
                 trackException(ex);
             }
         }
+        else {
+            debugPrint(loggable);
+        }
     }
 
     public static void trackDurationStart(Loggable loggable){
@@ -61,10 +64,12 @@ public class Logger {
                 trackException(ex);
             }
         }
+        else {
+            debugPrint(loggable);
+        }
     }
 
     public static void trackException(Exception ex) {
-        Log.e(TAG, ex.getMessage());
         if (isLogging()) {
             try {
                 Loggable.AppException appException = new Loggable.AppException(Loggable.Key.APP_EXCEPTION, ex);
@@ -72,6 +77,9 @@ public class Logger {
             } catch (Exception mixpanelEx) {
                 Log.e(TAG, mixpanelEx.getMessage());
             }
+        }
+        else {
+            Log.e(TAG, ex.getMessage());
         }
     }
 
@@ -83,5 +91,10 @@ public class Logger {
                 trackException(ex);
             }
         }
+    }
+
+    public static void debugPrint(Loggable loggable) {
+        Log.d(TAG, loggable.Name);
+        Log.d(TAG, loggable.Properties.toString());
     }
 }

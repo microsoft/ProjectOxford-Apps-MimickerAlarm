@@ -54,7 +54,6 @@ public class GameColorFinderActivity extends GameWithCameraActivity {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
             String[] features = {"Color"};
             AnalyzeResult result = mVisionServiceRestClient.analyzeImage(inputStream, features);
-            bitmap.recycle();
 
             double colorDistance = colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor));
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR_SUCCESS);
