@@ -1,13 +1,20 @@
 package com.microsoft.smartalarm;
 
 import android.content.Context;
+import android.view.Window;
+import android.view.WindowManager;
 
-import java.text.DateFormatSymbols;
+import com.ibm.icu.text.SimpleDateFormat;
+
 import java.text.Format;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class AlarmUtils {
+public final class AlarmUtils {
+
+    private AlarmUtils() {}
+
     public static String getUserTimeString(Context context, int hour, int minute) {
         Format formatter = android.text.format.DateFormat.getTimeFormat(context);
         Calendar calendar = Calendar.getInstance();
@@ -25,18 +32,53 @@ public class AlarmUtils {
 
     public static String[] getShortDayNames() {
         String[] dayNames = new String[7];
-        DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
+        Format formatter = new SimpleDateFormat("EEEEEE", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
         for(int d = Calendar.SUNDAY, i = 0; d <= Calendar.SATURDAY; d++, i++) {
-            String dayName = dateFormatSymbols.getShortWeekdays()[d].toUpperCase(Locale.getDefault());
-            if (dayName.length() >= 3) {
-                dayName = dayName.substring(0, 2);
-            }
-            dayNames[i] = dayName;
+            calendar.set(Calendar.DAY_OF_WEEK, d);
+            dayNames[i] = formatter.format(calendar.getTime()).toUpperCase(Locale.getDefault());
         }
         return dayNames;
     }
 
-    public static int convertDpToPixels(Context context, int dp) {
-        return (int) ((dp * context.getResources().getDisplayMetrics().density) + 0.5);
+    public static String getShortDayNamesString(int[] daysOfWeek) {
+        String dayNames = null;
+        Format formatter = new SimpleDateFormat("EEEEEE", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        for(int day = 0; day < daysOfWeek.length; day++) {
+            calendar.set(Calendar.DAY_OF_WEEK, daysOfWeek[day]);
+            if (day == 0) {
+                dayNames = formatter.format(calendar.getTime()).toUpperCase(Locale.getDefault());
+            } else {
+                dayNames += " " + formatter.format(calendar.getTime()).toUpperCase(Locale.getDefault());
+            }
+        }
+        return dayNames;
+    }
+
+    public static String getDayPeriodSummaryString(Context context, int[] daysOfWeek) {
+        int[] weekdays = { Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY };
+        int[] weekend = { Calendar.SUNDAY, Calendar.SATURDAY };
+        if (Arrays.equals(daysOfWeek, weekend)) {
+            return context.getString(R.string.alarm_list_weekend);
+        } else if (Arrays.equals(daysOfWeek, weekdays)) {
+            return context.getString(R.string.alarm_list_weekdays);
+        } else {
+            return getShortDayNamesString(daysOfWeek);
+        }
+    }
+
+    public static void setLockScreenFlags(Window window) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+    }
+
+    public static void clearLockScreenFlags(Window window) {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
     }
 }

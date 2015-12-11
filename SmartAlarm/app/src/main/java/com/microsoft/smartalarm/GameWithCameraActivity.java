@@ -88,6 +88,9 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
+
+        AlarmUtils.setLockScreenFlags(getWindow());
+
         try {
             mCameraPreview.initPreview();
             mCameraPreview.start();

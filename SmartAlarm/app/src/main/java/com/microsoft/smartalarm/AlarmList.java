@@ -5,11 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.microsoft.smartalarm.AlarmDbSchema.AlarmTable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.microsoft.smartalarm.AlarmDbSchema.AlarmTable;
 
 public class AlarmList {
     private static AlarmList sAlarmList;
@@ -90,7 +90,6 @@ public class AlarmList {
         values.put(AlarmTable.Columns.ENABLED, alarm.isEnabled() ? 1 : 0);
         values.put(AlarmTable.Columns.HOUR, alarm.getTimeHour());
         values.put(AlarmTable.Columns.MINUTE, alarm.getTimeMinute());
-        values.put(AlarmTable.Columns.WEEKLY, alarm.isRepeatWeekly() ? 1 : 0);
         values.put(AlarmTable.Columns.TONE, alarm.getAlarmTone() != null ? alarm.getAlarmTone().toString() : "");
 
         String repeatingDays = "";
@@ -102,6 +101,7 @@ public class AlarmList {
         values.put(AlarmTable.Columns.TONGUETWISTER, alarm.isTongueTwisterEnabled());
         values.put(AlarmTable.Columns.COLORCOLLECTOR, alarm.isColorCollectorEnabled());
         values.put(AlarmTable.Columns.EXPRESSYOURSELF, alarm.isExpressYourselfEnabled());
+        values.put(AlarmTable.Columns.NEW, alarm.isNew() ? 1 : 0);
 
         return values;
     }

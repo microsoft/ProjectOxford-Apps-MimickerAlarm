@@ -8,7 +8,7 @@ import com.microsoft.smartalarm.AlarmDbSchema.AlarmTable;
 
 public class AlarmDatabaseHelper extends SQLiteOpenHelper{
     private static final String TAG = "AlarmDatabaseHelper";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "alarmDatabase.db";
 
     public AlarmDatabaseHelper(Context context) { super(context, DATABASE_NAME, null, DATABASE_VERSION); }
@@ -22,13 +22,13 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper{
                 AlarmTable.Columns.ENABLED + ", " +
                 AlarmTable.Columns.HOUR + ", " +
                 AlarmTable.Columns.MINUTE + ", " +
-                AlarmTable.Columns.WEEKLY + ", " +
                 AlarmTable.Columns.DAYS + ", " +
                 AlarmTable.Columns.TONE + ", " +
                 AlarmTable.Columns.VIBRATE + ", " +
                 AlarmTable.Columns.TONGUETWISTER + ", " +
                 AlarmTable.Columns.COLORCOLLECTOR + ", " +
-                AlarmTable.Columns.EXPRESSYOURSELF +
+                AlarmTable.Columns.EXPRESSYOURSELF + ", " +
+                AlarmTable.Columns.NEW +
                 ")"
         );
     }
@@ -41,6 +41,10 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper{
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.TONGUETWISTER);
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.COLORCOLLECTOR);
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.EXPRESSYOURSELF);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.NEW);
+            case 2:
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.NEW);
+
         }
     }
 }
