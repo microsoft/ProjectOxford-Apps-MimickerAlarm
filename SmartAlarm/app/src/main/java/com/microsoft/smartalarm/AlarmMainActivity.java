@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -62,7 +63,6 @@ public class AlarmMainActivity extends AppCompatActivity
                 Fragment newFragment = new OnboardingTutorialFragment();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, newFragment);
-                transaction.addToBackStack(null);
                 transaction.commit();
             }
         }
@@ -120,10 +120,11 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     public void showAlarmList() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
         Fragment fragment = new AlarmListFragment();
         transaction.replace(R.id.fragment_container, fragment);
-        transaction.addToBackStack(null);
         transaction.commit();
         setTitle(R.string.alarm_list_title);
     }
