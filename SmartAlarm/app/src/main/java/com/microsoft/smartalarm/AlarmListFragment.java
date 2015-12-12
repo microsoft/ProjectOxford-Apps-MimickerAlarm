@@ -242,28 +242,7 @@ public class AlarmListFragment extends Fragment {
 
         private String getTitle(Alarm alarm) {
             String alarmTitle = mAlarm.getTitle();
-            if (alarm.isOneShot()) {
-                return alarmTitle;
-            } else {
-                String summary = getDayPeriodSummary(alarm);
-                if (alarmTitle == null || alarmTitle.isEmpty()) {
-                    return summary;
-                } else {
-                    return alarmTitle + ", " + summary;
-                }
-            }
-        }
-
-        private String getDayPeriodSummary(Alarm alarm) {
-            List<Integer> days = new ArrayList<>();
-            for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; dayOfWeek++) {
-                if (alarm.getRepeatingDay(dayOfWeek - 1)) {
-                    days.add(dayOfWeek);
-                }
-            }
-            Integer[] daysWrapper = days.toArray(new Integer[days.size()]);
-            int[] daysOfWeek =  ArrayUtils.toPrimitive(daysWrapper);
-            return AlarmUtils.getDayPeriodSummaryString(getContext(), daysOfWeek);
+            return alarmTitle;
         }
     }
 
