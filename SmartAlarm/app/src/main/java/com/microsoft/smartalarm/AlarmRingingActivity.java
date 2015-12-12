@@ -146,7 +146,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
             }
         });
 
-        animateClock();
+        setupClockAnimation();
         playAlarmSound();
         vibrateDeviceIfDesired();
 
@@ -178,7 +178,6 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
     private void dismissAlarm() {
         mShowClockOnDragEnd = false;
-        mAnimateClock.cancel();
 
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
         Alarm alarm = AlarmList.get(this).getAlarm(mAlarmId);
@@ -217,6 +216,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         AlarmUtils.setLockScreenFlags(getWindow());
         acquireWakeLock();
+        mAnimateClock.start();
 
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
         CrashManager.register(this, hockeyappToken);
@@ -227,7 +227,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
         super.onPause();
 
         Log.d(TAG, "Entered onPause!");
-
+        mAnimateClock.cancel();
         releaseWakeLock();
     }
 
@@ -343,12 +343,11 @@ public class AlarmRingingActivity extends AppCompatActivity {
         }
     }
 
-    private void animateClock() {
+    private void setupClockAnimation() {
         mAnimateClock = ObjectAnimator.ofFloat(mAlarmRingingClock, "translationY", -35f, 0f);
         mAnimateClock.setDuration(CLOCK_ANIMATION_DURATION);
         mAnimateClock.setInterpolator(new BounceInterpolator());
         mAnimateClock.setRepeatCount(ValueAnimator.INFINITE);
-        mAnimateClock.start();
     }
 
     private void finishActivity() {

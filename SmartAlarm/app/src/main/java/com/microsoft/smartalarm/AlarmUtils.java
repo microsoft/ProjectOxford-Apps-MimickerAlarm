@@ -32,6 +32,8 @@ public final class AlarmUtils {
 
     public static String[] getShortDayNames() {
         String[] dayNames = new String[7];
+        // As per http://icu-project.org/apiref/icu4j/com/ibm/icu/text/SimpleDateFormat.html, we
+        // need the format 'EEEEEE' to get a short weekday name
         Format formatter = new SimpleDateFormat("EEEEEE", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
         for(int d = Calendar.SUNDAY, i = 0; d <= Calendar.SATURDAY; d++, i++) {
