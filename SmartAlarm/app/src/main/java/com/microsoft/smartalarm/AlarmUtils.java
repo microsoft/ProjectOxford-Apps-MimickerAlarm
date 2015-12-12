@@ -5,6 +5,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import java.text.Format;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import com.ibm.icu.text.SimpleDateFormat;
@@ -30,6 +31,8 @@ public final class AlarmUtils {
 
     public static String[] getShortDayNames() {
         String[] dayNames = new String[7];
+        // As per http://icu-project.org/apiref/icu4j/com/ibm/icu/text/SimpleDateFormat.html, we
+        // need the format 'EEEEEE' to get a short weekday name
         Format formatter = new SimpleDateFormat("EEEEEE", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
         for(int d = Calendar.SUNDAY, i = 0; d <= Calendar.SATURDAY; d++, i++) {
@@ -37,6 +40,33 @@ public final class AlarmUtils {
             dayNames[i] = formatter.format(calendar.getTime()).toUpperCase(Locale.getDefault());
         }
         return dayNames;
+    }
+
+    public static String getShortDayNamesString(int[] daysOfWeek) {
+        String dayNames = null;
+        Format formatter = new SimpleDateFormat("EEEEEE", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        for(int day = 0; day < daysOfWeek.length; day++) {
+            calendar.set(Calendar.DAY_OF_WEEK, daysOfWeek[day]);
+            if (day == 0) {
+                dayNames = formatter.format(calendar.getTime()).toUpperCase(Locale.getDefault());
+            } else {
+                dayNames += " " + formatter.format(calendar.getTime()).toUpperCase(Locale.getDefault());
+            }
+        }
+        return dayNames;
+    }
+
+    public static String getDayPeriodSummaryString(Context context, int[] daysOfWeek) {
+        int[] weekdays = { Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY };
+        int[] weekend = { Calendar.SUNDAY, Calendar.SATURDAY };
+        if (Arrays.equals(daysOfWeek, weekend)) {
+            return context.getString(R.string.alarm_list_weekend);
+        } else if (Arrays.equals(daysOfWeek, weekdays)) {
+            return context.getString(R.string.alarm_list_weekdays);
+        } else {
+            return getShortDayNamesString(daysOfWeek);
+        }
     }
 
     public static void setLockScreenFlags(Window window) {
@@ -51,9 +81,5 @@ public final class AlarmUtils {
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         window.clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-    }
-
-    public static int convertDpToPixels(Context context, int dp) {
-        return (int) ((dp * context.getResources().getDisplayMetrics().density) + 0.5);
     }
 }

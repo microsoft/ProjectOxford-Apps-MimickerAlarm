@@ -16,6 +16,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:paddingRight="16dp"
+            android:paddingLeft="30dp"
+            android:paddingTop="30dp"
+            android:paddingBottom="30dp"
             android:layout_centerInParent="true"/>
 
         <LinearLayout

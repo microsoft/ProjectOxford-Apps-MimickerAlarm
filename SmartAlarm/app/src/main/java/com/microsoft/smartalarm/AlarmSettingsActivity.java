@@ -18,13 +18,12 @@ import java.util.UUID;
 public class AlarmSettingsActivity extends AppCompatActivity {
 
     private static final String ARGS_ALARM_ID = "alarm_id";
-    private static final String ARGS_NEW_ALARM = "new_alarm";
+
     private Fragment mFragment;
 
-    public static Intent newIntent(Context packageContext, UUID alarmId, boolean newAlarm) {
+    public static Intent newIntent(Context packageContext, UUID alarmId) {
         Intent intent = new Intent(packageContext, AlarmSettingsActivity.class);
         intent.putExtra(ARGS_ALARM_ID, alarmId);
-        intent.putExtra(ARGS_NEW_ALARM, newAlarm);
         return intent;
     }
 
@@ -40,7 +39,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         final UUID alarmId = (UUID) getIntent()
                 .getSerializableExtra(ARGS_ALARM_ID);
 
-        boolean newAlarm = getIntent().getBooleanExtra(ARGS_NEW_ALARM, false);
+        boolean newAlarm = AlarmList.get(this).getAlarm(alarmId).isNew();
 
         Loggable.UserAction userAction;
         if (newAlarm) {
@@ -51,7 +50,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
         Logger.track(userAction);
 
-        mFragment = AlarmSettingsFragment.newInstance(alarmId.toString(), newAlarm);
+        mFragment = AlarmSettingsFragment.newInstance(alarmId.toString());
         getSupportFragmentManager().beginTransaction()
                 .replace(android.R.id.content, mFragment)
                 .commit();
@@ -88,7 +87,6 @@ public class AlarmSettingsActivity extends AppCompatActivity {
 
         private static final String PREFERENCE_DIALOG_FRAGMENT_CLASS = "android.support.v7.preference.PreferenceFragment.DIALOG";
 
-        private boolean mNewAlarm;
         private UUID mAlarmId;
         private Alarm mAlarm;
         private TimePreference mTimePreference;
@@ -99,11 +97,10 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         private VibratePreference mVibratePreference;
         private ButtonsPreference mButtonsPreference;
 
-        public static AlarmSettingsFragment newInstance(String alarmId, boolean newAlarm) {
+        public static AlarmSettingsFragment newInstance(String alarmId) {
             AlarmSettingsFragment fragment = new AlarmSettingsFragment();
             Bundle bundle = new Bundle(1);
             bundle.putString(ARGS_ALARM_ID, alarmId);
-            bundle.putBoolean(ARGS_NEW_ALARM, newAlarm);
             fragment.setArguments(bundle);
             return fragment;
         }
@@ -115,7 +112,6 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             Bundle args = getArguments();
             mAlarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
             mAlarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
-            mNewAlarm = args.getBoolean(ARGS_NEW_ALARM);
 
             initializeTimePreference();
             initializeRepeatingDaysPreference();
@@ -165,7 +161,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
 
         private void initializeButtons() {
             mButtonsPreference = (ButtonsPreference) findPreference(getString(R.string.pref_buttons_key));
-            int resId = mNewAlarm ? android.R.string.cancel : R.string.pref_button_delete;
+            int resId = mAlarm.isNew() ? android.R.string.cancel : R.string.pref_button_delete;
             mButtonsPreference.setLeftButtonText(getResources().getString(resId));
             mButtonsPreference.setRightButtonText(getResources().getString(R.string.pref_button_save));
             mButtonsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -180,12 +176,12 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                             discardSettingsAndExit();
                         }
                     } else {
-                        if (mNewAlarm) {
+                        if (mAlarm.isNew()) {
                             // Cancel button was pressed
-                            onCancel();
+                            discardSettingsAndExit();
                         } else {
                             // Delete button was pressed
-                            onDelete();
+                            deleteSettingsAndExit();
                         }
                     }
                     return true;
@@ -211,7 +207,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
 
         private void onCancel() {
-            if (haveSettingsChanged() || mNewAlarm) {
+            if (haveSettingsChanged() || mAlarm.isNew()) {
                 new AlertDialog.Builder(getContext())
                         .setMessage(R.string.pref_dialog_save_changes_message)
                         .setPositiveButton(R.string.pref_dialog_save_changes_positive_button, new DialogInterface.OnClickListener() {
@@ -223,7 +219,7 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                         .setNegativeButton(R.string.pref_dialog_save_changes_negative_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (mNewAlarm) {
+                                if (mAlarm.isNew()) {
                                     deleteSettingsAndExit();
                                 } else {
                                     discardSettingsAndExit();
@@ -236,28 +232,10 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             }
         }
 
-        private void onDelete() {
-            new AlertDialog.Builder(getContext())
-                    .setMessage(R.string.pref_dialog_delete_alarm_message)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            deleteSettingsAndExit();
-                        }
-                    })
-                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Do nothing
-                        }
-                    })
-                    .show();
-        }
-
         private void saveSettingsAndExit() {
             AlarmManagerHelper.cancelAlarms(getContext());
             populateUpdatedSettings();
-
+            mAlarm.setNew(false);
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE);
             userAction.putJSON(mAlarm.toJSON());
             Logger.track(userAction);
@@ -281,7 +259,10 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE_DISCARD);
             userAction.putJSON(mAlarm.toJSON());
             Logger.track(userAction);
-
+            if (mAlarm.isNew()) {
+                mAlarm.setNew(false);
+                AlarmList.get(getActivity()).updateAlarm(mAlarm);
+            }
             getActivity().finish();
         }
 

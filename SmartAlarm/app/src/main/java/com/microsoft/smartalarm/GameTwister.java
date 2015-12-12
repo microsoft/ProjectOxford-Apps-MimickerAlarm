@@ -1,8 +1,6 @@
 package com.microsoft.smartalarm;
 
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -50,7 +48,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     @Override
     protected void onResume() {
         super.onResume();
-
+        AlarmUtils.setLockScreenFlags(getWindow());
         mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
         mTimer.start();
     }

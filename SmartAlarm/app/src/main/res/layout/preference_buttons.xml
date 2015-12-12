@@ -10,8 +10,8 @@
         android:layout_height="match_parent"
         android:layout_toLeftOf="@+id/right_settings_button"
         android:textAppearance="?android:attr/textAppearanceButton"
-        android:textColor="@color/green3"
         android:background="@drawable/abc_btn_borderless_material"
+        android:padding="20dp"
         />
 
     <android.support.v7.widget.AppCompatButton
@@ -23,6 +23,7 @@
         android:textAppearance="?android:attr/textAppearanceButton"
         android:textColor="@color/green3"
         android:background="@drawable/abc_btn_borderless_material"
+        android:padding="20dp"
         />
 
 </RelativeLayout>

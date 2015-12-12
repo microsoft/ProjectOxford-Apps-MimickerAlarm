@@ -56,6 +56,11 @@ android {
             manifestPlaceholders = [MIXPANEL_TOKEN: mixpanel_token, SPEECH_TOKEN: speech_token, VISION_TOKEN: vision_token, EMOTION_TOKEN: emotion_token, HOCKEYAPP_TOKEN: hockeyapp_token]
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
@@ -72,6 +77,8 @@ dependencies {
     compile 'com.microsoft.projectoxford:emotion:0.4.0'
     compile 'net.hockeyapp.android:HockeySDK:3.7.0-beta.1'
     compile 'com.ibm.icu:icu4j:56.1'
+    compile 'org.apache.commons:commons-lang3:3.4'
+
 
     compile "com.mixpanel.android:mixpanel-android:4.6.4"
     compile files('libs/gson-2.3.1.jar')
