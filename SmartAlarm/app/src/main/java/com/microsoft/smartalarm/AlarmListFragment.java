@@ -175,6 +175,7 @@ public class AlarmListFragment extends Fragment {
             implements View.OnClickListener {
 
         private TextView mTitleTextView;
+        private TextView mRecurrenceTextView;
         private TextView mTimeTextView;
         private SwitchCompat mAlarmEnabled;
         private RelativeLayout mContainer;
@@ -186,6 +187,7 @@ public class AlarmListFragment extends Fragment {
             itemView.setOnClickListener(this);
 
             mTitleTextView = (TextView) itemView.findViewById(R.id.list_item_alarm_title_text_view);
+            mRecurrenceTextView = (TextView) itemView.findViewById(R.id.list_item_alarm_recurrence_text_view);
             mTimeTextView = (TextView) itemView.findViewById(R.id.list_item_alarm_time_text_view);
             mAlarmEnabled = (SwitchCompat) itemView.findViewById(R.id.list_item_alarm_enabled_switch);
             mContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
@@ -210,6 +212,14 @@ public class AlarmListFragment extends Fragment {
             } else {
                 mTitleTextView.setVisibility(View.VISIBLE);
                 mTitleTextView.setText(title);
+            }
+
+            String repeatingSummary = mAlarm.getRepeatingSummary();
+            if (repeatingSummary == null || repeatingSummary.isEmpty()) {
+                mRecurrenceTextView.setVisibility(View.GONE);
+            } else {
+                mRecurrenceTextView.setVisibility(View.VISIBLE);
+                mRecurrenceTextView.setText(repeatingSummary);
             }
 
             mTimeTextView.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
