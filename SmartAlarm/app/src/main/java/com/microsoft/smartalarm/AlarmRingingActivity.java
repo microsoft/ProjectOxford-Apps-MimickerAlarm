@@ -232,10 +232,19 @@ public class AlarmRingingActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == GameFactory.START_GAME_REQUEST) {
             if (resultCode == RESULT_OK) {
                 finishActivity();
+                Bundle extras = intent.getExtras();
+                if (extras != null){
+                    String shareableUri = extras.getString(GameFactory.SHAREABLE_URI);
+                    if (shareableUri != null && shareableUri.length() > 0) {
+                        Intent shareActivityIntent = new Intent(this, ShareActivity.class);
+                        shareActivityIntent.putExtra(GameFactory.SHAREABLE_URI, shareableUri);
+                        startActivity(shareActivityIntent);
+                    }
+                }
             } else {
                 restartAlarmSound();
                 vibrateDeviceIfDesired();

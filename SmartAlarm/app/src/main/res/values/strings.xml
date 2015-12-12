@@ -41,4 +41,8 @@
     <string name="learn_more_privacy_link"><a href="http://go.microsoft.com/fwlink/?LinkId=521839">Privacy Statement</a></string>
     <string name="learn_more_contact_link"><a href="http://www.uservoice.com">Contact us</a></string>
     <string name="learn_more_other_link">Other links</string>
+    <string name="share_button">Share</string>
+    <string name="share_action_description">Share via ...</string>
+    <string name="share_text_template">I woke up this morning with Mimicker http://mimicker.ai</string>
+    <string name="share_subject_template">I woke up!</string>
 </resources>

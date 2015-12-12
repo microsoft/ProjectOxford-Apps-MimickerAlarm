@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
@@ -77,7 +78,7 @@ public class RepeatingDaysPreference extends Preference {
             super(context);
             mParent = parent;
             mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mPaint.setColor(Color.RED);
+            mPaint.setColor(ContextCompat.getColor(context, R.color.yellow2));
 
             setOnClickListener(new OnClickListener() {
                 @Override
@@ -98,11 +99,9 @@ public class RepeatingDaysPreference extends Preference {
         @Override
         protected void onDraw(Canvas canvas) {
             if (mRepeating){
-                /*
                 float centerX = getWidth() / 2;
                 float centerY = getHeight() / 2;
                 canvas.drawCircle(centerX, centerY, centerX - PADDING, mPaint);
-                */
                 setTypeface(null, Typeface.BOLD);
             }
             else{
