@@ -97,17 +97,15 @@
     <string name="pref_title_edit">Edit alarm</string>
     <string name="pref_title_name">Alarm name</string>
     <string name="pref_title_description_hint">[Describe your alarm]</string>
-    <string name="pref_title_game">Alarm games</string>
-    <string name="pref_no_game">No game selected</string>
+    <string name="pref_title_game">Mimics</string>
+    <string name="pref_no_game">No Mimic selected</string>
     <string name="pref_title_ringtone">Alarm ringtone</string>
     <string name="pref_no_ringtone">Silent</string>
     <string name="pref_title_vibrate">Vibration</string>
-    <string name="pref_positive_save_button">Save</string>
     <string name="pref_button_delete">Delete</string>
     <string name="pref_button_save">Save</string>
-    <string name="pref_dialog_save_changes_message">Your changes were not saved. Would you like to save them?</string>
-    <string name="pref_dialog_save_changes_negative_button">Discard changes</string>
-    <string name="pref_dialog_save_changes_positive_button">Save</string>
-    <string name="pref_dialog_delete_alarm_message">Are you sure that you want to delete this alarm?</string>
+    <string name="pref_dialog_save_changes_message">Would you like to save your changes before continuing?</string>
+    <string name="pref_dialog_save_changes_negative_button">Discard</string>
+    <string name="pref_dialog_save_changes_positive_button">Save changes</string>
 
 </resources>

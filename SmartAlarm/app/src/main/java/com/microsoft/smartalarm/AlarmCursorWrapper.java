@@ -17,7 +17,6 @@ public class AlarmCursorWrapper extends CursorWrapper {
         boolean isEnabled = (getInt(getColumnIndex(AlarmTable.Columns.ENABLED)) != 0);
         int timeHour = getInt(getColumnIndex(AlarmTable.Columns.HOUR));
         int timeMinute = getInt(getColumnIndex(AlarmTable.Columns.MINUTE));
-        boolean repeatWeekly = (getInt(getColumnIndex(AlarmTable.Columns.WEEKLY)) != 0);
         String alarmToneString = getString(getColumnIndex(AlarmTable.Columns.TONE));
         Uri alarmTone = null;
         if (!alarmToneString.isEmpty()) {
@@ -28,13 +27,13 @@ public class AlarmCursorWrapper extends CursorWrapper {
         boolean tongueTwister = (getInt(getColumnIndex(AlarmTable.Columns.TONGUETWISTER)) != 0);
         boolean colorCollector = (getInt(getColumnIndex(AlarmTable.Columns.COLORCOLLECTOR)) != 0);
         boolean expressYourself = (getInt(getColumnIndex(AlarmTable.Columns.EXPRESSYOURSELF)) != 0);
+        boolean isNew = (getInt(getColumnIndex(AlarmTable.Columns.NEW)) != 0);
 
         Alarm alarm = new Alarm(UUID.fromString(uuidString));
         alarm.setTitle(title);
         alarm.setIsEnabled(isEnabled);
         alarm.setTimeHour(timeHour);
         alarm.setTimeMinute(timeMinute);
-        alarm.setRepeatWeekly(repeatWeekly);
         alarm.setAlarmTone(alarmTone);
         for (int i = 0; i < repeatingDays.length; i++) {
             alarm.setRepeatingDay(i, !repeatingDays[i].equals("false"));
@@ -43,6 +42,7 @@ public class AlarmCursorWrapper extends CursorWrapper {
         alarm.setTongueTwisterEnabled(tongueTwister);
         alarm.setColorCollectorEnabled(colorCollector);
         alarm.setExpressYourselfEnabled(expressYourself);
+        alarm.setNew(isNew);
 
         return alarm;
     }

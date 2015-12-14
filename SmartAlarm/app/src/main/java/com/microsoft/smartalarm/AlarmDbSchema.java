@@ -10,13 +10,13 @@ public class AlarmDbSchema {
             public static final String HOUR = "hour";
             public static final String MINUTE = "minute";
             public static final String DAYS = "days";
-            public static final String WEEKLY = "weekly";
             public static final String TONE = "tone";
             public static final String ENABLED = "enabled";
             public static final String VIBRATE = "vibrate";
             public static final String TONGUETWISTER = "tongue_twister";
             public static final String COLORCOLLECTOR = "color_collector";
             public static final String EXPRESSYOURSELF = "express_yourself";
+            public static final String NEW = "new";
         }
     }
 }

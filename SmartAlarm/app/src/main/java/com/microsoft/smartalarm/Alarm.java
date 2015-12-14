@@ -16,13 +16,13 @@ public class Alarm {
     private int     mTimeHour;
     private int     mTimeMinute;
     private boolean mRepeatingDays[];
-    private boolean mRepeatWeekly;
     private Uri     mAlarmTone;
     private boolean mIsEnabled;
     private boolean mVibrate;
     private boolean mTongueTwisterEnabled;
     private boolean mColorCollectorEnabled;
     private boolean mExpressYourselfEnabled;
+    private boolean mNew;
 
     public Alarm () {
         this(UUID.randomUUID());
@@ -33,14 +33,14 @@ public class Alarm {
         Calendar calendar = Calendar.getInstance();
         mTimeHour = calendar.getTime().getHours();
         mTimeMinute = calendar.getTime().getMinutes();
-        mRepeatWeekly = true;
-        mRepeatingDays = new boolean[]{ true, true, true, true, true, true, true };
+        mRepeatingDays = new boolean[]{ false, false, false, false, false, false, false };
         mAlarmTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL);
         mIsEnabled = true;
         mVibrate = true;
         mTongueTwisterEnabled = true;
         mColorCollectorEnabled = true;
         mExpressYourselfEnabled = true;
+        mNew = false;
     }
 
     public String getTitle() {
@@ -77,15 +77,6 @@ public class Alarm {
 
     public void setTimeMinute(int timeMinute) {
         mTimeMinute = timeMinute;
-    }
-
-    public boolean isRepeatWeekly() {
-
-        return mRepeatWeekly;
-    }
-
-    public void setRepeatWeekly(boolean repeatWeekly) {
-        mRepeatWeekly = repeatWeekly;
     }
 
     public void setRepeatingDay(int dayOfWeek, boolean value) {
@@ -134,6 +125,25 @@ public class Alarm {
 
     public void setTongueTwisterEnabled(boolean tongueTwister) {
         mTongueTwisterEnabled = tongueTwister;
+    }
+
+    public boolean isNew() {
+        return mNew;
+    }
+
+    public void setNew(boolean isNew) {
+        mNew = isNew;
+    }
+
+    public boolean isOneShot() {
+        boolean isOneShot = true;
+        for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; ++dayOfWeek) {
+            if (getRepeatingDay(dayOfWeek - 1)) {
+                isOneShot = false;
+                break;
+            }
+        }
+        return isOneShot;
     }
 
     public JSONObject toJSON() {

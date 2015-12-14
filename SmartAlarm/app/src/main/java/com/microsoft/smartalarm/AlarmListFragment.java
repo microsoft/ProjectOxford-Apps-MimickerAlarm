@@ -22,6 +22,10 @@ import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class AlarmListFragment extends Fragment {
@@ -37,7 +41,7 @@ public class AlarmListFragment extends Fragment {
     private List<Alarm> mAlarms;
 
     public interface Callbacks {
-        void onAlarmSelected(Alarm alarm, boolean newAlarm);
+        void onAlarmSelected(Alarm alarm);
     }
 
     @Override
@@ -72,9 +76,9 @@ public class AlarmListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Alarm alarm = new Alarm();
+                alarm.setNew(true);
                 AlarmList.get(getActivity()).addAlarm(alarm);
-                updateUI();
-                mCallbacks.onAlarmSelected(alarm, true);
+                mCallbacks.onAlarmSelected(alarm);
             }
         });
 
@@ -200,13 +204,12 @@ public class AlarmListFragment extends Fragment {
         public void bindAlarm(Alarm alarm) {
             mAlarm = alarm;
 
-            String title = mAlarm.getTitle();
-
+            String title = getTitle(alarm);
             if (title == null || title.isEmpty()) {
                 mTitleTextView.setVisibility(View.GONE);
             } else {
                 mTitleTextView.setVisibility(View.VISIBLE);
-                mTitleTextView.setText(mAlarm.getTitle());
+                mTitleTextView.setText(title);
             }
 
             mTimeTextView.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
@@ -224,7 +227,33 @@ public class AlarmListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            mCallbacks.onAlarmSelected(mAlarm, false);
+            mCallbacks.onAlarmSelected(mAlarm);
+        }
+
+        private String getTitle(Alarm alarm) {
+            String alarmTitle = mAlarm.getTitle();
+            if (alarm.isOneShot()) {
+                return alarmTitle;
+            } else {
+                String summary = getDayPeriodSummary(alarm);
+                if (alarmTitle == null || alarmTitle.isEmpty()) {
+                    return summary;
+                } else {
+                    return alarmTitle + ", " + summary;
+                }
+            }
+        }
+
+        private String getDayPeriodSummary(Alarm alarm) {
+            List<Integer> days = new ArrayList<>();
+            for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; dayOfWeek++) {
+                if (alarm.getRepeatingDay(dayOfWeek - 1)) {
+                    days.add(dayOfWeek);
+                }
+            }
+            Integer[] daysWrapper = days.toArray(new Integer[days.size()]);
+            int[] daysOfWeek =  ArrayUtils.toPrimitive(daysWrapper);
+            return AlarmUtils.getDayPeriodSummaryString(getContext(), daysOfWeek);
         }
     }
 

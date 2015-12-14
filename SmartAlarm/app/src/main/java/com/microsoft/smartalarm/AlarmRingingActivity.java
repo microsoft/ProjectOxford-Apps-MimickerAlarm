@@ -4,8 +4,8 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -22,7 +22,6 @@ import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
@@ -46,11 +45,12 @@ public class AlarmRingingActivity extends AppCompatActivity {
     private boolean mShowClockOnDragEnd = true;
     private Handler mHandler;
     private Runnable mAlarmCancelTask;
+    private ObjectAnimator mAnimateClock;
 
     private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
     private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
     private static final int CLOCK_ANIMATION_DURATION = 1500;
-    private static final int SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY = 1000;
+    private static final int SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY = 250;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +60,12 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         Log.d(TAG, "Creating activity!");
 
-        mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmManagerHelper.ID);
-        String name = getIntent().getStringExtra(AlarmManagerHelper.TITLE);
-        int timeHour = getIntent().getIntExtra(AlarmManagerHelper.TIME_HOUR, 0);
-        int timeMinute = getIntent().getIntExtra(AlarmManagerHelper.TIME_MINUTE, 0);
-        mAlarmTone = getIntent().getStringExtra(AlarmManagerHelper.TONE);
-        mShouldVibrate = getIntent().getBooleanExtra(AlarmManagerHelper.VIBRATE, false);
+        mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ID);
+        String name = getIntent().getStringExtra(AlarmScheduler.TITLE);
+        int timeHour = getIntent().getIntExtra(AlarmScheduler.TIME_HOUR, 0);
+        int timeMinute = getIntent().getIntExtra(AlarmScheduler.TIME_MINUTE, 0);
+        mAlarmTone = getIntent().getStringExtra(AlarmScheduler.TONE);
+        mShouldVibrate = getIntent().getBooleanExtra(AlarmScheduler.VIBRATE, false);
 
         setTitle(null);
 
@@ -146,7 +146,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
             }
         });
 
-        animateClock();
+        setupClockAnimation();
         playAlarmSound();
         vibrateDeviceIfDesired();
 
@@ -168,6 +168,12 @@ public class AlarmRingingActivity extends AppCompatActivity {
         Alarm alarm = AlarmList.get(this).getAlarm(mAlarmId);
         appAction.putJSON(alarm.toJSON());
         Logger.track(appAction);
+
+        // TODO clean this up as we are using intent and grabbing stuff straight from singleton
+        if (alarm.isOneShot()) {
+            alarm.setIsEnabled(false);
+            AlarmList.get(this).updateAlarm(alarm);
+        }
     }
 
     private void dismissAlarm() {
@@ -210,6 +216,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
 
         AlarmUtils.setLockScreenFlags(getWindow());
         acquireWakeLock();
+        mAnimateClock.start();
 
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
         CrashManager.register(this, hockeyappToken);
@@ -220,14 +227,26 @@ public class AlarmRingingActivity extends AppCompatActivity {
         super.onPause();
 
         Log.d(TAG, "Entered onPause!");
+
+        mAnimateClock.cancel();
+
         releaseWakeLock();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == GameFactory.START_GAME_REQUEST) {
             if (resultCode == RESULT_OK) {
                 finishActivity();
+                Bundle extras = intent.getExtras();
+                if (extras != null){
+                    String shareableUri = extras.getString(GameFactory.SHAREABLE_URI);
+                    if (shareableUri != null && shareableUri.length() > 0) {
+                        Intent shareActivityIntent = new Intent(this, ShareActivity.class);
+                        shareActivityIntent.putExtra(GameFactory.SHAREABLE_URI, shareableUri);
+                        startActivity(shareActivityIntent);
+                    }
+                }
             } else {
                 restartAlarmSound();
                 vibrateDeviceIfDesired();
@@ -335,12 +354,11 @@ public class AlarmRingingActivity extends AppCompatActivity {
         }
     }
 
-    private void animateClock() {
-        ObjectAnimator animateClock = ObjectAnimator.ofFloat(mAlarmRingingClock, "translationY", -35f, 0f);
-        animateClock.setDuration(CLOCK_ANIMATION_DURATION);
-        animateClock.setInterpolator(new BounceInterpolator());
-        animateClock.setRepeatCount(ValueAnimator.INFINITE);
-        animateClock.start();
+    private void setupClockAnimation() {
+        mAnimateClock = ObjectAnimator.ofFloat(mAlarmRingingClock, "translationY", -35f, 0f);
+        mAnimateClock.setDuration(CLOCK_ANIMATION_DURATION);
+        mAnimateClock.setInterpolator(new BounceInterpolator());
+        mAnimateClock.setRepeatCount(ValueAnimator.INFINITE);
     }
 
     private void finishActivity() {
