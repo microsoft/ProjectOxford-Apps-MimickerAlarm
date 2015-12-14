@@ -69,9 +69,23 @@ public class Loggable {
         }
     }
 
+    public static class AppError extends Loggable {
+        public AppError (String name, String error) {
+            Name = name;
+            Properties = new JSONObject();
+            try {
+                Properties.put("Type", "Error");
+                Properties.put("Message", error);
+            }
+            catch (JSONException jsonEx) {
+            }
+        }
+    }
+
     public interface Key {
         String APP_ALARM_RINGING = "An alarm rang";
         String APP_EXCEPTION = "Exception caught";
+        String APP_ERROR = "Error occurred";
 
         String ACTION_ALARM_SNOOZE = "Snoozed an alarm";
         String ACTION_ALARM_DISMISS = "Dismissed an alarm";

@@ -142,6 +142,9 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
                     break;
                 }
             }
+
+            TextView understoodText = (TextView) findViewById(R.id.understood_text);
+            understoodText.setText(mUnderstoodText);
             verify();
         }
     }
@@ -153,7 +156,8 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
 
     @Override
     public void onError(int errorCode, final String s) {
-        Log.e(LOGTAG, s);
+        Loggable.AppError error = new Loggable.AppError(Loggable.Key.APP_ERROR, s);
+        Logger.track(error);
     }
 
     @Override
@@ -168,6 +172,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
         mRecognitionMode = SpeechRecognitionMode.ShortPhrase;
 /*
         try {
+            //TODO: localize
             String language = "en-us";
             String subscriptionKey = Util.getToken(this, "speech");
             if (mMicClient == null) {
@@ -175,7 +180,6 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
             }
         }
         catch(Exception e){
-            Log.e(LOGTAG, "Speech client failed to initialize " + e);
             Logger.trackException(e);
         }
 */

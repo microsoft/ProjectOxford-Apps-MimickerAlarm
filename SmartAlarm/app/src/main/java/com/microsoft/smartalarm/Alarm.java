@@ -2,6 +2,8 @@ package com.microsoft.smartalarm;
 
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +25,8 @@ public class Alarm {
     private boolean mColorCollectorEnabled;
     private boolean mExpressYourselfEnabled;
     private boolean mNew;
+    // TODO: localize this
+    private static final boolean mStartsOnSunday = true;
 
     public Alarm () {
         this(UUID.randomUUID());
@@ -144,6 +148,63 @@ public class Alarm {
             }
         }
         return isOneShot;
+    }
+        
+    public @Nullable String getRepeatingSummary() {
+        String summary = null;
+        String[] dayNames = AlarmUtils.getShortDayNames();
+        boolean weekday = true;
+        boolean weekend = true;
+        boolean allWeek = true;
+        for (int i = 0; i < 7; i++) {
+            if (!getRepeatingDay(i)) {
+                allWeek = false;
+                if (mStartsOnSunday) {
+                    // Starts on sunday
+                    if (i == 0 || i == 6)
+                        weekend = false;
+                    else
+                        weekday = false;
+                }
+                else {
+                    // Starts on monday
+                    if (i == 5 || i == 6)
+                        weekend = false;
+                    else
+                        weekday = false;
+                }
+            }
+            else {
+                if (mStartsOnSunday) {
+                    // Starts on sunday
+                    if (i == 0 || i == 6)
+                        weekday = false;
+                    else
+                        weekend = false;
+                }
+                else {
+                    // Starts on monday
+                    if (i == 5 || i== 6)
+                        weekday = false;
+                    else
+                        weekend = false;
+                }
+                if (summary == null)
+                    summary = dayNames[i];
+                else
+                    summary += ", " + dayNames[i];
+            }
+        }
+        if (allWeek) {
+            summary = "Every day";
+        }
+        else if (weekday) {
+            summary = "Weekdays";
+        }
+        else if (weekend) {
+            summary = "Weekends";
+        }
+        return summary;
     }
 
     public JSONObject toJSON() {
