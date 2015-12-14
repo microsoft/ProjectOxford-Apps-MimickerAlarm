@@ -5,13 +5,11 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -52,6 +50,7 @@ public class AlarmMainActivity extends AppCompatActivity
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
         CrashManager.register(this, hockeyappToken);
         UpdateManager.register(this, hockeyappToken);
+
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
             setStatusBarColor();
             if (!mOboardingStarted) {
@@ -60,15 +59,12 @@ public class AlarmMainActivity extends AppCompatActivity
                 Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING);
                 Logger.track(userAction);
 
-                Fragment newFragment = new OnboardingTutorialFragment();
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, newFragment);
-                transaction.commit();
+                showFragment(new OnboardingTutorialFragment());
             }
         }
         else if (mPreferences.getBoolean(SHOULD_TOS, true)) {
             setStatusBarColor();
-            showToS(null);
+            showToS();
         }
         else {
             showAlarmList();
@@ -96,10 +92,10 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSkip(View view) {
+    public void onSkip() {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING_SKIP);
         Logger.track(userAction);
-        showToS(view);
+        showToS();
     }
 
     @Override
@@ -108,24 +104,13 @@ public class AlarmMainActivity extends AppCompatActivity
         showAlarmList();
     }
 
-    public void showToS(View view) {
+    public void showToS() {
         mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
-        Fragment newFragment = new OnboardingToSFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, newFragment);
-        if (view != null){
-            transaction.addToBackStack(null);
-        }
-        transaction.commit();
+        showFragment(new OnboardingToSFragment());
     }
 
     public void showAlarmList() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        Fragment fragment = new AlarmListFragment();
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.commit();
+        showFragment(new AlarmListFragment());
         setTitle(R.string.alarm_list_title);
     }
 
@@ -144,5 +129,11 @@ public class AlarmMainActivity extends AppCompatActivity
             window.clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
+    }
+
+    private void showFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
     }
 }

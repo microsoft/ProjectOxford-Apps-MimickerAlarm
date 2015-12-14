@@ -18,12 +18,12 @@ import android.widget.TextView;
 
 public class OnboardingTutorialFragment extends Fragment {
     private Boolean mStarted = false;
-    private static final int WELCOME_MSG_DURATION = 5000;
+    private static final int WELCOME_MSG_DURATION = 1500;
     private static final int WELCOME_MSG_CROSSFADE_DURATION = 1000;
     OnOnboardingTutorialListener mCallback;
 
     public interface OnOnboardingTutorialListener {
-        void onSkip(View view);
+        void onSkip();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class OnboardingTutorialFragment extends Fragment {
         skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCallback.onSkip(v);
+                skipToToS();
             }
         });
         return rootView;
@@ -81,6 +81,10 @@ public class OnboardingTutorialFragment extends Fragment {
         else{
             tutorialContainer.setAlpha(1f);
         }
+    }
+
+    public void skipToToS () {
+        mCallback.onSkip();
     }
 
     private static class OnboardingPagerAdapter extends FragmentStatePagerAdapter {
@@ -144,6 +148,13 @@ public class OnboardingTutorialFragment extends Fragment {
             if (args.getInt(POSITION) == 3){
                 View nextButton = rootView.findViewById(android.R.id.button1);
                 nextButton.setVisibility(View.VISIBLE);
+                nextButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        OnboardingTutorialFragment parent = (OnboardingTutorialFragment) getParentFragment();
+                        parent.skipToToS();
+                    }
+                });
             }
             return rootView;
         }
