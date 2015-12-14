@@ -54,11 +54,6 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         Logger.flush();
@@ -170,7 +165,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
 
     private void initialize() {
         mRecognitionMode = SpeechRecognitionMode.ShortPhrase;
-/*
+
         try {
             //TODO: localize
             String language = "en-us";
@@ -182,7 +177,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
         catch(Exception e){
             Logger.trackException(e);
         }
-*/
+
         mCaptureButton = (ProgressButton) findViewById(R.id.capture_button);
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
             @Override
