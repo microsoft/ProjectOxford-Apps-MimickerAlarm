@@ -38,6 +38,11 @@ public class Util {
         }
     }
 
+    public static Uri defaultRingtone() {
+        Uri defaultUri = Uri.parse("android.resource://" + BuildConfig.APPLICATION_ID + "/" + R.raw.mimicker_ringtone);
+        return defaultUri;
+    }
+
     // OMG WHY ANDROID !?!?!
     // http://stackoverflow.com/questions/4096851/remove-underline-from-links-in-textview-android
     private static class URLSpanNoUnderline extends URLSpan {

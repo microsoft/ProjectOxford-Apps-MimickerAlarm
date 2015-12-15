@@ -1,9 +1,7 @@
 package com.microsoft.smartalarm;
 
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +36,7 @@ public class Alarm {
         mTimeHour = calendar.getTime().getHours();
         mTimeMinute = calendar.getTime().getMinutes();
         mRepeatingDays = new boolean[]{ false, false, false, false, false, false, false };
-        mAlarmTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL);
+        mAlarmTone = Util.defaultRingtone();
         mIsEnabled = true;
         mVibrate = true;
         mTongueTwisterEnabled = true;

@@ -46,4 +46,5 @@
     <string name="share_action_description">Share via ...</string>
     <string name="share_text_template">I woke up this morning with Mimicker http://mimicker.ai</string>
     <string name="share_subject_template">I woke up!</string>
+    <string name="default_ringtone_name">Mimicker</string>
 </resources>
