@@ -19,7 +19,6 @@ import java.util.Random;
 
 public class GameEmotionActivity extends GameWithCameraActivity {
     private EmotionServiceRestClient mEmotionServiceRestClient;
-    private static String           LOGTAG = "GameEmotionActivity";
     private String                  mEmotion;
     private static final double     EMOTION_ACCEPTANCE = 0.6;
 
@@ -101,7 +100,6 @@ public class GameEmotionActivity extends GameWithCameraActivity {
             }
         }
         catch(Exception ex) {
-            Log.e(LOGTAG, "Error calling ProjectOxford", ex);
             Logger.trackException(ex);
         }
 

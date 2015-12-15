@@ -45,27 +45,27 @@
             android:orientation="horizontal"
             android:weightSum="2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="50dp">
             <ImageButton
                 android:src="@drawable/download_button"
-                android:background="@drawable/yellow_button"
+                android:background="@drawable/share_button_colors"
                 android:layout_weight="1"
                 android:onClick="download"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
                 android:scaleType="fitCenter"
                 android:layout_width="0dp"
-                android:layout_height="50dp"/>
+                android:layout_height="match_parent"/>
             <ImageButton
                 android:src="@drawable/share_button"
-                android:background="@drawable/yellow_button"
+                android:background="@drawable/share_button_colors"
                 android:layout_weight="1"
                 android:onClick="share"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
                 android:scaleType="fitCenter"
                 android:layout_width="0dp"
-                android:layout_height="50dp"/>
+                android:layout_height="match_parent"/>
         </LinearLayout>
         <View
             android:background="#FF000000"

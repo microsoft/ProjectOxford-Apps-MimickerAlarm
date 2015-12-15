@@ -1,16 +1,16 @@
 package com.microsoft.smartalarm;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
 
-public class ShareActivity extends Activity{
+public class ShareActivity extends AppCompatActivity{
 
     private String mShareableUri;
     private final static int SHARE_REQUEST_CODE = 2;
@@ -38,6 +38,7 @@ public class ShareActivity extends Activity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Logger.flush();
         if (mShareableUri != null && mShareableUri.length() > 0) {
             File deleteFile = new File(mShareableUri);
             deleteFile.delete();

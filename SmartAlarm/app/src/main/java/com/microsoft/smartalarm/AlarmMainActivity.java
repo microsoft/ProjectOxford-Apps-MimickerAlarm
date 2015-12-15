@@ -52,18 +52,16 @@ public class AlarmMainActivity extends AppCompatActivity
         UpdateManager.register(this, hockeyappToken);
 
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
-            setStatusBarColor();
             if (!mOboardingStarted) {
                 mOboardingStarted = true;
 
                 Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING);
                 Logger.track(userAction);
 
-                showFragment(new OnboardingTutorialFragment());
+                showTutorial(null);
             }
         }
         else if (mPreferences.getBoolean(SHOULD_TOS, true)) {
-            setStatusBarColor();
             showToS();
         }
         else {
@@ -91,25 +89,36 @@ public class AlarmMainActivity extends AppCompatActivity
         FeedbackManager.showFeedbackActivity(this);
     }
 
+    public void showTutorial(MenuItem item){
+        setStatusBarColor();
+        showFragment(new OnboardingTutorialFragment());
+    }
+
     @Override
     public void onSkip() {
-        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING_SKIP);
-        Logger.track(userAction);
-        showToS();
+        if (mPreferences.getBoolean(SHOULD_TOS, true)) {
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING_SKIP);
+            Logger.track(userAction);
+            showToS();
+        }
+        else {
+            showAlarmList();
+        }
     }
 
     @Override
     public void onAccept() {
-        resetStatusBarColor();
         showAlarmList();
     }
 
     public void showToS() {
+        setStatusBarColor();
         mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
         showFragment(new OnboardingToSFragment());
     }
 
     public void showAlarmList() {
+        resetStatusBarColor();
         showFragment(new AlarmListFragment());
         setTitle(R.string.alarm_list_title);
     }

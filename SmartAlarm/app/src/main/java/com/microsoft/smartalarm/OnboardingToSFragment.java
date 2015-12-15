@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class OnboardingToSFragment extends Fragment {
     OnOnboardingToSListener mCallback;
@@ -63,6 +64,8 @@ public class OnboardingToSFragment extends Fragment {
                 transitionToSPage(R.id.onboarding_tos_acceptance_reminder, R.id.onboarding_tos_acceptance);
             }
         });
+
+        Util.enableLinks((TextView) mRootToSView.findViewById(R.id.onboarding_tos_text));
         return mRootToSView;
     }
 

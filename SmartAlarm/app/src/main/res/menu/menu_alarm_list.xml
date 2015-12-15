@@ -7,4 +7,6 @@
           android:orderInCategory="101" app:showAsAction="never" />
     <item android:id="@+id/action_feedback" android:title="@string/action_feedback"
           android:orderInCategory="102" android:onClick="showFeedback" />
+    <item android:id="@+id/action_tutorial" android:title="@string/action_tutorial"
+          android:orderInCategory="103" android:onClick="showTutorial" />
 </menu>

@@ -14,6 +14,7 @@
     <string name="game_vision_prompt">Find something %s</string>
     <string name="game_emotion_prompt">Make a %s face</string>
     <string name="action_feedback">Feedback</string>
+    <string name="action_tutorial">Tutorial</string>
     <string name="game_time_up_message">Time\'s Up!</string>
     <string name="game_failure_message">That does not look quite right</string>
     <string name="game_success_message">You did it!</string>
