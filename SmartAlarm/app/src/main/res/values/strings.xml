@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmartAlarm</string>
+    <string name="app_name">Mimicker Alarm</string>
     <string name="alarm_list_title">Alarms</string>
     <string name="action_settings">Settings</string>
     <string name="action_learn_more">Learn more</string>

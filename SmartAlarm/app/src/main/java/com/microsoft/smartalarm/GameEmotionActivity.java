@@ -88,6 +88,7 @@ public class GameEmotionActivity extends GameWithCameraActivity {
 
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_EMOTION_SUCCESS);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mEmotion);
+            userAction.putEmotions(result);
             if (success)
             {
                 Logger.track(userAction);
