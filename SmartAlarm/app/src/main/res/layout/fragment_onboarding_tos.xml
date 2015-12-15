@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
     <LinearLayout
-        android:id="@+id/onboarding_tos_1"
+        android:id="@+id/onboarding_tos_acceptance_before"
         android:orientation="vertical"
+        android:background="@color/green1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin">
 
         <TextView
             android:text="@string/tos_prompt_title"
@@ -42,12 +48,16 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/onboarding_tos_2"
+        android:id="@+id/onboarding_tos_acceptance"
         android:visibility="gone"
         android:background="@color/white"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin">
         <TextView
             android:text="@string/tos_title"
             android:gravity="center"
@@ -86,16 +96,22 @@
                 android:textAllCaps="true"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/onboarding_tos_3"
+        android:id="@+id/onboarding_tos_acceptance_reminder"
         android:orientation="vertical"
         android:visibility="gone"
+        android:background="@color/green1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        >
 
         <TextView
             android:text="@string/tos_prompt_ohoh"

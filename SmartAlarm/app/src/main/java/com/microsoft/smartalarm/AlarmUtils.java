@@ -4,12 +4,11 @@ import android.content.Context;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.ibm.icu.text.SimpleDateFormat;
-
 import java.text.Format;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
+import com.ibm.icu.text.SimpleDateFormat;
 
 public final class AlarmUtils {
 

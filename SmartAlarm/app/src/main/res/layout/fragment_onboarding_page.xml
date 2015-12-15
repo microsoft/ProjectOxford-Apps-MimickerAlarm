@@ -29,7 +29,6 @@
     </LinearLayout>
     <Button
         android:id="@android:id/button1"
-        android:onClick="showToS"
         android:visibility="gone"
         android:layout_gravity="center_horizontal"
         android:textColor="@color/white"

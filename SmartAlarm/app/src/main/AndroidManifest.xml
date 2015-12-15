@@ -22,23 +22,21 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-        <activity android:name=".OnboardingActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
 
         <activity
             android:name=".AlarmSettingsActivity"
-            android:parentActivityName=".AlarmListActivity"
+            android:parentActivityName=".AlarmMainActivity"
             android:screenOrientation="portrait">
         </activity>
 
         <activity
-            android:name=".AlarmListActivity"
+            android:name=".AlarmMainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
 
         <activity
@@ -68,11 +66,11 @@
         <activity
             android:name=".AlarmGlobalSettingsActivity"
             android:label="@string/title_activity_alarm_settings"
-            android:parentActivityName=".AlarmListActivity"
+            android:parentActivityName=".AlarmMainActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.microsoft.smartalarm.AlarmListActivity"/>
+                android:value=".AlarmMainActivity"/>
         </activity>
 
         <activity
@@ -80,7 +78,7 @@
             android:label="@string/title_activity_learn_more">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.microsoft.smartalarm.AlarmListActivity"/>
+                android:value=".AlarmMainActivity"/>
         </activity>
 
         <activity
