@@ -12,11 +12,6 @@ public final class AlarmScheduler {
     private AlarmScheduler() {}
 
     public static final String ID = "id";
-    public static final String TITLE = "title";
-    public static final String TIME_HOUR = "timeHour";
-    public static final String TIME_MINUTE = "timeMinute";
-    public static final String TONE = "alarmTone";
-    public static final String VIBRATE = "shouldVibrate";
 
     public static void scheduleAlarm(Context context, Alarm alarm) {
         if (alarm.isOneShot()) {
@@ -92,13 +87,6 @@ public final class AlarmScheduler {
     private static PendingIntent createPendingIntent(Context context, Alarm alarm) {
         Intent intent = new Intent(context, AlarmWakeReceiver.class);
         intent.putExtra(ID, alarm.getId());
-        intent.putExtra(TITLE, alarm.getTitle());
-        intent.putExtra(TIME_HOUR, alarm.getTimeHour());
-        intent.putExtra(TIME_MINUTE, alarm.getTimeMinute());
-        if (alarm.getAlarmTone() != null) {
-            intent.putExtra(TONE, alarm.getAlarmTone().toString());
-        }
-        intent.putExtra(VIBRATE, alarm.shouldVibrate());
 
         return PendingIntent.getBroadcast(context, (int) alarm.getId().getLeastSignificantBits(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }

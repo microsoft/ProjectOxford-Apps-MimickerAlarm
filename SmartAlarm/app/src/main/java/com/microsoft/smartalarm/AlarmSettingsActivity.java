@@ -233,14 +233,14 @@ public class AlarmSettingsActivity extends AppCompatActivity {
         }
 
         private void saveSettingsAndExit() {
-            AlarmManagerHelper.cancelAlarms(getContext());
+            AlarmRegistrar.cancelAlarms(getContext());
             populateUpdatedSettings();
             mAlarm.setNew(false);
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE);
             userAction.putJSON(mAlarm.toJSON());
             Logger.track(userAction);
             AlarmList.get(getActivity()).updateAlarm(mAlarm);
-            AlarmManagerHelper.setAlarms(getContext());
+            AlarmRegistrar.setAlarms(getContext());
             getActivity().finish();
         }
 
@@ -249,9 +249,9 @@ public class AlarmSettingsActivity extends AppCompatActivity {
             userAction.putJSON(mAlarm.toJSON());
             Logger.track(userAction);
 
-            AlarmManagerHelper.cancelAlarms(getContext());
+            AlarmRegistrar.cancelAlarms(getContext());
             AlarmList.get(getActivity()).deleteAlarm(mAlarm);
-            AlarmManagerHelper.setAlarms(getContext());
+            AlarmRegistrar.setAlarms(getContext());
             getActivity().finish();
         }
 

@@ -1,0 +1,305 @@
+package com.microsoft.smartalarm;
+
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.content.ClipData;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.preference.PreferenceManager;
+import android.util.Log;
+import android.view.DragEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import net.hockeyapp.android.CrashManager;
+
+import java.util.UUID;
+
+public class AlarmRingingFragment extends Fragment {
+
+    public final String TAG = this.getClass().getSimpleName();
+    private static final String ARGS_ALARM_ID = "alarm_id";
+
+    private MediaPlayer mPlayer;
+    private Vibrator mVibrator;
+    private ImageView mAlarmRingingClock;
+    private UUID mAlarmId;
+    private boolean mShowClockOnDragEnd = true;
+    private Handler mHandler;
+    private Runnable mAlarmCancelTask;
+    private ObjectAnimator mAnimateClock;
+    private Alarm mAlarm;
+
+    private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
+    private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
+    private static final int CLOCK_ANIMATION_DURATION = 1500;
+    private static final int SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY = 250;
+
+    public static AlarmRingingFragment newInstance(String alarmId) {
+        AlarmRingingFragment fragment = new AlarmRingingFragment();
+        Bundle bundle = new Bundle(1);
+        bundle.putString(ARGS_ALARM_ID, alarmId);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        Logger.init(getActivity());
+        Bundle args = getArguments();
+        mAlarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
+        mAlarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
+
+        View view = inflater.inflate(R.layout.activity_alarm_ringing, container, false);
+
+        TextView timeField = (TextView) view.findViewById(R.id.alarm_ringing_time);
+        timeField.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
+
+        TextView dateField = (TextView) view.findViewById(R.id.alarm_ringing_date);
+        dateField.setText(AlarmUtils.getFullDateStringForNow());
+
+        String name = mAlarm.getTitle();
+        if (name == null || name.isEmpty()) {
+            name = getString(R.string.alarm_ringing_default_text);
+        }
+        TextView titleField = (TextView) view.findViewById(R.id.alarm_ringing_title);
+        titleField.setText(name);
+
+        ImageView dismissButton = (ImageView) view.findViewById(R.id.alarm_ringing_dismiss);
+        dismissButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismissAlarm();
+            }
+        });
+        dismissButton.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DROP:
+                        dismissAlarm();
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        if (mShowClockOnDragEnd) {
+                            mAlarmRingingClock.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mAlarmRingingClock.setVisibility(View.VISIBLE);
+                                }
+                            }, SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+
+        ImageView snoozeButton = (ImageView) view.findViewById(R.id.alarm_ringing_snooze);
+        snoozeButton.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                switch(event.getAction()) {
+                    case DragEvent.ACTION_DROP:
+                        //snoozeAlarm();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+
+        mAlarmRingingClock = (ImageView) view.findViewById(R.id.alarm_ringing_clock);
+        mAlarmRingingClock.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    ClipData dragData = ClipData.newPlainText("", "");
+                    View.DragShadowBuilder shadow = new View.DragShadowBuilder(mAlarmRingingClock);
+                    mAlarmRingingClock.startDrag(dragData, shadow, null, 0);
+                    mAlarmRingingClock.setVisibility(View.INVISIBLE);
+                    return true;
+                } else {
+                    return false;
+                }
+
+            }
+        });
+
+        setupClockAnimation();
+        playAlarmSound();
+        vibrateDeviceIfDesired();
+
+        mAlarmCancelTask = new Runnable() {
+            @Override
+            public void run() {
+                cancelAlarmSound();
+                cancelVibration();
+            }
+        };
+
+        mHandler = new Handler();
+        mHandler.postDelayed(mAlarmCancelTask, getAlarmRingingDuration());
+
+        Loggable.AppAction appAction = new Loggable.AppAction(Loggable.Key.APP_ALARM_RINGING);
+
+        appAction.putJSON(mAlarm.toJSON());
+        Logger.track(appAction);
+
+        if (mAlarm.isOneShot()) {
+            mAlarm.setIsEnabled(false);
+            AlarmList.get(getContext()).updateAlarm(mAlarm);
+        }
+
+        return view;
+    }
+
+    private void dismissAlarm() {
+        mShowClockOnDragEnd = false;
+
+        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
+        Alarm alarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
+        userAction.putJSON(alarm.toJSON());
+        Logger.track(userAction);
+
+        cancelAlarmSound();
+        cancelVibration();
+/*
+        if (!GameFactory.startGame(AlarmRingingFragment.this, mAlarmId)) {
+            finishActivity();
+        }*/
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d(TAG, "Entered onResume!");
+
+        mAnimateClock.start();
+
+        final String hockeyappToken = Util.getToken(getActivity(), "hockeyapp");
+        CrashManager.register(getActivity(), hockeyappToken);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        Log.d(TAG, "Entered onPause!");
+
+        mAnimateClock.cancel();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Log.d(TAG, "Entered onDestroy!");
+
+        if (mPlayer != null) {
+            mPlayer.release();
+            mPlayer = null;
+        }
+
+        mHandler.removeCallbacks(mAlarmCancelTask);
+    }
+
+    private int getAlarmRingingDuration() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String durationPreference = preferences.getString("KEY_RING_DURATION", DEFAULT_RINGING_DURATION_STRING);
+
+        int alarmRingingDuration = DEFAULT_RINGING_DURATION_INTEGER;
+        try {
+            alarmRingingDuration = Integer.parseInt(durationPreference);
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+            Logger.trackException(e);
+        }
+
+        return alarmRingingDuration;
+    }
+
+    private void vibrateDeviceIfDesired() {
+        if (mAlarm.shouldVibrate()) {
+            mVibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+            // Start immediately
+            // Vibrate for 200 milliseconds
+            // Sleep for 500 milliseconds
+            long[] vibrationPattern = { 0, 200, 500 };
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                mVibrator.vibrate(vibrationPattern, 0, new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build());
+            } else {
+                mVibrator.vibrate(vibrationPattern, 0);
+            }
+        }
+    }
+
+    private void cancelVibration() {
+        if (mVibrator != null) {
+            mVibrator.cancel();
+        }
+    }
+
+    private void playAlarmSound() {
+        try {
+            Uri toneUri = mAlarm.getAlarmTone();
+            if (toneUri != null) {
+                mPlayer = new MediaPlayer();
+                mPlayer.setDataSource(getActivity(), toneUri);
+                mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                mPlayer.setLooping(true);
+                mPlayer.prepare();
+                mPlayer.start();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Logger.trackException(e);
+        }
+    }
+
+    private void restartAlarmSound() {
+        if (mPlayer != null) {
+            mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start();
+                }
+            });
+            mPlayer.prepareAsync();
+        }
+    }
+
+    private void cancelAlarmSound() {
+        if (mPlayer != null && mPlayer.isPlaying())
+        {
+            mPlayer.stop();
+        }
+    }
+
+    private void setupClockAnimation() {
+        mAnimateClock = ObjectAnimator.ofFloat(mAlarmRingingClock, "translationY", -35f, 0f);
+        mAnimateClock.setDuration(CLOCK_ANIMATION_DURATION);
+        mAnimateClock.setInterpolator(new BounceInterpolator());
+        mAnimateClock.setRepeatCount(ValueAnimator.INFINITE);
+    }
+}

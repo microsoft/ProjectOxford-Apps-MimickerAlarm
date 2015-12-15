@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import java.util.List;
 
-public class AlarmManagerHelper extends BroadcastReceiver {
+public class AlarmRegistrar extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -24,11 +24,9 @@ public class AlarmManagerHelper extends BroadcastReceiver {
 
     public static void cancelAlarms(Context context) {
         List<Alarm> alarms =  AlarmList.get(context).getAlarms();
-        if (alarms != null) {
-            for (Alarm alarm : alarms) {
-                if (alarm.isEnabled()) {
-                    AlarmScheduler.cancelAlarm(context, alarm);
-                }
+        for (Alarm alarm : alarms) {
+            if (alarm.isEnabled()) {
+                AlarmScheduler.cancelAlarm(context, alarm);
             }
         }
     }

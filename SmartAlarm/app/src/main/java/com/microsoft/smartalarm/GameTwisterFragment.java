@@ -1,11 +1,14 @@
 package com.microsoft.smartalarm;
 
-import android.content.Intent;
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.microsoft.projectoxford.speechrecognition.Confidence;
@@ -19,9 +22,15 @@ import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionServiceFac
 
 import java.util.Random;
 
-public class GameTwister extends AppCompatActivity implements ISpeechRecognitionServerEvents {
+public class GameTwisterFragment extends Fragment implements ISpeechRecognitionServerEvents {
+    GameResultListener mCallback;
 
-    private static String LOGTAG = "GameTwister";
+    public interface GameResultListener {
+        void onGameSuccess();
+        void onGameFailure();
+    }
+
+    private static String LOGTAG = "GameTwisterFragment";
 
     private MicrophoneRecognitionClient mMicClient = null;
     private SpeechRecognitionMode mRecognitionMode;
@@ -29,62 +38,71 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     private String mQuestion = null;
     private ProgressButton mCaptureButton;
     private CountDownTimerView mTimer;
+    private GameStateBanner mStateBanner;
+    private TextView mTextResponse;
 
     private final static int TIMEOUT_MILLISECONDS = 30000;
     private final static float SUCCESS_THRESHOLD = 0.5f;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_twister_game);
-        generateQuestion();
-        initialize();
-        Logger.init(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_twister_game, container, false);
+        mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
+        mStateBanner = (GameStateBanner) view.findViewById(R.id.game_state);
+        mTextResponse = (TextView) view.findViewById(R.id.understood_text);
+
+        generateQuestion(view);
+        initialize(view);
+
+        Logger.init(getContext());
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER);
         Logger.track(userAction);
+        return view;
     }
 
     @Override
-    protected void onResume() {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallback = (GameResultListener) context;
+    }
+
+    @Override
+    public void onResume() {
         super.onResume();
-        AlarmUtils.setLockScreenFlags(getWindow());
-        mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
+        AlarmUtils.setLockScreenFlags(getActivity().getWindow());
         mTimer.start();
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         Logger.flush();
     }
 
-    private void generateQuestion() {
+    private void generateQuestion(View view) {
         Resources resources = getResources();
         String[] questions = resources.getStringArray(R.array.tongue_twisters);
         mQuestion = questions[new Random().nextInt(questions.length)];
 
-        final TextView instructionTextView = (TextView) findViewById(R.id.instruction_text);
+        final TextView instructionTextView = (TextView) view.findViewById(R.id.instruction_text);
         instructionTextView.setText(mQuestion);
     }
 
     protected void gameSuccess() {
         mTimer.stop();
-        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         String successMessage = getString(R.string.game_success_message);
-        stateBanner.success(successMessage, new GameStateBanner.Command() {
+        mStateBanner.success(successMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
-                Intent intent = GameTwister.this.getIntent();
-                GameTwister.this.setResult(RESULT_OK, intent);
-                finish();
+                mCallback.onGameSuccess();
             }
         });
     }
     protected void gameFailure(boolean allowRetry) {
-        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         if (allowRetry) {
             String failureMessage = getString(R.string.game_failure_message);
-            stateBanner.failure(failureMessage, new GameStateBanner.Command() {
+            mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
                 public void execute() {
                     mCaptureButton.readyAudio();
@@ -96,12 +114,10 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
             userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
             Logger.track(userAction);
             String failureMessage = getString(R.string.game_time_up_message);
-            stateBanner.failure(failureMessage, new GameStateBanner.Command() {
+            mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
                 public void execute() {
-                    Intent intent = GameTwister.this.getIntent();
-                    GameTwister.this.setResult(RESULT_CANCELED, intent);
-                    finish();
+                    mCallback.onGameFailure();
                 }
             });
         }
@@ -110,9 +126,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     @Override
     public void onPartialResponseReceived(String s) {
         Log.d(LOGTAG, s);
-        mUnderstoodText = s;
-        TextView understoodText = (TextView) findViewById(R.id.understood_text);
-        understoodText.setText(s);
+        mTextResponse.setText(s);
     }
 
     @Override
@@ -137,8 +151,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
                 }
             }
 
-            TextView understoodText = (TextView) findViewById(R.id.understood_text);
-            understoodText.setText(mUnderstoodText);
+            mTextResponse.setText(mUnderstoodText);
             verify();
         }
     }
@@ -162,22 +175,24 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
         }
     }
 
-    private void initialize() {
+    private void initialize(View view) {
         mRecognitionMode = SpeechRecognitionMode.ShortPhrase;
 
         try {
             //TODO: localize
             String language = "en-us";
-            String subscriptionKey = Util.getToken(this, "speech");
+            String subscriptionKey = Util.getToken(getActivity(), "speech");
             if (mMicClient == null) {
-                mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mRecognitionMode, language, this, subscriptionKey);
+                mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(getActivity(), mRecognitionMode, language, this, subscriptionKey);
             }
         }
         catch(Exception e){
             Logger.trackException(e);
         }
 
-        mCaptureButton = (ProgressButton) findViewById(R.id.capture_button);
+
+        mCaptureButton = (ProgressButton) view.findViewById(R.id.capture_button);
+
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -192,7 +207,7 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
         });
         mCaptureButton.readyAudio();
 
-        mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
+        mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
         mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
             @Override
             public void execute() {

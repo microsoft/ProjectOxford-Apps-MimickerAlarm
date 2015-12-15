@@ -41,7 +41,6 @@
 
         <activity
             android:name=".AlarmRingingActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
 
         <receiver
@@ -54,7 +53,7 @@
             android:enabled="true"/>
 
         <receiver
-            android:name=".AlarmManagerHelper">
+            android:name=".AlarmRegistrar">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
@@ -82,7 +81,7 @@
         </activity>
 
         <activity
-            android:name=".GameTwister"
+            android:name=".GameTwisterFragment"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
             android:screenOrientation="portrait">
         </activity>

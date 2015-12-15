@@ -26,7 +26,7 @@ public final class GameFactory {
 
         List<Class> games = new ArrayList<>();
         if (alarm.isTongueTwisterEnabled()) {
-            games.add(GameTwister.class);
+            games.add(GameTwisterFragment.class);
         }
         if (alarm.isColorCollectorEnabled()) {
             games.add(GameColorFinderActivity.class);

@@ -22,10 +22,6 @@ import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class AlarmListFragment extends Fragment {
@@ -195,10 +191,10 @@ public class AlarmListFragment extends Fragment {
             mAlarmEnabled.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AlarmManagerHelper.cancelAlarms(getContext());
+                    AlarmRegistrar.cancelAlarms(getContext());
                     mAlarm.setIsEnabled(mAlarmEnabled.isChecked());
                     AlarmList.get(getActivity()).updateAlarm(mAlarm);
-                    AlarmManagerHelper.setAlarms(getContext());
+                    AlarmRegistrar.setAlarms(getContext());
                 }
             });
         }
