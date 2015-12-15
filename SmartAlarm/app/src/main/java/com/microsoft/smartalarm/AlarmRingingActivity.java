@@ -227,9 +227,7 @@ public class AlarmRingingActivity extends AppCompatActivity {
         super.onPause();
 
         Log.d(TAG, "Entered onPause!");
-
         mAnimateClock.cancel();
-
         releaseWakeLock();
     }
 

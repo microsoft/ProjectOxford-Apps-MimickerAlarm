@@ -37,7 +37,6 @@ public class GameTwister extends AppCompatActivity implements ISpeechRecognition
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_twister_game);
-        AlarmUtils.setLockScreenFlags(getWindow());
         generateQuestion();
         initialize();
         Logger.init(this);
