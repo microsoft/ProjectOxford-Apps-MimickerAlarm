@@ -91,6 +91,7 @@ public class GameEmotionFragment extends GameWithCameraFragment {
 
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_EMOTION_SUCCESS);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mEmotion);
+            userAction.putEmotions(result);
             if (success)
             {
                 Logger.track(userAction);
@@ -103,7 +104,6 @@ public class GameEmotionFragment extends GameWithCameraFragment {
             }
         }
         catch(Exception ex) {
-            Log.e(LOGTAG, "Error calling ProjectOxford", ex);
             Logger.trackException(ex);
         }
 

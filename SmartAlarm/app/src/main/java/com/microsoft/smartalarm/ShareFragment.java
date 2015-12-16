@@ -130,7 +130,7 @@ public class ShareFragment extends Fragment {
     public static Uri saveShareableBitmap(Context context, Bitmap bitmap) {
         File tempFile;
         try {
-            tempFile = File.createTempFile("test", ".png", context.getCacheDir());
+            tempFile = File.createTempFile("mimicker", ".jpg", context.getCacheDir());
             tempFile.setReadable(true, false);
             tempFile.deleteOnExit();
         }

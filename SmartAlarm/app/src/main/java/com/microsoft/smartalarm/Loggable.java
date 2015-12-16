@@ -1,9 +1,14 @@
 package com.microsoft.smartalarm;
 
+import com.microsoft.projectoxford.emotion.contract.RecognizeResult;
+import com.microsoft.projectoxford.vision.contract.AnalyzeResult;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
+import java.util.List;
 
 public class Loggable {
     String Name;
@@ -26,6 +31,68 @@ public class Loggable {
                 String key = (String)keys.next();
                 Properties.put(key, json.get(key));
             }
+        }
+        catch (JSONException ex) {
+            Logger.trackException(ex);
+        }
+    }
+
+    public void putVision(AnalyzeResult result) {
+        try {
+            Properties.put("Color Dominants", result.color.dominantColors);
+            Properties.put("Color Dominant FG", result.color.dominantColorForeground);
+            Properties.put("Color Dominant BG", result.color.dominantColorBackground);
+            Properties.put("Color Accent", result.color.accentColor);
+        }
+        catch (JSONException ex) {
+            Logger.trackException(ex);
+        }
+    }
+
+    public void putEmotions(List<RecognizeResult> results) {
+        try {
+            double[] scores = new double[results.size()];
+            JSONArray scores2 = new JSONArray();
+
+            for (int i = 0; i < results.size(); i++) {
+                scores[i] = results.get(i).scores.anger;
+            }
+            Properties.put("Emotion Anger", new JSONArray(scores));
+
+            for (int i = 0; i < results.size(); i++) {
+                scores[i] = results.get(i).scores.contempt;
+            }
+            Properties.put("Emotion Contempt", new JSONArray(scores));
+
+            for (int i = 0; i < results.size(); i++) {
+                scores[i] = results.get(i).scores.disgust;
+            }
+            Properties.put("Emotion Disgust", new JSONArray(scores));
+
+            for (int i = 0; i < results.size(); i++) {
+                scores[i] = results.get(i).scores.fear;
+            }
+            Properties.put("Emotion Fear", new JSONArray(scores));
+
+            for (int i = 0; i < results.size(); i++) {
+                scores[i] = results.get(i).scores.happiness;
+            }
+            Properties.put("Emotion Happiness", new JSONArray(scores));
+
+            for (int i = 0; i < results.size(); i++) {
+                scores[i] = results.get(i).scores.neutral;
+            }
+            Properties.put("Emotion Neutral", new JSONArray(scores));
+
+            for (int i = 0; i < results.size(); i++) {
+                scores[i] = results.get(i).scores.sadness;
+            }
+            Properties.put("Emotion Sadness", new JSONArray(scores));
+
+            for (int i = 0; i < results.size(); i++) {
+                scores[i] = results.get(i).scores.surprise;
+            }
+            Properties.put("Emotion Surprise", new JSONArray(scores));
         }
         catch (JSONException ex) {
             Logger.trackException(ex);

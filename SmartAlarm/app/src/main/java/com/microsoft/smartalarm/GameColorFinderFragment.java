@@ -64,6 +64,7 @@ public class GameColorFinderFragment extends GameWithCameraFragment {
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR_SUCCESS);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestionColorName);
             userAction.putProp(Loggable.Key.PROP_DIFF, colorDistance);
+            userAction.putVision(result);
 
             boolean success = false;
             //TODO: this will not work for languages other than English.
