@@ -35,18 +35,25 @@ public final class GameFactory {
             games.add(GameEmotionFragment.class);
         }
 
-        Class game = GameNoNetworkFragment.class;
-        if (games.size() > 0 &&
-                isNetworkAvailable(caller)) {
+        Class game = null;
+        if (games.size() > 0) {
+            if (isNetworkAvailable(caller)) {
                 int rand = new Random().nextInt(games.size());
-            game = games.get(rand);
+                game = games.get(rand);
+            }
+            else
+            {
+                game = GameNoNetworkFragment.class;
+            }
         }
 
         Fragment fragment = null;
-        try {
-            fragment = (Fragment) game.newInstance();
-        } catch (Exception e) {
-            Log.e(TAG, "Couldn't create fragment:", e);
+        if (game != null) {
+            try {
+                fragment = (Fragment) game.newInstance();
+            } catch (Exception e) {
+                Log.e(TAG, "Couldn't create fragment:", e);
+            }
         }
         return fragment;
     }

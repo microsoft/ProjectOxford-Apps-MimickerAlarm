@@ -88,7 +88,12 @@ public class AlarmRingingActivity extends AppCompatActivity
         userAction.putJSON(alarm.toJSON());
         Logger.track(userAction);
         mIsGameRunning = true;
-        showFragment(GameFactory.getGameFragment(this, mAlarmId));
+        Fragment gameFragment = GameFactory.getGameFragment(this, mAlarmId);
+        if (gameFragment != null) {
+            showFragment(gameFragment);
+        } else {
+            finishActivity();
+        }
     }
 
     @Override
