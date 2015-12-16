@@ -26,7 +26,9 @@ public class AlarmRingingService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Alarm service started!");
-        Intent alarmIntent = new Intent(getBaseContext(), AlarmRingingFragment.class);
+        SharedWakeLock.get(getApplicationContext()).acquireWakeLock();
+
+        Intent alarmIntent = new Intent(getBaseContext(), AlarmRingingActivity.class);
         alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         alarmIntent.putExtras(intent.getExtras());
         getApplication().startActivity(alarmIntent);

@@ -41,7 +41,8 @@
 
         <activity
             android:name=".AlarmRingingActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
 
         <receiver
             android:name=".AlarmWakeReceiver"
@@ -78,30 +79,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".AlarmMainActivity"/>
-        </activity>
-
-        <activity
-            android:name=".GameTwisterFragment"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
-            android:screenOrientation="portrait">
-        </activity>
-
-        <activity
-            android:name=".GameColorFinderActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-        </activity>
-
-        <activity
-            android:name=".GameEmotionActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-        </activity>
-
-        <activity
-            android:name=".GameNoNetwork"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         </activity>
 
         <activity

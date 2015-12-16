@@ -6,44 +6,44 @@
 
     <com.microsoft.smartalarm.GameStateBanner
         android:id="@+id/game_state"
-        android:padding="@dimen/activity_horizontal_margin"
         android:layout_width="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_height="90dp"
+        android:layout_alignParentTop="true"
         android:gravity="center"
+        android:padding="@dimen/activity_horizontal_margin"
         android:textColor="@android:color/white"
         android:textSize="20sp"
         android:visibility="invisible"/>
 
     <LinearLayout
-        android:orientation="vertical"
-        android:padding="0dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="0dp">
 
         <com.microsoft.smartalarm.CountDownTimerView
+            android:id="@+id/countdown_timer"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:id="@+id/countdown_timer"/>
+            android:layout_height="20dp" />
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical"
+            android:paddingBottom="@dimen/activity_vertical_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:weightSum="8"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:weightSum="8">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
                 android:layout_weight="1"
+                android:padding="16dp"
                 android:text="@string/game_twister_prompt"
-                android:textSize="16sp"
                 android:textAllCaps="true"
+                android:textSize="16sp"
                 android:textStyle="normal"/>
 
             <TextView
@@ -60,22 +60,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:textStyle="bold"
-                android:textColor="#009688"
                 android:padding="16dp"
-                android:textSize="16sp"/>
+                android:textColor="#009688"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <RelativeLayout
-                android:gravity="center"
-                android:layout_weight="1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
 
                 <com.microsoft.smartalarm.ProgressButton
                     android:id="@+id/capture_button"
-                    android:layout_centerInParent="true"
                     android:layout_width="80dp"
-                    android:layout_height="80dp"/>
+                    android:layout_height="80dp"
+                    android:layout_centerInParent="true" />
 
             </RelativeLayout>
         </LinearLayout>

@@ -4,17 +4,14 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -31,24 +28,18 @@ import net.hockeyapp.android.CrashManager;
 import java.util.UUID;
 
 public class AlarmRingingFragment extends Fragment {
-
-    public final String TAG = this.getClass().getSimpleName();
     private static final String ARGS_ALARM_ID = "alarm_id";
-
+    private static final int CLOCK_ANIMATION_DURATION = 1500;
+    private static final int SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY = 250;
+    public final String TAG = this.getClass().getSimpleName();
+    RingingResultListener mCallback;
     private MediaPlayer mPlayer;
     private Vibrator mVibrator;
     private ImageView mAlarmRingingClock;
     private UUID mAlarmId;
-    private boolean mShowClockOnDragEnd = true;
-    private Handler mHandler;
-    private Runnable mAlarmCancelTask;
+    private boolean mShowClockOnDragEnd;
     private ObjectAnimator mAnimateClock;
     private Alarm mAlarm;
-
-    private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
-    private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
-    private static final int CLOCK_ANIMATION_DURATION = 1500;
-    private static final int SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY = 250;
 
     public static AlarmRingingFragment newInstance(String alarmId) {
         AlarmRingingFragment fragment = new AlarmRingingFragment();
@@ -67,7 +58,7 @@ public class AlarmRingingFragment extends Fragment {
         mAlarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
         mAlarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
 
-        View view = inflater.inflate(R.layout.activity_alarm_ringing, container, false);
+        View view = inflater.inflate(R.layout.fragment_alarm_ringing, container, false);
 
         TextView timeField = (TextView) view.findViewById(R.id.alarm_ringing_time);
         timeField.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
@@ -117,7 +108,7 @@ public class AlarmRingingFragment extends Fragment {
         snoozeButton.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
-                switch(event.getAction()) {
+                switch (event.getAction()) {
                     case DragEvent.ACTION_DROP:
                         //snoozeAlarm();
                         break;
@@ -145,20 +136,8 @@ public class AlarmRingingFragment extends Fragment {
             }
         });
 
-        setupClockAnimation();
-        playAlarmSound();
-        vibrateDeviceIfDesired();
-
-        mAlarmCancelTask = new Runnable() {
-            @Override
-            public void run() {
-                cancelAlarmSound();
-                cancelVibration();
-            }
-        };
-
-        mHandler = new Handler();
-        mHandler.postDelayed(mAlarmCancelTask, getAlarmRingingDuration());
+        initializeClockAnimation();
+        initializeMediaPlayer();
 
         Loggable.AppAction appAction = new Loggable.AppAction(Loggable.Key.APP_ALARM_RINGING);
 
@@ -181,12 +160,19 @@ public class AlarmRingingFragment extends Fragment {
         userAction.putJSON(alarm.toJSON());
         Logger.track(userAction);
 
-        cancelAlarmSound();
-        cancelVibration();
-/*
-        if (!GameFactory.startGame(AlarmRingingFragment.this, mAlarmId)) {
-            finishActivity();
-        }*/
+        mCallback.onDismiss();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallback = (RingingResultListener) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallback = null;
     }
 
     @Override
@@ -195,6 +181,10 @@ public class AlarmRingingFragment extends Fragment {
 
         Log.d(TAG, "Entered onResume!");
 
+        playAlarmSound();
+        vibrateDeviceIfDesired();
+        mShowClockOnDragEnd = true;
+        mAlarmRingingClock.setVisibility(View.VISIBLE);
         mAnimateClock.start();
 
         final String hockeyappToken = Util.getToken(getActivity(), "hockeyapp");
@@ -207,6 +197,8 @@ public class AlarmRingingFragment extends Fragment {
 
         Log.d(TAG, "Entered onPause!");
 
+        cancelAlarmSound();
+        cancelVibration();
         mAnimateClock.cancel();
     }
 
@@ -220,23 +212,6 @@ public class AlarmRingingFragment extends Fragment {
             mPlayer.release();
             mPlayer = null;
         }
-
-        mHandler.removeCallbacks(mAlarmCancelTask);
-    }
-
-    private int getAlarmRingingDuration() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String durationPreference = preferences.getString("KEY_RING_DURATION", DEFAULT_RINGING_DURATION_STRING);
-
-        int alarmRingingDuration = DEFAULT_RINGING_DURATION_INTEGER;
-        try {
-            alarmRingingDuration = Integer.parseInt(durationPreference);
-        } catch (NumberFormatException e){
-            e.printStackTrace();
-            Logger.trackException(e);
-        }
-
-        return alarmRingingDuration;
     }
 
     private void vibrateDeviceIfDesired() {
@@ -245,7 +220,7 @@ public class AlarmRingingFragment extends Fragment {
             // Start immediately
             // Vibrate for 200 milliseconds
             // Sleep for 500 milliseconds
-            long[] vibrationPattern = { 0, 200, 500 };
+            long[] vibrationPattern = {0, 200, 500};
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 mVibrator.vibrate(vibrationPattern, 0, new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build());
             } else {
@@ -260,7 +235,7 @@ public class AlarmRingingFragment extends Fragment {
         }
     }
 
-    private void playAlarmSound() {
+    private void initializeMediaPlayer() {
         try {
             Uri toneUri = mAlarm.getAlarmTone();
             if (toneUri != null) {
@@ -268,8 +243,6 @@ public class AlarmRingingFragment extends Fragment {
                 mPlayer.setDataSource(getActivity(), toneUri);
                 mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                 mPlayer.setLooping(true);
-                mPlayer.prepare();
-                mPlayer.start();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -277,15 +250,20 @@ public class AlarmRingingFragment extends Fragment {
         }
     }
 
-    private void restartAlarmSound() {
-        if (mPlayer != null) {
-            mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mp.start();
-                }
-            });
-            mPlayer.prepareAsync();
+    private void playAlarmSound() {
+        try {
+            if (mPlayer != null) {
+                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        mp.start();
+                    }
+                });
+                mPlayer.prepareAsync();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Logger.trackException(e);
         }
     }
 
@@ -296,10 +274,16 @@ public class AlarmRingingFragment extends Fragment {
         }
     }
 
-    private void setupClockAnimation() {
+    private void initializeClockAnimation() {
         mAnimateClock = ObjectAnimator.ofFloat(mAlarmRingingClock, "translationY", -35f, 0f);
         mAnimateClock.setDuration(CLOCK_ANIMATION_DURATION);
         mAnimateClock.setInterpolator(new BounceInterpolator());
         mAnimateClock.setRepeatCount(ValueAnimator.INFINITE);
+    }
+
+    public interface RingingResultListener {
+        void onSnooze();
+
+        void onDismiss();
     }
 }

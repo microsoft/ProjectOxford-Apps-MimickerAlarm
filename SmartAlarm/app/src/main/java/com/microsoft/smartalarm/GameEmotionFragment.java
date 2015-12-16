@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.microsoft.projectoxford.emotion.EmotionServiceRestClient;
@@ -12,40 +15,40 @@ import com.microsoft.projectoxford.emotion.contract.RecognizeResult;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
-public class GameEmotionActivity extends GameWithCameraActivity {
+public class GameEmotionFragment extends GameWithCameraFragment {
+    private static final double EMOTION_ACCEPTANCE = 0.6;
+    private static String LOGTAG = "GameEmotionFragment";
     private EmotionServiceRestClient mEmotionServiceRestClient;
-    private static String           LOGTAG = "GameEmotionActivity";
     private String                  mEmotion;
-    private static final double     EMOTION_ACCEPTANCE = 0.6;
 
-    public GameEmotionActivity() {
+    public GameEmotionFragment() {
         CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
 
         Resources resources = getResources();
 
-        String subscriptionKey = Util.getToken(this, "emotion");
+        String subscriptionKey = Util.getToken(getActivity(), "emotion");
         mEmotionServiceRestClient = new EmotionServiceRestClient(subscriptionKey);
 
         String[] emotions = resources.getStringArray(R.array.emotions);
         String[] adjectives = resources.getStringArray(R.array.emotions_adjectives);
         int randomNumber = new Random().nextInt(emotions.length);
         mEmotion = emotions[randomNumber];
-        TextView instruction = (TextView) findViewById(R.id.instruction_text);
+        TextView instruction = (TextView) view.findViewById(R.id.instruction_text);
         instruction.setText(String.format(resources.getString(R.string.game_emotion_prompt), adjectives[randomNumber]));
 
-        Logger.init(this);
+        Logger.init(getActivity());
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_EMOTION);
         Logger.track(userAction);
+
+        return view;
     }
 
     @Override

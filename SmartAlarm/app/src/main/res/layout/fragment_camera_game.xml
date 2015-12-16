@@ -7,11 +7,11 @@
 
     <com.microsoft.smartalarm.GameStateBanner
         android:id="@+id/game_state"
-        android:padding="@dimen/activity_horizontal_margin"
         android:layout_width="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_height="90dp"
+        android:layout_alignParentTop="true"
         android:gravity="center"
+        android:padding="@dimen/activity_horizontal_margin"
         android:textColor="@android:color/white"
         android:textSize="20sp"
         android:visibility="invisible"/>
@@ -27,39 +27,39 @@
 
         <RelativeLayout
             android:id="@+id/camera_preview_overlay"
-            android:orientation="horizontal"
-            android:background="#00ffffff"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="#00ffffff"
+            android:orientation="horizontal">
 
             <com.microsoft.smartalarm.ProgressButton
                 android:id="@+id/capture_button"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_alignParentBottom="true"
                 android:layout_centerInParent="true"
-                android:layout_marginBottom="20dp"
-                android:layout_width="80dp"
-                android:layout_height="80dp"/>
+                android:layout_marginBottom="20dp" />
         </RelativeLayout>
     </FrameLayout>
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <com.microsoft.smartalarm.CountDownTimerView
+            android:id="@+id/countdown_timer"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:id="@+id/countdown_timer"/>
+            android:layout_height="20dp" />
 
         <TextView
-            style="@style/Font.Title"
-            android:background="@color/yellow2"
             android:id="@+id/instruction_text"
+            style="@style/Font.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
+            android:background="@color/yellow2"
             android:gravity="center"
+            android:padding="20dp"
             android:textAllCaps="true"/>
 
     </LinearLayout>

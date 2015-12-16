@@ -1,39 +1,47 @@
 package com.microsoft.smartalarm;
 
-import android.content.Intent;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
+
+import com.microsoft.smartalarm.GameFactory.GameResultListener;
 
 @SuppressWarnings("deprecation")
-public abstract class GameWithCameraActivity extends AppCompatActivity{
+abstract class GameWithCameraFragment extends Fragment {
 
-    private static final String LOGTAG = "GameWithCameraActivity";
+    GameResultListener mCallback;
+
+    private static final String LOGTAG = "GameWithCameraFragment";
     private static final int TIMEOUT_MILLISECONDS = 30000;
     protected static int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
     private CameraPreview   mCameraPreview;
     private ProgressButton  mCaptureButton;
     private CountDownTimerView      mTimer;
+    private GameStateBanner mStateBanner;
 
     private Point mSize;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera_game);
-        SurfaceView previewView = (SurfaceView) findViewById(R.id.camera_preview_view);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_camera_game, container, false);
 
-        Display display = getWindowManager().getDefaultDisplay();
+        mStateBanner = (GameStateBanner) view.findViewById(R.id.game_state);
+        SurfaceView previewView = (SurfaceView) view.findViewById(R.id.camera_preview_view);
+
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         mSize = size;
@@ -41,7 +49,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
                 (double)size.y / (double)size.x : (double)size.x / (double)size.y;
         mCameraPreview = new CameraPreview(previewView, aspectRatio, CameraFacing);
 
-        View overlay = findViewById(R.id.camera_preview_overlay);
+        View overlay = view.findViewById(R.id.camera_preview_overlay);
         overlay.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -55,7 +63,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
             }
         });
 
-        mCaptureButton = (ProgressButton) findViewById(R.id.capture_button);
+        mCaptureButton = (ProgressButton) view.findViewById(R.id.capture_button);
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,31 +74,32 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
         });
         mCaptureButton.readyCamera();
 
-        mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
+        mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
         mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
             @Override
             public void execute() {
                 gameFailure(false);
             }
         });
+
+        return view;
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallback = (GameResultListener) context;
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle inState) {
-        super.onRestoreInstanceState(inState);
-        mCameraPreview.start();
+    public void onDetach() {
+        super.onDetach();
+        mCallback = null;
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-
-        AlarmUtils.setLockScreenFlags(getWindow());
 
         try {
             mCameraPreview.initPreview();
@@ -104,7 +113,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         mCameraPreview.stop();
     }
@@ -131,7 +140,7 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
             try{
                 if (bitmaps.length > 0) {
                     if (verify(bitmaps[0])) {
-                        Uri tempFile = GameFactory.saveShareableBitmap(GameWithCameraActivity.this, bitmaps[0]);
+                        Uri tempFile = GameFactory.saveShareableBitmap(getActivity(), bitmaps[0]);
                         bitmaps[0].recycle();
                         return tempFile;
                     }
@@ -150,36 +159,29 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
             mCaptureButton.stop();
             if (shareableUri != null) {
                 gameSuccess(shareableUri);
-                return;
             }
             else{
                 gameFailure(true);
-                return;
             }
         }
     }
 
     protected void gameSuccess(final Uri shareableUri) {
         mTimer.stop();
-        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         String successMessage = getString(R.string.game_success_message);
-        stateBanner.success(successMessage, new GameStateBanner.Command() {
+        mStateBanner.success(successMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
-                Intent intent = GameWithCameraActivity.this.getIntent();
-                intent.putExtra(GameFactory.SHAREABLE_URI, shareableUri.getPath());
-                GameWithCameraActivity.this.setResult(RESULT_OK, intent);
-                finish();
+                mCallback.onGameSuccess();
             }
         });
     }
     protected void gameFailure(boolean allowRetry) {
-        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         if (allowRetry) {
             mCameraPreview.start();
             mCaptureButton.readyCamera();
             String failureMessage = getString(R.string.game_failure_message);
-            stateBanner.failure(failureMessage, new GameStateBanner.Command() {
+            mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
                 public void execute() {
                     mTimer.resume();
@@ -188,12 +190,10 @@ public abstract class GameWithCameraActivity extends AppCompatActivity{
         }
         else {
             String failureMessage = getString(R.string.game_time_up_message);
-            stateBanner.failure(failureMessage, new GameStateBanner.Command() {
+            mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
                 public void execute() {
-                    Intent intent = GameWithCameraActivity.this.getIntent();
-                    GameWithCameraActivity.this.setResult(RESULT_CANCELED, intent);
-                    finish();
+                    mCallback.onGameFailure();
                 }
             });
         }

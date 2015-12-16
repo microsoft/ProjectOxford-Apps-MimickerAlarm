@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.microsoft.projectoxford.vision.VisionServiceRestClient;
@@ -14,36 +17,38 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
-public class GameColorFinderActivity extends GameWithCameraActivity {
+public class GameColorFinderFragment extends GameWithCameraFragment {
+    private static final int COLOR_DIFF_ACCEPTANCE = 300;
     private VisionServiceRestClient mVisionServiceRestClient;
     private String                  mQuestionColorName;
     private int                     mQuestionColorCode;
-    private static final int        COLOR_DIFF_ACCEPTANCE = 300;
 
-    public GameColorFinderActivity() {
+    public GameColorFinderFragment() {
         CameraFacing = Camera.CameraInfo.CAMERA_FACING_BACK;
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
 
         Resources resources = getResources();
 
-        String subscriptionKey = Util.getToken(this, "vision");
+        String subscriptionKey = Util.getToken(getActivity(), "vision");
         mVisionServiceRestClient = new VisionServiceRestClient(subscriptionKey);
 
         String[] questions = resources.getStringArray(R.array.vision_color_codes);
         String colorCode = questions[new Random().nextInt(questions.length)];
         mQuestionColorCode = rgbToInt(colorCode);
-        TextView instruction = (TextView) findViewById(R.id.instruction_text);
-        int colorNameId = resources.getIdentifier("_" + colorCode, "string", getPackageName());
+        TextView instruction = (TextView) view.findViewById(R.id.instruction_text);
+        int colorNameId = resources.getIdentifier("_" + colorCode, "string", getActivity().getPackageName());
         mQuestionColorName = resources.getString(colorNameId);
         instruction.setText(String.format(resources.getString(R.string.game_vision_prompt), mQuestionColorName));
 
-        Logger.init(this);
+        Logger.init(getActivity());
         Loggable playGameEvent = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR);
         Logger.track(playGameEvent);
+
+        return view;
     }
 
     @Override

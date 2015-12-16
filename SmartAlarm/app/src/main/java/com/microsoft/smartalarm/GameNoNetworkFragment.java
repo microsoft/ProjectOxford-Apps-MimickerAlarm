@@ -1,7 +1,6 @@
 package com.microsoft.smartalarm;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -9,30 +8,38 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.microsoft.smartalarm.GameFactory.GameResultListener;
+
 import java.util.Random;
 
-public class GameNoNetwork extends AppCompatActivity {
-
-    private CountDownTimerView mTimer;
+public class GameNoNetworkFragment extends Fragment {
     private final static int TIMEOUT_MILLISECONDS = 30000;
+    GameResultListener mCallback;
+    private CountDownTimerView mTimer;
+    private TextView mInstructionText;
+    private GameStateBanner mStateBanner;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_nonetwork_game);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_nonetwork_game, container, false);
+
+        mStateBanner = (GameStateBanner) view.findViewById(R.id.game_state);
+
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1);
         Game game = new Game(this);
         game.setLayoutParams(params);
-        ((LinearLayout) findViewById(R.id.game_container)).addView(game);
-        mTimer = (CountDownTimerView) findViewById(R.id.countdown_timer);
+        ((LinearLayout) view.findViewById(R.id.game_container)).addView(game);
+        mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
         mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
             @Override
             public void execute() {
@@ -40,46 +47,55 @@ public class GameNoNetwork extends AppCompatActivity {
             }
         });
 
-        ((TextView) findViewById(R.id.instruction_text)).setText(R.string.game_nonetwork_prompt);
+        mInstructionText = (TextView) view.findViewById(R.id.instruction_text);
+        mInstructionText.setText(R.string.game_nonetwork_prompt);
 
-        Logger.init(this);
+        Logger.init(getActivity());
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_NONETWORK);
         Logger.track(userAction);
+
+        return view;
     }
 
     @Override
-    protected void onResume() {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallback = (GameResultListener) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallback = null;
+    }
+
+    @Override
+    public void onResume() {
         super.onResume();
         mTimer.start();
     }
 
     protected void gameFailure() {
-        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         String failureMessage = getString(R.string.game_time_up_message);
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_NONETWORK_TIMEOUT);
         Logger.track(userAction);
-        stateBanner.failure(failureMessage, new GameStateBanner.Command() {
+        mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
-                Intent intent = GameNoNetwork.this.getIntent();
-                GameNoNetwork.this.setResult(RESULT_CANCELED, intent);
-                finish();
+                mCallback.onGameFailure();
             }
         });
     }
 
     protected void gameSuccess() {
         mTimer.stop();
-        final GameStateBanner stateBanner = (GameStateBanner) findViewById(R.id.game_state);
         String successMessage = getString(R.string.game_success_message);
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_NONETWORK_SUCCESS);
         Logger.track(userAction);
-        stateBanner.success(successMessage, new GameStateBanner.Command() {
+        mStateBanner.success(successMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
-                Intent intent = GameNoNetwork.this.getIntent();
-                GameNoNetwork.this.setResult(RESULT_OK, intent);
-                finish();
+                mCallback.onGameSuccess();
             }
         });
     }
@@ -89,16 +105,16 @@ public class GameNoNetwork extends AppCompatActivity {
         private int mWidth, mHeight;
         private GameLoop mGameLoop;
         private GameEngine mGameEngine;
-        private GameNoNetwork mParentActivity;
+        private GameNoNetworkFragment mParentFragment;
 
-        public Game(Context context) {
-            super(context);
+        public Game(GameNoNetworkFragment parent) {
+            super(getActivity());
             addOnLayoutChangeListener(this);
             SurfaceHolder holder = getHolder();
             holder.addCallback(this);
             mGameEngine  = new GameEngine();
             mGameLoop = new GameLoop(holder, mGameEngine);
-            mParentActivity = (GameNoNetwork) context;
+            mParentFragment = parent;
         }
 
         @Override
@@ -106,14 +122,14 @@ public class GameNoNetwork extends AppCompatActivity {
             int tapsRemaining = mGameEngine.touch(event);
 
             if (tapsRemaining == 2) {
-                ((TextView) mParentActivity.findViewById(R.id.instruction_text)).setText(R.string.game_nonetwork_prompt2);
+                mInstructionText.setText(R.string.game_nonetwork_prompt2);
             }
             else if (tapsRemaining == 1) {
-                ((TextView) mParentActivity.findViewById(R.id.instruction_text)).setText(R.string.game_nonetwork_prompt3);
+                mInstructionText.setText(R.string.game_nonetwork_prompt3);
             }
             else if (tapsRemaining <= 0){
                 stopLoop();
-                mParentActivity.gameSuccess();
+                mParentFragment.gameSuccess();
             }
 
             return super.onTouchEvent(event);
@@ -195,17 +211,18 @@ public class GameNoNetwork extends AppCompatActivity {
         public boolean IsRunning() {
             return mRunning;
         }
+
         public void setRunning(boolean state) {
             mRunning = state;
         }
     }
 
     private class GameEngine {
+        private final float EPSILON = 0.002f;
         private Paint mPaint, mBackgroundPaint;
         private float mX, mY;
         private int mWidth, mHeight;
         private Vector2D mVelocity;
-        private final float EPSILON = 0.002f;
         private boolean mInitialized = false;
         private RectF mHitbox;
         private int mTapsRemaining = 3;

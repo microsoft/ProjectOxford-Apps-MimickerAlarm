@@ -1,59 +1,87 @@
 package com.microsoft.smartalarm;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import net.hockeyapp.android.CrashManager;
 
+import java.util.UUID;
+
 public class AlarmRingingActivity extends AppCompatActivity
-        implements GameTwisterFragment.GameResultListener {
+        implements GameFactory.GameResultListener,
+        AlarmRingingFragment.RingingResultListener {
 
+    private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
+    private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
     public final String TAG = this.getClass().getSimpleName();
-
-    private WakeLock mWakeLock;
+    private UUID mAlarmId;
+    private Fragment mAlarmRingingFragment;
+    private Handler mHandler;
+    private Runnable mAlarmCancelTask;
+    private boolean mIsGameRunning;
+    private boolean mAlarmTimedOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "Creating activity!");
+        mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ID);
 
-        setTitle(null);
+        Log.d(TAG, "Creating activity!");
 
         setContentView(R.layout.activity_fragment);
 
+        mAlarmRingingFragment = AlarmRingingFragment.newInstance(mAlarmId.toString());
+        showFragment(mAlarmRingingFragment);
 
+        mAlarmCancelTask = new Runnable() {
+            @Override
+            public void run() {
+                mAlarmTimedOut = true;
+                if (!mIsGameRunning) {
+                    finishActivity();
+                }
+            }
+        };
+        mHandler = new Handler();
+        mHandler.postDelayed(mAlarmCancelTask, getAlarmRingingDuration());
     }
 
     @Override
     public void onGameSuccess() {
-
+        mIsGameRunning = false;
+        finishActivity();
     }
 
     @Override
     public void onGameFailure() {
-
+        mIsGameRunning = false;
+        if (mAlarmTimedOut) {
+            finishActivity();
+        } else {
+            showFragment(mAlarmRingingFragment);
+        }
     }
 
-    private void dismissAlarm() {
-/*
+    @Override
+    public void onDismiss() {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
         Alarm alarm = AlarmList.get(this).getAlarm(mAlarmId);
         userAction.putJSON(alarm.toJSON());
         Logger.track(userAction);
-
-        if (!GameFactory.startGame(AlarmRingingFragment.this, mAlarmId)) {
-            finishActivity();
-        }
-        */
+        mIsGameRunning = true;
+        showFragment(GameFactory.getGameFragment(this, mAlarmId));
     }
 
-    private void snoozeAlarm() {
-        // TODO - Oxford Apps VSO Task: 5264 Enable snooze functionality on ringing screen
+    @Override
+    public void onSnooze() {
+
     }
 
     @Override
@@ -63,7 +91,6 @@ public class AlarmRingingActivity extends AppCompatActivity
         Log.d(TAG, "Entered onResume!");
 
         AlarmUtils.setLockScreenFlags(getWindow());
-        acquireWakeLock();
 
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
         CrashManager.register(this, hockeyappToken);
@@ -72,10 +99,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-
         Log.d(TAG, "Entered onPause!");
-
-        releaseWakeLock();
     }
 
     @Override
@@ -83,27 +107,33 @@ public class AlarmRingingActivity extends AppCompatActivity
         // Eat the back button
     }
 
-    private void acquireWakeLock() {
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        if (mWakeLock == null) {
-            mWakeLock = pm.newWakeLock((PowerManager.FULL_WAKE_LOCK | PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), TAG);
-        }
 
-        if (!mWakeLock.isHeld()) {
-            mWakeLock.acquire();
-            Log.d(TAG, "Acquired WAKE_LOCK!");
-        }
-    }
-
-    private void releaseWakeLock() {
-        if (mWakeLock != null && mWakeLock.isHeld()) {
-            mWakeLock.release();
-            Log.d(TAG, "Released WAKE_LOCK!");
-        }
-    }
 
     private void finishActivity() {
-
+        AlarmUtils.clearLockScreenFlags(getWindow());
+        SharedWakeLock.get(this).releaseWakeLock();
+        mHandler.removeCallbacks(mAlarmCancelTask);
         finish();
+    }
+
+    private void showFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+    }
+
+    private int getAlarmRingingDuration() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String durationPreference = preferences.getString("KEY_RING_DURATION", DEFAULT_RINGING_DURATION_STRING);
+
+        int alarmRingingDuration = DEFAULT_RINGING_DURATION_INTEGER;
+        try {
+            alarmRingingDuration = Integer.parseInt(durationPreference);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            Logger.trackException(e);
+        }
+
+        return alarmRingingDuration;
     }
 }

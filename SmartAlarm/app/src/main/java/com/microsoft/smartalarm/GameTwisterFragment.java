@@ -19,19 +19,15 @@ import com.microsoft.projectoxford.speechrecognition.RecognitionStatus;
 import com.microsoft.projectoxford.speechrecognition.RecognizedPhrase;
 import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionServiceFactory;
+import com.microsoft.smartalarm.GameFactory.GameResultListener;
 
 import java.util.Random;
 
 public class GameTwisterFragment extends Fragment implements ISpeechRecognitionServerEvents {
-    GameResultListener mCallback;
-
-    public interface GameResultListener {
-        void onGameSuccess();
-        void onGameFailure();
-    }
-
+    private final static int TIMEOUT_MILLISECONDS = 30000;
+    private final static float SUCCESS_THRESHOLD = 0.5f;
     private static String LOGTAG = "GameTwisterFragment";
-
+    GameResultListener mCallback;
     private MicrophoneRecognitionClient mMicClient = null;
     private SpeechRecognitionMode mRecognitionMode;
     private String mUnderstoodText = null;
@@ -41,13 +37,10 @@ public class GameTwisterFragment extends Fragment implements ISpeechRecognitionS
     private GameStateBanner mStateBanner;
     private TextView mTextResponse;
 
-    private final static int TIMEOUT_MILLISECONDS = 30000;
-    private final static float SUCCESS_THRESHOLD = 0.5f;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_twister_game, container, false);
+        View view = inflater.inflate(R.layout.fragment_twister_game, container, false);
         mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
         mStateBanner = (GameStateBanner) view.findViewById(R.id.game_state);
         mTextResponse = (TextView) view.findViewById(R.id.understood_text);
@@ -68,9 +61,14 @@ public class GameTwisterFragment extends Fragment implements ISpeechRecognitionS
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallback = null;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        AlarmUtils.setLockScreenFlags(getActivity().getWindow());
         mTimer.start();
     }
 
