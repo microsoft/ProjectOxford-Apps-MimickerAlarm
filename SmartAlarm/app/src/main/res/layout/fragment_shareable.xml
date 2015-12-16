@@ -23,11 +23,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <ImageView
+            android:id="@+id/finish_button"
             android:layout_alignRight="@android:id/title"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_centerVertical="true"
             android:src="@drawable/close_button"
-            android:onClick="finishShare"
             style="@style/Font.Title"
             android:background="@color/invisible"
             android:layout_width="wrap_content"
@@ -47,20 +47,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageButton
+                android:id="@+id/download_button"
                 android:src="@drawable/download_button"
                 android:background="@drawable/yellow_button"
                 android:layout_weight="1"
-                android:onClick="download"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
                 android:scaleType="fitCenter"
                 android:layout_width="0dp"
                 android:layout_height="50dp"/>
             <ImageButton
+                android:id="@+id/share_button"
                 android:src="@drawable/share_button"
                 android:background="@drawable/yellow_button"
                 android:layout_weight="1"
-                android:onClick="share"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
                 android:scaleType="fitCenter"

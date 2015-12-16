@@ -41,6 +41,11 @@ public class AlarmRingingFragment extends Fragment {
     private ObjectAnimator mAnimateClock;
     private Alarm mAlarm;
 
+    public interface RingingResultListener {
+        void onRingingSnooze();
+        void onRingingDismiss();
+    }
+
     public static AlarmRingingFragment newInstance(String alarmId) {
         AlarmRingingFragment fragment = new AlarmRingingFragment();
         Bundle bundle = new Bundle(1);
@@ -160,7 +165,7 @@ public class AlarmRingingFragment extends Fragment {
         userAction.putJSON(alarm.toJSON());
         Logger.track(userAction);
 
-        mCallback.onDismiss();
+        mCallback.onRingingDismiss();
     }
 
     @Override
@@ -252,7 +257,7 @@ public class AlarmRingingFragment extends Fragment {
 
     private void playAlarmSound() {
         try {
-            if (mPlayer != null) {
+            if (mPlayer != null && !mPlayer.isPlaying()) {
                 mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
@@ -279,11 +284,5 @@ public class AlarmRingingFragment extends Fragment {
         mAnimateClock.setDuration(CLOCK_ANIMATION_DURATION);
         mAnimateClock.setInterpolator(new BounceInterpolator());
         mAnimateClock.setRepeatCount(ValueAnimator.INFINITE);
-    }
-
-    public interface RingingResultListener {
-        void onSnooze();
-
-        void onDismiss();
     }
 }

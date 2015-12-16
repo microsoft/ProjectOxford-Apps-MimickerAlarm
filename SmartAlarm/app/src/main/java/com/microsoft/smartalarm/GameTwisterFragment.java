@@ -93,7 +93,7 @@ public class GameTwisterFragment extends Fragment implements ISpeechRecognitionS
         mStateBanner.success(successMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
-                mCallback.onGameSuccess();
+                mCallback.onGameSuccess(null);
             }
         });
     }

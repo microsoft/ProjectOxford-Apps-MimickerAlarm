@@ -9,12 +9,11 @@ public class SharedWakeLock {
     private static final String TAG = "SharedWakeLock";
     private static SharedWakeLock sWakeLock;
 
-    private Context mContext;
     private PowerManager.WakeLock mWakeLock;
 
     private SharedWakeLock(Context context) {
-        mContext = context.getApplicationContext();
-        PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        Context appContext = context.getApplicationContext();
+        PowerManager pm = (PowerManager) appContext.getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock((PowerManager.FULL_WAKE_LOCK | PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), TAG);
     }
 

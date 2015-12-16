@@ -81,12 +81,6 @@
                 android:value=".AlarmMainActivity"/>
         </activity>
 
-        <activity
-            android:name=".ShareActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-        </activity>
-
         <activity android:name="net.hockeyapp.android.UpdateActivity"/>
         <activity android:name="net.hockeyapp.android.FeedbackActivity"/>
         <activity android:name="net.hockeyapp.android.PaintActivity"/>

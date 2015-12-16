@@ -15,6 +15,7 @@ import java.util.UUID;
 
 public class AlarmRingingActivity extends AppCompatActivity
         implements GameFactory.GameResultListener,
+        ShareFragment.ShareResultListener,
         AlarmRingingFragment.RingingResultListener {
 
     private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
@@ -35,6 +36,8 @@ public class AlarmRingingActivity extends AppCompatActivity
 
         Log.d(TAG, "Creating activity!");
 
+        AlarmUtils.setLockScreenFlags(getWindow());
+
         setContentView(R.layout.activity_fragment);
 
         mAlarmRingingFragment = AlarmRingingFragment.newInstance(mAlarmId.toString());
@@ -54,9 +57,13 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onGameSuccess() {
+    public void onGameSuccess(String shareable) {
         mIsGameRunning = false;
-        finishActivity();
+        if (shareable != null && shareable.length() > 0) {
+            showFragment(ShareFragment.newInstance(shareable));
+        } else {
+            finishActivity();
+        }
     }
 
     @Override
@@ -70,7 +77,12 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDismiss() {
+    public void onShareCompleted() {
+        finishActivity();
+    }
+
+    @Override
+    public void onRingingDismiss() {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
         Alarm alarm = AlarmList.get(this).getAlarm(mAlarmId);
         userAction.putJSON(alarm.toJSON());
@@ -80,7 +92,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSnooze() {
+    public void onRingingSnooze() {
 
     }
 
@@ -89,8 +101,6 @@ public class AlarmRingingActivity extends AppCompatActivity
         super.onResume();
 
         Log.d(TAG, "Entered onResume!");
-
-        AlarmUtils.setLockScreenFlags(getWindow());
 
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
         CrashManager.register(this, hockeyappToken);

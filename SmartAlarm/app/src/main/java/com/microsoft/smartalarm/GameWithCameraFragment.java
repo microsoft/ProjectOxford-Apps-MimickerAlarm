@@ -140,7 +140,7 @@ abstract class GameWithCameraFragment extends Fragment {
             try{
                 if (bitmaps.length > 0) {
                     if (verify(bitmaps[0])) {
-                        Uri tempFile = GameFactory.saveShareableBitmap(getActivity(), bitmaps[0]);
+                        Uri tempFile = ShareFragment.saveShareableBitmap(getActivity(), bitmaps[0]);
                         bitmaps[0].recycle();
                         return tempFile;
                     }
@@ -172,7 +172,7 @@ abstract class GameWithCameraFragment extends Fragment {
         mStateBanner.success(successMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
-                mCallback.onGameSuccess();
+                mCallback.onGameSuccess(shareableUri.getPath());
             }
         });
     }

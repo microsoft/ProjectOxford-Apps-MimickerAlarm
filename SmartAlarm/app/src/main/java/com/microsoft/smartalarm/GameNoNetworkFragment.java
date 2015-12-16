@@ -95,7 +95,7 @@ public class GameNoNetworkFragment extends Fragment {
         mStateBanner.success(successMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
-                mCallback.onGameSuccess();
+                mCallback.onGameSuccess(null);
             }
         });
     }
