@@ -4,7 +4,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ import java.util.Random;
 
 public class GameEmotionFragment extends GameWithCameraFragment {
     private static final double EMOTION_ACCEPTANCE = 0.6;
-    private static String LOGTAG = "GameEmotionFragment";
     private EmotionServiceRestClient mEmotionServiceRestClient;
     private String                  mEmotion;
 
