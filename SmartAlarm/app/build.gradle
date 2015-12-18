@@ -83,3 +83,37 @@ dependencies {
     compile files('libs/gson-2.3.1.jar')
 }
 
+// The location of the HP Fortify sourceanalyzer tool needs to be added to the PATH variable
+// for this task to run correctly
+task fortify << {
+    // Default classpath should be set to the location of the default android SDK
+    def classpath = "C:\\Program Files (x86)\\Android\\android-sdk\\platforms\\android-22\\android.jar;"
+    // We build the classpath with all the imported jars from the dependencies
+    def variant = android.applicationVariants.getAt(0)
+    variant.javaCompile.classpath.each { path ->
+        classpath = classpath + path + ";"
+    }
+
+    println "Running Fortify analysis tool.."
+    println "Step 1 - Clean..."
+    exec {
+        executable "sourceanalyzer"
+        args "-b", "MyBuild", "-clean"
+    }
+
+    println "Clean complete!"
+    println "Step 2 - Build intermediate files for analysis..."
+    exec {
+        executable "sourceanalyzer"
+        args "-b", "MyBuild", "-cp", classpath, "src/main/**/*.java"
+    }
+
+    println "Build completed!"
+    println "Step 3 - Scan source for potential flaws... "
+    exec {
+        executable "sourceanalyzer"
+        args "-b", "MyBuild", "-Xmx1200m", "-scan", "-f", "mimicker.fpr"
+    }
+
+    println "Scan completed!"
+}

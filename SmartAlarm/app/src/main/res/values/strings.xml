@@ -9,6 +9,7 @@
     <string name="alarm_ringing_default_text">Wakey Wakey</string>
     <string name="alarm_list_weekend">Weekend</string>
     <string name="alarm_list_weekdays">Weekdays</string>
+    <string name="alarm_snooze_label">Snoozed</string>
 
     <string name="game_twister_prompt">Say the following tongue twister</string>
     <string name="game_vision_prompt">Find something %s</string>

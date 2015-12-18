@@ -1,5 +1,6 @@
 package com.microsoft.smartalarm;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,6 +55,11 @@ public class AlarmRingingActivity extends AppCompatActivity
         };
         mHandler = new Handler();
         mHandler.postDelayed(mAlarmCancelTask, getAlarmRingingDuration());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
     }
 
     @Override

@@ -115,7 +115,7 @@ public class AlarmRingingFragment extends Fragment {
             public boolean onDrag(View v, DragEvent event) {
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DROP:
-                        //snoozeAlarm();
+                        mCallback.onRingingSnooze();
                         break;
                     default:
                         break;
