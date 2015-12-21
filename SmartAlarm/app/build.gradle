@@ -84,9 +84,9 @@ dependencies {
 }
 
 // The location of the HP Fortify sourceanalyzer tool needs to be added to the PATH variable
-// for this task to run correctly
+// for this task to run correctly. You also need to add SDL files from http://codebox/sdlfortify.
 task fortify << {
-    // Default classpath should be set to the location of the default android SDK
+    // Default classpath should be set to the location of the default android SDK - not totally necessary though
     def classpath = "C:\\Program Files (x86)\\Android\\android-sdk\\platforms\\android-22\\android.jar;"
     // We build the classpath with all the imported jars from the dependencies
     def variant = android.applicationVariants.getAt(0)
@@ -105,14 +105,14 @@ task fortify << {
     println "Step 2 - Build intermediate files for analysis..."
     exec {
         executable "sourceanalyzer"
-        args "-b", "MyBuild", "-cp", classpath, "src/main/**/*.java"
+        args "-b", "MyBuild", "-jdk", "1.8", "-cp", classpath, "src/main/**/*.java"
     }
 
     println "Build completed!"
     println "Step 3 - Scan source for potential flaws... "
     exec {
         executable "sourceanalyzer"
-        args "-b", "MyBuild", "-Xmx1200m", "-scan", "-f", "mimicker.fpr"
+        args "-b", "MyBuild", "-scan", "-filter", "C:\\Program Files\\HP_Fortify\\HP_Fortify_SCA_and_Apps_4.31\\SDL\\SDL_Filter_Java.txt", "-f", "mimicker.fpr"
     }
 
     println "Scan completed!"

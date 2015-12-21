@@ -17,12 +17,16 @@ import java.util.UUID;
 public class AlarmRingingActivity extends AppCompatActivity
         implements GameFactory.GameResultListener,
         ShareFragment.ShareResultListener,
-        AlarmRingingFragment.RingingResultListener {
+        AlarmRingingFragment.RingingResultListener,
+        AlarmSnoozeFragment.SnoozeResultListener {
 
+    private static final String DEFAULT_SNOOZE_DURATION_STRING = "60000";
+    private static final int DEFAULT_SNOOZE_DURATION_INTEGER = 60 * 1000;
     private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
     private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
     public final String TAG = this.getClass().getSimpleName();
     private UUID mAlarmId;
+    private Alarm mAlarm;
     private Fragment mAlarmRingingFragment;
     private Handler mHandler;
     private Runnable mAlarmCancelTask;
@@ -34,6 +38,7 @@ public class AlarmRingingActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ID);
+        mAlarm = AlarmList.get(this).getAlarm(mAlarmId);
 
         Log.d(TAG, "Creating activity!");
 
@@ -90,8 +95,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     public void onRingingDismiss() {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
-        Alarm alarm = AlarmList.get(this).getAlarm(mAlarmId);
-        userAction.putJSON(alarm.toJSON());
+        userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
         mIsGameRunning = true;
         Fragment gameFragment = GameFactory.getGameFragment(this, mAlarmId);
@@ -104,7 +108,13 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     @Override
     public void onRingingSnooze() {
+        showFragment(new AlarmSnoozeFragment());
+        AlarmScheduler.snoozeAlarm(this, mAlarm, getAlarmSnoozeDuration());
+    }
 
+    @Override
+    public void onSnoozeDismiss() {
+        finishActivity();
     }
 
     @Override
@@ -128,8 +138,6 @@ public class AlarmRingingActivity extends AppCompatActivity
         // Eat the back button
     }
 
-
-
     private void finishActivity() {
         AlarmUtils.clearLockScreenFlags(getWindow());
         SharedWakeLock.get(this).releaseWakeLock();
@@ -151,7 +159,20 @@ public class AlarmRingingActivity extends AppCompatActivity
         try {
             alarmRingingDuration = Integer.parseInt(durationPreference);
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            Logger.trackException(e);
+        }
+
+        return alarmRingingDuration;
+    }
+
+    private int getAlarmSnoozeDuration() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String durationPreference = preferences.getString("KEY_SNOOZE_DURATION", DEFAULT_SNOOZE_DURATION_STRING);
+
+        int alarmRingingDuration = DEFAULT_SNOOZE_DURATION_INTEGER;
+        try {
+            alarmRingingDuration = Integer.parseInt(durationPreference);
+        } catch (NumberFormatException e) {
             Logger.trackException(e);
         }
 

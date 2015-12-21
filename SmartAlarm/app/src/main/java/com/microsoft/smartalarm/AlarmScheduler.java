@@ -21,6 +21,14 @@ public final class AlarmScheduler {
         }
     }
 
+    public static void snoozeAlarm(Context context, Alarm alarm, int snoozePeriod) {
+        Calendar calendarAlarm = Calendar.getInstance();
+        long now = calendarAlarm.getTimeInMillis();
+        calendarAlarm.setTimeInMillis(now + snoozePeriod);
+        PendingIntent pendingIntent = createPendingIntent(context, alarm);
+        setAlarm(context, calendarAlarm, pendingIntent);
+    }
+
     public static void cancelAlarm(Context context, Alarm alarm) {
         PendingIntent pIntent = createPendingIntent(context, alarm);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
