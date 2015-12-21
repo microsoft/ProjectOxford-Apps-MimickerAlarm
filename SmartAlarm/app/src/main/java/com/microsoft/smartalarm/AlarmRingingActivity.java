@@ -1,9 +1,13 @@
 package com.microsoft.smartalarm;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +36,27 @@ public class AlarmRingingActivity extends AppCompatActivity
     private Runnable mAlarmCancelTask;
     private boolean mIsGameRunning;
     private boolean mAlarmTimedOut;
+    private AlarmRingingService mRingingService;
+    private boolean mIsServiceBound;
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the service object we can use to
+            // interact with the service.  Because we have bound to a explicit
+            // service that we know is running in our own process, we can
+            // cast its IBinder to a concrete class and directly access it.
+            mRingingService = ((AlarmRingingService.LocalBinder)service).getService();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            // Because it is running in our same process, we should never
+            // see this happen.
+            mRingingService = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +85,8 @@ public class AlarmRingingActivity extends AppCompatActivity
         };
         mHandler = new Handler();
         mHandler.postDelayed(mAlarmCancelTask, getAlarmRingingDuration());
+
+        bindRingingService();
     }
 
     @Override
@@ -134,13 +161,20 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "Entered onDestroy!");
+        reportRingingCompleted();
+        unbindRingingService();
+    }
+
+    @Override
     public void onBackPressed() {
         // Eat the back button
     }
 
     private void finishActivity() {
         AlarmUtils.clearLockScreenFlags(getWindow());
-        SharedWakeLock.get(this).releaseWakeLock();
         mHandler.removeCallbacks(mAlarmCancelTask);
         finish();
     }
@@ -177,5 +211,29 @@ public class AlarmRingingActivity extends AppCompatActivity
         }
 
         return alarmRingingDuration;
+    }
+
+    private void bindRingingService() {
+        // Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        bindService(new Intent(AlarmRingingActivity.this,
+                AlarmRingingService.class), mServiceConnection, Context.BIND_AUTO_CREATE);
+        mIsServiceBound = true;
+    }
+
+    private void unbindRingingService() {
+        if (mIsServiceBound) {
+            // Detach our existing connection.
+            unbindService(mServiceConnection);
+            mIsServiceBound = false;
+        }
+    }
+
+    private void reportRingingCompleted () {
+        if (mRingingService != null) {
+            mRingingService.reportAlarmRingingCompleted();
+        }
     }
 }

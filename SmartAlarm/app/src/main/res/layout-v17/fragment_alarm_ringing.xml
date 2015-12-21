@@ -11,7 +11,7 @@
         android:layout_height="70dp"
         android:src="@drawable/sunrise_header"/>
 
-    <TextView
+    <TextClock
         android:id="@+id/alarm_ringing_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

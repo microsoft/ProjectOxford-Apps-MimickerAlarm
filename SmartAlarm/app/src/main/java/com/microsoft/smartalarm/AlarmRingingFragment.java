@@ -8,6 +8,7 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
@@ -65,8 +66,10 @@ public class AlarmRingingFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_alarm_ringing, container, false);
 
-        TextView timeField = (TextView) view.findViewById(R.id.alarm_ringing_time);
-        timeField.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
+        if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
+            TextView timeField = (TextView) view.findViewById(R.id.alarm_ringing_time);
+            timeField.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
+        }
 
         TextView dateField = (TextView) view.findViewById(R.id.alarm_ringing_date);
         dateField.setText(AlarmUtils.getFullDateStringForNow());
