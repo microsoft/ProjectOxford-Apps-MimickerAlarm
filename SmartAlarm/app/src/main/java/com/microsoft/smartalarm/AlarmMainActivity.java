@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
-import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
@@ -48,8 +47,8 @@ public class AlarmMainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
-        CrashManager.register(this, hockeyappToken);
         UpdateManager.register(this, hockeyappToken);
+        Util.registerCrashReport(this);
 
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
             if (!mOboardingStarted) {

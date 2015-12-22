@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-import net.hockeyapp.android.CrashManager;
-
 public class AlarmRingingService extends Service {
 
     public final String TAG = this.getClass().getSimpleName();
@@ -14,8 +12,7 @@ public class AlarmRingingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        final String hockeyappToken = Util.getToken(this, "hockeyapp");
-        CrashManager.register(this, hockeyappToken);
+        Util.registerCrashReport(this);
     }
 
     @Override

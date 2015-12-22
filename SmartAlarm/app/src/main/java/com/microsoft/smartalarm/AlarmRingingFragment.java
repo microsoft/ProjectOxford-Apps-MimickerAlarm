@@ -23,8 +23,6 @@ import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import net.hockeyapp.android.CrashManager;
-
 import java.util.UUID;
 
 public class AlarmRingingFragment extends Fragment {
@@ -192,8 +190,7 @@ public class AlarmRingingFragment extends Fragment {
         mAlarmRingingClock.setVisibility(View.VISIBLE);
         mAnimateClock.start();
 
-        final String hockeyappToken = Util.getToken(getActivity(), "hockeyapp");
-        CrashManager.register(getActivity(), hockeyappToken);
+        Util.registerCrashReport(getActivity());
     }
 
     @Override

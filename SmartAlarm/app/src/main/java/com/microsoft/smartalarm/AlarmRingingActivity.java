@@ -9,8 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
-import net.hockeyapp.android.CrashManager;
-
 import java.util.UUID;
 
 public class AlarmRingingActivity extends AppCompatActivity
@@ -107,8 +105,7 @@ public class AlarmRingingActivity extends AppCompatActivity
 
         Log.d(TAG, "Entered onResume!");
 
-        final String hockeyappToken = Util.getToken(this, "hockeyapp");
-        CrashManager.register(this, hockeyappToken);
+        Util.registerCrashReport(this);
     }
 
     @Override
