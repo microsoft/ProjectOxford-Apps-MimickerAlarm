@@ -91,6 +91,15 @@ public class ShareFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mShareableUri != null && mShareableUri.length() > 0) {
+            File deleteFile = new File(mShareableUri);
+            deleteFile.delete();
+        }
+    }
+
     public void share() {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_SHARE);
         Logger.track(userAction);

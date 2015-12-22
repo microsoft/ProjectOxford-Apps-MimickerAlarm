@@ -7,6 +7,7 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Display;
@@ -78,7 +79,7 @@ abstract class GameWithCameraFragment extends Fragment {
         mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
             @Override
             public void execute() {
-                gameFailure(false);
+                gameFailure(null, false);
             }
         });
 
@@ -133,54 +134,63 @@ abstract class GameWithCameraFragment extends Fragment {
         }
     };
 
-    public class processOnProjectOxfordAsync extends AsyncTask<Bitmap, String, Uri> {
+    public class processOnProjectOxfordAsync extends AsyncTask<Bitmap, String, GameResult> {
 
         @Override
-        protected Uri doInBackground(Bitmap... bitmaps) {
+        protected GameResult doInBackground(Bitmap... bitmaps) {
+            GameResult gameResult = null;
             try{
                 if (bitmaps.length > 0) {
-                    if (verify(bitmaps[0])) {
-                        Uri tempFile = ShareFragment.saveShareableBitmap(getActivity(), bitmaps[0]);
+                    gameResult = verify(bitmaps[0]);
+                    if (gameResult.success) {
+                        gameResult.shareableUri = ShareFragment.saveShareableBitmap(getActivity(), bitmaps[0]);
                         bitmaps[0].recycle();
-                        return tempFile;
                     }
                 }
             }
             catch (Exception ex) {
                 Logger.trackException(ex);
             }
-            return null;
+            return gameResult;
         }
 
 
         @Override
-        protected void onPostExecute(Uri shareableUri) {
-            super.onPostExecute(shareableUri);
+        protected void onPostExecute(GameResult gameResult) {
+            super.onPostExecute(gameResult);
             mCaptureButton.stop();
-            if (shareableUri != null) {
-                gameSuccess(shareableUri);
+            if (gameResult.success) {
+                gameSuccess(gameResult);
             }
             else{
-                gameFailure(true);
+                gameFailure(gameResult, true);
             }
         }
     }
 
-    protected void gameSuccess(final Uri shareableUri) {
+    protected void gameSuccess(final GameResult gameResult) {
         mTimer.stop();
         String successMessage = getString(R.string.game_success_message);
+        if (gameResult != null && gameResult.message != null){
+            successMessage = gameResult.message;
+        }
         mStateBanner.success(successMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
-                mCallback.onGameSuccess(shareableUri.getPath());
+                if (gameResult.shareableUri != null) {
+                    mCallback.onGameSuccess(gameResult.shareableUri.getPath());
+                }
             }
         });
     }
-    protected void gameFailure(boolean allowRetry) {
+    protected void gameFailure(GameResult gameResult, boolean allowRetry) {
         if (allowRetry) {
             mCameraPreview.start();
             mCaptureButton.readyCamera();
             String failureMessage = getString(R.string.game_failure_message);
+            if (gameResult != null && gameResult.message != null){
+                failureMessage = gameResult.message;
+            }
             mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
                 @Override
                 public void execute() {
@@ -199,6 +209,11 @@ abstract class GameWithCameraFragment extends Fragment {
         }
     }
 
-    abstract protected Boolean verify(Bitmap bitmap);
+    protected class GameResult  {
+        boolean success = false;
+        String message = null;
+        Uri shareableUri = null;
+    }
+    abstract protected GameResult verify(Bitmap bitmap);
 }
 

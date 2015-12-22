@@ -9,14 +9,22 @@
         <item>sadness</item>
         <item>surprise</item>
     </string-array>
+    <!-- THIS WILL ALLOW US TO HAVE DIFFERENT ACCEPTANCE CRITERION FOR EACH EMOTION-->
+    <array name="emotion_acceptance">
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+    </array>
 
-    <string-array name="emotions_adjectives">
-        <item>angry</item>
-        <item>disgusted</item>
-        <item>scared</item>
-        <item>happy</item>
-        <item>poker</item>
-        <item>sad</item>
-        <item>surprised</item>
-    </string-array>
+    <string name="emotion_anger">angry</string>
+    <string name="emotion_disgust">disgusted</string>
+    <string name="emotion_fear">scared</string>
+    <string name="emotion_happiness">happy</string>
+    <string name="emotion_neutral">neutral</string>
+    <string name="emotion_sadness">sad</string>
+    <string name="emotion_surprise">surprised</string>
 </resources>

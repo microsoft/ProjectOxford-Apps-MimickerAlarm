@@ -24,8 +24,9 @@ import com.microsoft.smartalarm.GameFactory.GameResultListener;
 import java.util.Random;
 
 public class GameTwisterFragment extends Fragment implements ISpeechRecognitionServerEvents {
-    private final static int TIMEOUT_MILLISECONDS = 30000;
-    private final static float SUCCESS_THRESHOLD = 0.5f;
+    private final static int TIMEOUT_MILLISECONDS = 15000;
+    private final static float DIFFERENCE_SUCCESS_THRESHOLD = 0.3f;
+    private final static float DIFFERENCE_PERFECT_THRESHOLD = 0.1f;
     private static String LOGTAG = "GameTwisterFragment";
     GameResultListener mCallback;
     private MicrophoneRecognitionClient mMicClient = null;
@@ -87,9 +88,12 @@ public class GameTwisterFragment extends Fragment implements ISpeechRecognitionS
         instructionTextView.setText(mQuestion);
     }
 
-    protected void gameSuccess() {
+    protected void gameSuccess(double difference) {
         mTimer.stop();
         String successMessage = getString(R.string.game_success_message);
+        if (difference <= DIFFERENCE_PERFECT_THRESHOLD) {
+            successMessage = getString(R.string.game_twister_perfect_message);
+        }
         mStateBanner.success(successMessage, new GameStateBanner.Command() {
             @Override
             public void execute() {
@@ -272,15 +276,15 @@ public class GameTwisterFragment extends Fragment implements ISpeechRecognitionS
             return;
         }
 
-        double distance = (double)levenshteinDistance(mUnderstoodText, mQuestion) / (double)mQuestion.length();
+        double difference = (double)levenshteinDistance(mUnderstoodText, mQuestion) / (double)mQuestion.length();
 
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER_SUCCESS);
         userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
-        userAction.putProp(Loggable.Key.PROP_DIFF, distance);
+        userAction.putProp(Loggable.Key.PROP_DIFF, difference);
 
-        if (distance <= SUCCESS_THRESHOLD) {
+        if (difference <= DIFFERENCE_SUCCESS_THRESHOLD) {
             Logger.track(userAction);
-            gameSuccess();
+            gameSuccess(difference);
         }
         else {
             userAction.Name = Loggable.Key.ACTION_GAME_TWISTER_FAIL;

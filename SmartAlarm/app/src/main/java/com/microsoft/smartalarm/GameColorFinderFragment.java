@@ -52,7 +52,8 @@ public class GameColorFinderFragment extends GameWithCameraFragment {
     }
 
     @Override
-    public Boolean verify(Bitmap bitmap) {
+    public GameResult verify(Bitmap bitmap) {
+        GameResult gameResult = new GameResult();
         try{
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
@@ -66,44 +67,42 @@ public class GameColorFinderFragment extends GameWithCameraFragment {
             userAction.putProp(Loggable.Key.PROP_DIFF, colorDistance);
             userAction.putVision(result);
 
-            boolean success = false;
             //TODO: this will not work for languages other than English.
             if (colorDistance < COLOR_DIFF_ACCEPTANCE ||
                     result.color.dominantColorForeground.toLowerCase().equals(mQuestionColorName) ||
                     result.color.dominantColorBackground.toLowerCase().equals(mQuestionColorName))
             {
-                success = true;
+                gameResult.success = true;
             }
 
             for (String color : result.color.dominantColors) {
                 if (color.toLowerCase().equals(mQuestionColorName)) {
-                    success = true;
+                    gameResult.success = true;
                     break;
                 }
             }
 
-            if (!success) {
+            if (!gameResult.success) {
                 userAction.Name = Loggable.Key.ACTION_GAME_COLOR_FAIL;
             }
 
             Logger.track(userAction);
-            return success;
         }
         catch(Exception ex) {
             Logger.trackException(ex);
         }
 
-        return false;
+        return gameResult;
     }
 
     @Override
-    protected void gameFailure(boolean allowRetry) {
+    protected void gameFailure(GameResult gameResult, boolean allowRetry) {
         if (!allowRetry){
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR_TIMEOUT);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestionColorName);
             Logger.track(userAction);
         }
-        super.gameFailure(allowRetry);
+        super.gameFailure(gameResult, allowRetry);
     }
 
     private int rgbToInt(String c) {

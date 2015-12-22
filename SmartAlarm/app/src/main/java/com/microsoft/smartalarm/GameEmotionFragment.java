@@ -1,6 +1,7 @@
 package com.microsoft.smartalarm;
 
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -14,11 +15,12 @@ import com.microsoft.projectoxford.emotion.contract.RecognizeResult;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
 
 public class GameEmotionFragment extends GameWithCameraFragment {
-    private static final double EMOTION_ACCEPTANCE = 0.6;
+    private double mEmotionAcceptance = 0.5;
     private EmotionServiceRestClient mEmotionServiceRestClient;
     private String                  mEmotion;
 
@@ -36,11 +38,16 @@ public class GameEmotionFragment extends GameWithCameraFragment {
         mEmotionServiceRestClient = new EmotionServiceRestClient(subscriptionKey);
 
         String[] emotions = resources.getStringArray(R.array.emotions);
-        String[] adjectives = resources.getStringArray(R.array.emotions_adjectives);
         int randomNumber = new Random().nextInt(emotions.length);
         mEmotion = emotions[randomNumber];
         TextView instruction = (TextView) view.findViewById(R.id.instruction_text);
-        instruction.setText(String.format(resources.getString(R.string.game_emotion_prompt), adjectives[randomNumber]));
+        int adjectiveId = resources.getIdentifier("emotion_" + mEmotion, "string", getActivity().getPackageName());
+        String adjective = resources.getString(adjectiveId);
+        instruction.setText(String.format(resources.getString(R.string.game_emotion_prompt), adjective));
+
+        TypedArray acceptances = resources.obtainTypedArray(R.array.emotion_acceptance);
+        mEmotionAcceptance = acceptances.getFloat(randomNumber, 0.5f);
+        acceptances.recycle();
 
         Logger.init(getActivity());
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_EMOTION);
@@ -50,72 +57,66 @@ public class GameEmotionFragment extends GameWithCameraFragment {
     }
 
     @Override
-    public Boolean verify(Bitmap bitmap) {
+    public GameResult verify(Bitmap bitmap) {
+        GameResult gameResult = new GameResult();
         try{
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
             ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
             List<RecognizeResult> result = mEmotionServiceRestClient.recognizeImage(inputStream);
 
-            Boolean success = false;
+            String dominantEmotion = null;
+            double dominantEmotionScore = 0;
             for (RecognizeResult r : result) {
-                switch(mEmotion) {
-                    case "anger":
-                        success |= r.scores.anger > EMOTION_ACCEPTANCE;
-                        break;
-                    case "contempt":
-                        success |= r.scores.contempt > EMOTION_ACCEPTANCE;
-                        break;
-                    case "disgust":
-                        success |= r.scores.disgust > EMOTION_ACCEPTANCE;
-                        break;
-                    case "fear":
-                        success |= r.scores.fear > EMOTION_ACCEPTANCE;
-                        break;
-                    case "happiness":
-                        success |= r.scores.happiness > EMOTION_ACCEPTANCE;
-                        break;
-                    case "neutral":
-                        success |= r.scores.neutral > EMOTION_ACCEPTANCE;
-                        break;
-                    case "sadness":
-                        success |= r.scores.sadness > EMOTION_ACCEPTANCE;
-                        break;
-                    case "surprise":
-                        success |= r.scores.surprise > EMOTION_ACCEPTANCE;
-                        break;
+                for (Field field : r.scores.getClass().getFields()) {
+                    double score = (double)field.get(r.scores);
+                    if (field.getName().equalsIgnoreCase(mEmotion)) {
+                        if (score > mEmotionAcceptance) {
+                            gameResult.success = true;
+                            break;
+                        }
+                    }
+                    if (score > dominantEmotionScore) {
+                        dominantEmotion = field.getName();
+                        dominantEmotionScore = score;
+                    }
                 }
             }
 
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_EMOTION_SUCCESS);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mEmotion);
             userAction.putEmotions(result);
-            if (success)
+            if (gameResult.success)
             {
                 Logger.track(userAction);
-                return true;
             }
             else {
                 userAction.Name = Loggable.Key.ACTION_GAME_EMOTION_FAIL;
                 Logger.track(userAction);
-                return false;
+                if (dominantEmotion != null) {
+                    Resources resources = getResources();
+                    int adjectiveId = resources.getIdentifier("emotion_" + dominantEmotion, "string", getActivity().getPackageName());
+                    String adjective = resources.getString(adjectiveId);
+                    gameResult.message = String.format(resources.getString(R.string.game_emotion_failure), adjective);
+                }
             }
         }
         catch(Exception ex) {
             Logger.trackException(ex);
+            gameResult.success = false;
         }
 
-        return false;
+        return gameResult;
     }
 
     @Override
-    protected void gameFailure(boolean allowRetry) {
+    protected void gameFailure(GameResult gameResult, boolean allowRetry) {
         if (!allowRetry){
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_EMOTION_TIMEOUT);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mEmotion);
             Logger.track(userAction);
         }
-        super.gameFailure(allowRetry);
+        super.gameFailure(gameResult, allowRetry);
     }
 }
 

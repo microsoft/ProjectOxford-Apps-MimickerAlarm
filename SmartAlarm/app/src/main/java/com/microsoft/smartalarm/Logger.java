@@ -41,6 +41,10 @@ public class Logger {
         }
     }
 
+    public static void local(String s) {
+        Log.d(TAG, s);
+    }
+
     public static void track(Loggable loggable){
         if (isLogging()) {
             try {

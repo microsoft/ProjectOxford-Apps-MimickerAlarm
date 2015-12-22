@@ -18,6 +18,8 @@
     <string name="game_time_up_message">Time\'s Up!</string>
     <string name="game_failure_message">That does not look quite right</string>
     <string name="game_success_message">You did it!</string>
+    <string name="game_emotion_failure">You look too %s, try again</string>
+    <string name="game_twister_perfect_message">Perfect!</string>
 
     <string name="onboarding_tutorial_title_1">Set your alarm</string>
     <string name="onboarding_tutorial_text_1">Tell us when you want to wake up and leave the rest to us</string>
