@@ -47,7 +47,8 @@ public class AlarmMainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         final String hockeyappToken = Util.getToken(this, "hockeyapp");
-        UpdateManager.register(this, hockeyappToken);
+        if (!BuildConfig.DEBUG)
+            UpdateManager.register(this, hockeyappToken);
         Util.registerCrashReport(this);
 
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {

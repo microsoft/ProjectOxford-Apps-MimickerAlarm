@@ -81,10 +81,6 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     @Override
     public void onRingingDismiss() {
-        Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
-        Alarm alarm = AlarmList.get(this).getAlarm(mAlarmId);
-        userAction.putJSON(alarm.toJSON());
-        Logger.track(userAction);
         mIsGameRunning = true;
         Fragment gameFragment = GameFactory.getGameFragment(this, mAlarmId);
         if (gameFragment != null) {
