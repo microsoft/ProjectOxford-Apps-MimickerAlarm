@@ -59,6 +59,8 @@ public class GameEmotionFragment extends GameWithCameraFragment {
     @Override
     public GameResult verify(Bitmap bitmap) {
         GameResult gameResult = new GameResult();
+        gameResult.question = ((TextView) getView().findViewById(R.id.instruction_text)).getText().toString();
+
         try{
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);

@@ -56,6 +56,13 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/game_twister_i_said"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textSize="16sp"/>
+            <TextView
                 android:id="@+id/understood_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

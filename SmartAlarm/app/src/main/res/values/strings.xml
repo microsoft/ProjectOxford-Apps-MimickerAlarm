@@ -14,6 +14,7 @@
     <string name="alarm_no_games_tap_to_add">Tap to add!</string>
 
     <string name="game_twister_prompt">Say the following tongue twister</string>
+    <string name="game_twister_i_said">I said</string>
     <string name="game_vision_prompt">Find something %s</string>
     <string name="game_emotion_prompt">Make a %s face</string>
     <string name="action_feedback">Feedback</string>
@@ -48,7 +49,8 @@
     <string name="learn_more_contact_link"><a href="http://www.uservoice.com">Contact us</a></string>
     <string name="learn_more_other_link">Other links</string>
     <string name="share_button">Share</string>
-    <string name="share_action_description">Share via ...</string>
+    <string name="share_action_description">Share via …</string>
+    <string name="share_action_download_confirmation">(Coming soon) Save to gallery</string>
     <string name="share_text_template">I woke up this morning with Mimicker http://mimicker.ai</string>
     <string name="share_subject_template">I woke up!</string>
     <string name="default_ringtone_name">Mimicker</string>

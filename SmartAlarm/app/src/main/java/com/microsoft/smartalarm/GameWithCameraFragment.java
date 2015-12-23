@@ -150,7 +150,7 @@ abstract class GameWithCameraFragment extends Fragment {
                     height = (int)(width * ratio);
                     gameResult = verify(Bitmap.createScaledBitmap(bitmaps[0], width, height, true));
                     if (gameResult.success) {
-                        gameResult.shareableUri = ShareFragment.saveShareableBitmap(getActivity(), bitmaps[0]);
+                        gameResult.shareableUri = ShareFragment.saveShareableBitmap(getActivity(), bitmaps[0], gameResult.question);
                         bitmaps[0].recycle();
                     }
                 }
@@ -220,6 +220,7 @@ abstract class GameWithCameraFragment extends Fragment {
         boolean success = false;
         String message = null;
         Uri shareableUri = null;
+        String question = null;
     }
     abstract protected GameResult verify(Bitmap bitmap);
 }
