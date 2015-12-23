@@ -176,13 +176,8 @@ public class AlarmSettingsActivity extends AppCompatActivity {
                             discardSettingsAndExit();
                         }
                     } else {
-                        if (mAlarm.isNew()) {
-                            // Cancel button was pressed
-                            discardSettingsAndExit();
-                        } else {
-                            // Delete button was pressed
-                            deleteSettingsAndExit();
-                        }
+                        // Cancel (when new) or Delete button was pressed
+                        deleteSettingsAndExit();
                     }
                     return true;
                 }

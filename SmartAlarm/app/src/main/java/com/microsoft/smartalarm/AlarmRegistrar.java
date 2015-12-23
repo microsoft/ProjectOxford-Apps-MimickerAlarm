@@ -35,6 +35,4 @@ public class AlarmRegistrar extends BroadcastReceiver {
         cancelAlarms(context);
         setAlarms(context);
     }
-
-
 }

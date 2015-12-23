@@ -9,7 +9,7 @@
         android:entryValues="@array/pref_ring_duration_values"
         android:defaultValue="1800000"/>
 
-    <com.microsoft.smartalarm.SnoozePreference
+    <ListPreference
         android:key="KEY_SNOOZE_DURATION"
         android:title="@string/pref_title_snooze_duration"
         android:entries="@array/pref_snooze_duration_labels"

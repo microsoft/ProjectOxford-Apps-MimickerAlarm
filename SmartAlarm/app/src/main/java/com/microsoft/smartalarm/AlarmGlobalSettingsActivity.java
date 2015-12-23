@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceManager;
 
 public class AlarmGlobalSettingsActivity extends AppCompatActivity {
     @Override
@@ -48,6 +49,10 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals("KEY_SNOOZE_DURATION")) {
                 mSnoozeDuration.setSummary(mSnoozeDuration.getEntry());
+                PreferenceManager.getDefaultSharedPreferences(getActivity())
+                        .edit()
+                        .putString("KEY_SNOOZE_DURATION_DISPLAY", mSnoozeDuration.getEntry().toString())
+                        .apply();
             } else if (key.equals("KEY_RING_DURATION")) {
                 mRingDuration.setSummary(mRingDuration.getEntry());
             }
