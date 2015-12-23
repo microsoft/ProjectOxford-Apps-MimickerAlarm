@@ -75,6 +75,12 @@ public class GameNoNetworkFragment extends Fragment {
         mTimer.start();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mTimer.stop();
+    }
+
     protected void gameFailure() {
         String failureMessage = getString(R.string.game_time_up_message);
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_NONETWORK_TIMEOUT);

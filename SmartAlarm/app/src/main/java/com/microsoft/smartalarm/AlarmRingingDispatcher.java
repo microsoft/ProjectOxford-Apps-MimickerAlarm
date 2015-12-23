@@ -16,6 +16,9 @@ public final class AlarmRingingDispatcher {
     }
 
     public void register(Intent intent) {
+        // We add the new intent to the queue. If successful, we check the queue length
+        // and if this is the only work item, we then acquire the wakelock and dispatch.
+        // We use 'offer' here rather than 'add' as it is non-throwing
         if (mAlarmIntentQueue.offer(intent) &&
                 mAlarmIntentQueue.size() == 1) {
             SharedWakeLock.get(mContext).acquireWakeLock();
@@ -33,6 +36,8 @@ public final class AlarmRingingDispatcher {
     }
 
     public void workCompleted() {
+        // On completion of work, we take the head item off the queue and dispatch the
+        // next work item if necessary. We use 'poll' rather than 'remove' as it is non-throwing.
         if (mAlarmIntentQueue.poll() != null) {
             dispatch(mAlarmIntentQueue.peek());
         }

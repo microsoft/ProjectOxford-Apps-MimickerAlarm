@@ -22,12 +22,11 @@ public class AlarmRingingActivity extends AppCompatActivity
         implements GameFactory.GameResultListener,
         ShareFragment.ShareResultListener,
         AlarmRingingFragment.RingingResultListener,
-        AlarmSnoozeFragment.SnoozeResultListener {
+        AlarmSnoozeFragment.SnoozeResultListener,
+        AlarmNoGamesFragment.NoGameResultListener {
 
-    private static final String DEFAULT_SNOOZE_DURATION_STRING = "60000";
-    private static final int DEFAULT_SNOOZE_DURATION_INTEGER = 60 * 1000;
-    private static final String DEFAULT_RINGING_DURATION_STRING = "60000";
-    private static final int DEFAULT_RINGING_DURATION_INTEGER = 60 * 1000;
+    private static final String DEFAULT_DURATION_STRING = "60000";
+    private static final int DEFAULT_DURATION_INTEGER = 60 * 1000;
     public final String TAG = this.getClass().getSimpleName();
     private UUID mAlarmId;
     private Alarm mAlarm;
@@ -43,7 +42,7 @@ public class AlarmRingingActivity extends AppCompatActivity
         public void onServiceConnected(ComponentName className, IBinder service) {
             // This is called when the connection with the service has been
             // established, giving us the service object we can use to
-            // interact with the service.  Because we have bound to a explicit
+            // interact with the service.  Because we have bound to an explicit
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             mRingingService = ((AlarmRingingService.LocalBinder)service).getService();
@@ -67,6 +66,7 @@ public class AlarmRingingActivity extends AppCompatActivity
 
         Log.d(TAG, "Creating activity!");
 
+        // This call must be made before setContentView to avoid the view being refreshed
         AlarmUtils.setLockScreenFlags(getWindow());
 
         setContentView(R.layout.activity_fragment);
@@ -90,12 +90,8 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-    }
-
-    @Override
     public void onGameSuccess(String shareable) {
+        cancelAlarmTimeout();
         mIsGameRunning = false;
         if (shareable != null && shareable.length() > 0) {
             showFragment(ShareFragment.newInstance(shareable));
@@ -124,23 +120,34 @@ public class AlarmRingingActivity extends AppCompatActivity
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
         userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
-        mIsGameRunning = true;
         Fragment gameFragment = GameFactory.getGameFragment(this, mAlarmId);
         if (gameFragment != null) {
+            mIsGameRunning = true;
             showFragment(gameFragment);
         } else {
-            finishActivity();
+            cancelAlarmTimeout();
+            showFragment(AlarmNoGamesFragment.newInstance(mAlarmId.toString()));
         }
     }
 
     @Override
     public void onRingingSnooze() {
+        cancelAlarmTimeout();
         showFragment(new AlarmSnoozeFragment());
         AlarmScheduler.snoozeAlarm(this, mAlarm, getAlarmSnoozeDuration());
     }
 
     @Override
     public void onSnoozeDismiss() {
+        finishActivity();
+    }
+
+    @Override
+    public void onNoGameDismiss(boolean launchSettings) {
+        if (launchSettings) {
+            Intent intent = AlarmSettingsActivity.newIntent(this, mAlarm.getId());
+            startActivity(intent);
+        }
         finishActivity();
     }
 
@@ -170,12 +177,13 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        // Eat the back button
+        if (mIsGameRunning) {
+            showFragment(mAlarmRingingFragment);
+        }
     }
 
     private void finishActivity() {
         AlarmUtils.clearLockScreenFlags(getWindow());
-        mHandler.removeCallbacks(mAlarmCancelTask);
         finish();
     }
 
@@ -186,24 +194,18 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     private int getAlarmRingingDuration() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String durationPreference = preferences.getString("KEY_RING_DURATION", DEFAULT_RINGING_DURATION_STRING);
-
-        int alarmRingingDuration = DEFAULT_RINGING_DURATION_INTEGER;
-        try {
-            alarmRingingDuration = Integer.parseInt(durationPreference);
-        } catch (NumberFormatException e) {
-            Logger.trackException(e);
-        }
-
-        return alarmRingingDuration;
+        return getDurationSetting("KEY_RING_DURATION");
     }
 
     private int getAlarmSnoozeDuration() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String durationPreference = preferences.getString("KEY_SNOOZE_DURATION", DEFAULT_SNOOZE_DURATION_STRING);
+        return getDurationSetting("KEY_SNOOZE_DURATION");
+    }
 
-        int alarmRingingDuration = DEFAULT_SNOOZE_DURATION_INTEGER;
+    private int getDurationSetting(String setting) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String durationPreference = preferences.getString(setting, DEFAULT_DURATION_STRING);
+
+        int alarmRingingDuration = DEFAULT_DURATION_INTEGER;
         try {
             alarmRingingDuration = Integer.parseInt(durationPreference);
         } catch (NumberFormatException e) {
@@ -235,5 +237,9 @@ public class AlarmRingingActivity extends AppCompatActivity
         if (mRingingService != null) {
             mRingingService.reportAlarmRingingCompleted();
         }
+    }
+
+    private void cancelAlarmTimeout () {
+        mHandler.removeCallbacks(mAlarmCancelTask);
     }
 }
