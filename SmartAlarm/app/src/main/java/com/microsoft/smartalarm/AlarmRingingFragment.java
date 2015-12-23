@@ -80,12 +80,6 @@ public class AlarmRingingFragment extends Fragment {
         titleField.setText(name);
 
         ImageView dismissButton = (ImageView) view.findViewById(R.id.alarm_ringing_dismiss);
-        dismissButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismissAlarm();
-            }
-        });
         dismissButton.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {

@@ -19,7 +19,7 @@ public class AlarmSnoozeFragment extends Fragment {
         void onSnoozeDismiss();
     }
 
-    private static final int SNOOZE_SCREEN_TIMEOUT_DURATION = 5 * 1000;
+    private static final int SNOOZE_SCREEN_TIMEOUT_DURATION = 3 * 1000;
 
     @Nullable
     @Override
