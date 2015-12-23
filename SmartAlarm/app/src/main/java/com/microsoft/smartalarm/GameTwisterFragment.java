@@ -76,6 +76,10 @@ public class GameTwisterFragment extends Fragment implements ISpeechRecognitionS
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mMicClient != null) {
+            mMicClient.endMicAndRecognition();
+        }
+        mTimer.stop();
         Logger.flush();
     }
 

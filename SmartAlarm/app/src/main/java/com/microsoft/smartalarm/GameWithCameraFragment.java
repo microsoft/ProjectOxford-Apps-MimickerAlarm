@@ -123,6 +123,7 @@ abstract class GameWithCameraFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mTimer.stop();
         mCameraPreview.stop();
         mCaptureButton.stop();
         Logger.flush();
