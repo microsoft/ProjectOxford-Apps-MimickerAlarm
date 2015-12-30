@@ -24,7 +24,6 @@ public class AlarmRingingActivity extends AppCompatActivity
         AlarmNoGamesFragment.NoGameResultListener,
         AlarmSettingsFragment.AlarmSettingsListener {
 
-    public final static String SETTINGS_FRAGMENT_TAG = "settings_fragment";
     private static final String DEFAULT_DURATION_STRING = "60000";
     private static final int DEFAULT_DURATION_INTEGER = 60 * 1000;
     public final String TAG = this.getClass().getSimpleName();
@@ -147,7 +146,7 @@ public class AlarmRingingActivity extends AppCompatActivity
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container,
                     AlarmSettingsFragment.newInstance(mAlarmId.toString()),
-                    SETTINGS_FRAGMENT_TAG);
+                    AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
             transaction.commit();
         } else {
             finishActivity();
@@ -160,7 +159,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSettingsDeleteOrThrowawayNew() {
+    public void onSettingsDeleteOrNewCancel() {
         finishActivity();
     }
 
@@ -193,7 +192,7 @@ public class AlarmRingingActivity extends AppCompatActivity
             showFragment(mAlarmRingingFragment);
         } else if (mEditingSettings) {
             ((AlarmSettingsFragment)getSupportFragmentManager()
-                    .findFragmentByTag(SETTINGS_FRAGMENT_TAG))
+                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
                     .onCancel();
         }
     }

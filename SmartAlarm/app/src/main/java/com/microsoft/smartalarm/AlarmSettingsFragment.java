@@ -25,10 +25,11 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
 
     public interface AlarmSettingsListener {
         void onSettingsSaveOrIgnoreChanges();
-        void onSettingsDeleteOrThrowawayNew();
+        void onSettingsDeleteOrNewCancel();
     }
 
     public final String TAG = this.getClass().getSimpleName();
+    public static final String SETTINGS_FRAGMENT_TAG = "settings_fragment";
     private static final String ARGS_ALARM_ID = "alarm_id";
     private static final String PREFERENCE_DIALOG_FRAGMENT_CLASS = "android.support.v7.preference.PreferenceFragment.DIALOG";
 
@@ -233,7 +234,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         AlarmScheduler.cancelAlarms(getContext());
         AlarmList.get(getActivity()).deleteAlarm(mAlarm);
         AlarmScheduler.setAlarms(getContext());
-        mCallback.onSettingsDeleteOrThrowawayNew();
+        mCallback.onSettingsDeleteOrNewCancel();
     }
 
     private void discardSettingsAndExit() {

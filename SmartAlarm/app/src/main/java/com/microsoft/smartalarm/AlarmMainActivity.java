@@ -22,7 +22,6 @@ public class AlarmMainActivity extends AppCompatActivity
     private boolean mOboardingStarted = false;
     public final static String SHOULD_ONBOARD = "onboarding";
     public final static String SHOULD_TOS = "show-tos";
-    public final static String SETTINGS_FRAGMENT_TAG = "settings_fragment";
     private SharedPreferences mPreferences = null;
 
     @Override
@@ -106,7 +105,7 @@ public class AlarmMainActivity extends AppCompatActivity
     public void onBackPressed() {
         if (mEditingAlarm) {
             ((AlarmSettingsFragment)getSupportFragmentManager()
-                    .findFragmentByTag(SETTINGS_FRAGMENT_TAG))
+                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
                     .onCancel();
         } else {
             super.onBackPressed();
@@ -135,7 +134,7 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSettingsDeleteOrThrowawayNew() {
+    public void onSettingsDeleteOrNewCancel() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         transaction.replace(R.id.fragment_container, new AlarmListFragment());
@@ -158,7 +157,9 @@ public class AlarmMainActivity extends AppCompatActivity
     private void showAlarmSettingsFragment(String alarmId) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
-        transaction.replace(R.id.fragment_container, AlarmSettingsFragment.newInstance(alarmId), SETTINGS_FRAGMENT_TAG);
+        transaction.replace(R.id.fragment_container,
+                            AlarmSettingsFragment.newInstance(alarmId),
+                            AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
         transaction.commit();
     }
 }
