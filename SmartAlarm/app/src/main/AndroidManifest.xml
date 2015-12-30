@@ -24,12 +24,6 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".AlarmSettingsActivity"
-            android:parentActivityName=".AlarmMainActivity"
-            android:screenOrientation="portrait">
-        </activity>
-
-        <activity
             android:name=".AlarmMainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" >
@@ -75,7 +69,9 @@
 
         <activity
             android:name=".LearnMoreActivity"
-            android:label="@string/title_activity_learn_more">
+            android:label="@string/title_activity_learn_more"
+            android:parentActivityName=".AlarmMainActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".AlarmMainActivity"/>

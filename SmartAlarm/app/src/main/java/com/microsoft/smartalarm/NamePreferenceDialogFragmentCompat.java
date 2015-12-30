@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.preference.EditTextPreferenceDialogFragmentCompat;
 import android.support.v7.preference.Preference;
+import android.text.InputFilter;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -13,6 +14,7 @@ public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialog
 
     private EditText mEditText;
     private static int KEYBOARD_SHOW_DELAY = 100;
+    private static int NAME_LENGTH_MAX = 50;
 
     private static final String ARGS_KEY = "key";
 
@@ -33,6 +35,7 @@ public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialog
         mEditText.setSelection(mEditText.getText().length());
         mEditText.setOnFocusChangeListener(this);
         mEditText.setHint(R.string.pref_title_description_hint);
+        mEditText.setFilters(new InputFilter[] {new InputFilter.LengthFilter(NAME_LENGTH_MAX)});
     }
 
     @Override

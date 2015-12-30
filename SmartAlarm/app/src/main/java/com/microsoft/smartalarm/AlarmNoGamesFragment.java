@@ -41,14 +41,14 @@ public class AlarmNoGamesFragment extends Fragment {
         UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
         Alarm alarm = AlarmList.get(getContext()).getAlarm(alarmId);
 
-        TextView snoozeDuration = (TextView) view.findViewById(R.id.alarm_no_games_label);
+        TextView alarmTitle = (TextView) view.findViewById(R.id.alarm_no_games_label);
 
         String name = alarm.getTitle();
         if (name == null || name.isEmpty()) {
             name = getString(R.string.alarm_ringing_default_text);
         }
 
-        snoozeDuration.setText(name);
+        alarmTitle.setText(name);
 
         view.findViewById(R.id.alarm_no_games_tap_to_add).setOnClickListener(new View.OnClickListener() {
             @Override

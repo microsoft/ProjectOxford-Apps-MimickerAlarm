@@ -1,37 +1,29 @@
 package com.microsoft.smartalarm;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.WindowManager;
 
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
 public class AlarmMainActivity extends AppCompatActivity
-        implements AlarmListFragment.Callbacks,
+        implements AlarmListFragment.AlarmListListener,
         OnboardingTutorialFragment.OnOnboardingTutorialListener,
-        OnboardingToSFragment.OnOnboardingToSListener {
+        OnboardingToSFragment.OnOnboardingToSListener,
+        AlarmSettingsFragment.AlarmSettingsListener {
 
+    private boolean mEditingAlarm = false;
     private boolean mOboardingStarted = false;
     public final static String SHOULD_ONBOARD = "onboarding";
     public final static String SHOULD_TOS = "show-tos";
+    public final static String SETTINGS_FRAGMENT_TAG = "settings_fragment";
     private SharedPreferences mPreferences = null;
-
-    @Override
-    public void onAlarmSelected(Alarm alarm) {
-        Intent intent = AlarmSettingsActivity.newIntent(this, alarm.getId());
-        startActivity(intent);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +56,8 @@ public class AlarmMainActivity extends AppCompatActivity
         else if (mPreferences.getBoolean(SHOULD_TOS, true)) {
             showToS();
         }
-        else {
-            showAlarmList();
+        else if (!mEditingAlarm) {
+            showAlarmList(false);
         }
     }
 
@@ -90,7 +82,6 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     public void showTutorial(MenuItem item){
-        setStatusBarColor();
         showFragment(new OnboardingTutorialFragment());
     }
 
@@ -102,47 +93,72 @@ public class AlarmMainActivity extends AppCompatActivity
             showToS();
         }
         else {
-            showAlarmList();
+            showAlarmList(false);
         }
     }
 
     @Override
     public void onAccept() {
-        showAlarmList();
+        showAlarmList(false);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mEditingAlarm) {
+            ((AlarmSettingsFragment)getSupportFragmentManager()
+                    .findFragmentByTag(SETTINGS_FRAGMENT_TAG))
+                    .onCancel();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     public void showToS() {
-        setStatusBarColor();
         mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
         showFragment(new OnboardingToSFragment());
     }
 
-    public void showAlarmList() {
-        resetStatusBarColor();
-        showFragment(new AlarmListFragment());
+    public void showAlarmList(boolean animateEntrance) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (animateEntrance) {
+            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        }
+        transaction.replace(R.id.fragment_container, new AlarmListFragment());
+        transaction.commit();
         setTitle(R.string.alarm_list_title);
     }
 
-    private void setStatusBarColor(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.green1));
-        }
+    @Override
+    public void onSettingsSaveOrIgnoreChanges() {
+        showAlarmList(true);
+        mEditingAlarm = false;
     }
 
-    private void resetStatusBarColor(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        }
+    @Override
+    public void onSettingsDeleteOrThrowawayNew() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        transaction.replace(R.id.fragment_container, new AlarmListFragment());
+        transaction.commit();
+        setTitle(R.string.alarm_list_title);
+    }
+
+    @Override
+    public void onAlarmSelected(Alarm alarm) {
+        showAlarmSettingsFragment(alarm.getId().toString());
+        mEditingAlarm = true;
     }
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+    }
+
+    private void showAlarmSettingsFragment(String alarmId) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+        transaction.replace(R.id.fragment_container, AlarmSettingsFragment.newInstance(alarmId), SETTINGS_FRAGMENT_TAG);
         transaction.commit();
     }
 }

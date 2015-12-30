@@ -22,6 +22,10 @@ import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class AlarmListFragment extends Fragment {
@@ -33,10 +37,10 @@ public class AlarmListFragment extends Fragment {
     private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
     private FloatingActionButton mFab;
-    private Callbacks mCallbacks;
+    private AlarmListListener mCallbacks;
     private List<Alarm> mAlarms;
 
-    public interface Callbacks {
+    public interface AlarmListListener {
         void onAlarmSelected(Alarm alarm);
     }
 
@@ -50,7 +54,7 @@ public class AlarmListFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mCallbacks = (Callbacks) context;
+        mCallbacks = (AlarmListListener) context;
     }
 
     @Override
@@ -95,11 +99,6 @@ public class AlarmListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         updateUI();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -171,7 +170,6 @@ public class AlarmListFragment extends Fragment {
             implements View.OnClickListener {
 
         private TextView mTitleTextView;
-        private TextView mRecurrenceTextView;
         private TextView mTimeTextView;
         private SwitchCompat mAlarmEnabled;
         private RelativeLayout mContainer;
@@ -183,7 +181,6 @@ public class AlarmListFragment extends Fragment {
             itemView.setOnClickListener(this);
 
             mTitleTextView = (TextView) itemView.findViewById(R.id.list_item_alarm_title_text_view);
-            mRecurrenceTextView = (TextView) itemView.findViewById(R.id.list_item_alarm_recurrence_text_view);
             mTimeTextView = (TextView) itemView.findViewById(R.id.list_item_alarm_time_text_view);
             mAlarmEnabled = (SwitchCompat) itemView.findViewById(R.id.list_item_alarm_enabled_switch);
             mContainer = (RelativeLayout) itemView.findViewById(R.id.list_item_container);
@@ -191,10 +188,13 @@ public class AlarmListFragment extends Fragment {
             mAlarmEnabled.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AlarmRegistrar.cancelAlarms(getContext());
                     mAlarm.setIsEnabled(mAlarmEnabled.isChecked());
                     AlarmList.get(getActivity()).updateAlarm(mAlarm);
-                    AlarmRegistrar.setAlarms(getContext());
+                    if (mAlarm.isEnabled()) {
+                        AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
+                    } else {
+                        AlarmScheduler.cancelAlarm(getContext(), mAlarm);
+                    }
                 }
             });
         }
@@ -208,14 +208,6 @@ public class AlarmListFragment extends Fragment {
             } else {
                 mTitleTextView.setVisibility(View.VISIBLE);
                 mTitleTextView.setText(title);
-            }
-
-            String repeatingSummary = mAlarm.getRepeatingSummary();
-            if (repeatingSummary == null || repeatingSummary.isEmpty()) {
-                mRecurrenceTextView.setVisibility(View.GONE);
-            } else {
-                mRecurrenceTextView.setVisibility(View.VISIBLE);
-                mRecurrenceTextView.setText(repeatingSummary);
             }
 
             mTimeTextView.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
@@ -238,7 +230,28 @@ public class AlarmListFragment extends Fragment {
 
         private String getTitle(Alarm alarm) {
             String alarmTitle = mAlarm.getTitle();
-            return alarmTitle;
+            if (alarm.isOneShot()) {
+                return alarmTitle;
+            } else {
+                String summary = getDayPeriodSummary(alarm);
+                if (alarmTitle == null || alarmTitle.isEmpty()) {
+                    return summary;
+                } else {
+                    return alarmTitle + ", " + summary;
+                }
+            }
+        }
+
+        private String getDayPeriodSummary(Alarm alarm) {
+            List<Integer> days = new ArrayList<>();
+            for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; dayOfWeek++) {
+                if (alarm.getRepeatingDay(dayOfWeek - 1)) {
+                    days.add(dayOfWeek);
+                }
+            }
+            Integer[] daysWrapper = days.toArray(new Integer[days.size()]);
+            int[] daysOfWeek =  ArrayUtils.toPrimitive(daysWrapper);
+            return AlarmUtils.getDayPeriodSummaryString(getContext(), daysOfWeek);
         }
     }
 

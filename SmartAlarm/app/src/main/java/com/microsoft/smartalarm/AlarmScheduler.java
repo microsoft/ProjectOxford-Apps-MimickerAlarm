@@ -6,12 +6,31 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.util.Calendar;
+import java.util.List;
 
 public final class AlarmScheduler {
 
     private AlarmScheduler() {}
 
-    public static final String ID = "id";
+    public static final String ALARM_ID = "alarm_id";
+
+    public static void setAlarms(Context context) {
+        List<Alarm> alarms =  AlarmList.get(context).getAlarms();
+        for (Alarm alarm : alarms) {
+            if (alarm.isEnabled()) {
+                scheduleAlarm(context, alarm);
+            }
+        }
+    }
+
+    public static void cancelAlarms(Context context) {
+        List<Alarm> alarms =  AlarmList.get(context).getAlarms();
+        for (Alarm alarm : alarms) {
+            if (alarm.isEnabled()) {
+                cancelAlarm(context, alarm);
+            }
+        }
+    }
 
     public static void scheduleAlarm(Context context, Alarm alarm) {
         if (alarm.isOneShot()) {
@@ -39,7 +58,7 @@ public final class AlarmScheduler {
         Calendar calendarAlarm = Calendar.getInstance();
         calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
         calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
-        calendarAlarm.set(Calendar.SECOND, 00);
+        calendarAlarm.set(Calendar.SECOND, 0);
 
         final int nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         final int nowMinute = Calendar.getInstance().get(Calendar.MINUTE);
@@ -59,7 +78,7 @@ public final class AlarmScheduler {
         Calendar calendarAlarm = Calendar.getInstance();
         calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
         calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
-        calendarAlarm.set(Calendar.SECOND, 00);
+        calendarAlarm.set(Calendar.SECOND, 0);
         boolean thisWeek = false;
 
         final int nowDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
@@ -94,7 +113,7 @@ public final class AlarmScheduler {
 
     private static PendingIntent createPendingIntent(Context context, Alarm alarm) {
         Intent intent = new Intent(context, AlarmWakeReceiver.class);
-        intent.putExtra(ID, alarm.getId());
+        intent.putExtra(ALARM_ID, alarm.getId());
 
         return PendingIntent.getBroadcast(context, (int) alarm.getId().getLeastSignificantBits(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }

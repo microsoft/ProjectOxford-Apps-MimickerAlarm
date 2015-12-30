@@ -21,8 +21,10 @@ public class AlarmRingingActivity extends AppCompatActivity
         ShareFragment.ShareResultListener,
         AlarmRingingFragment.RingingResultListener,
         AlarmSnoozeFragment.SnoozeResultListener,
-        AlarmNoGamesFragment.NoGameResultListener {
+        AlarmNoGamesFragment.NoGameResultListener,
+        AlarmSettingsFragment.AlarmSettingsListener {
 
+    public final static String SETTINGS_FRAGMENT_TAG = "settings_fragment";
     private static final String DEFAULT_DURATION_STRING = "60000";
     private static final int DEFAULT_DURATION_INTEGER = 60 * 1000;
     public final String TAG = this.getClass().getSimpleName();
@@ -32,6 +34,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     private Handler mHandler;
     private Runnable mAlarmCancelTask;
     private boolean mIsGameRunning;
+    private boolean mEditingSettings;
     private boolean mAlarmTimedOut;
     private AlarmRingingService mRingingService;
     private boolean mIsServiceBound;
@@ -59,7 +62,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ID);
+        mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
         mAlarm = AlarmList.get(this).getAlarm(mAlarmId);
 
         Log.d(TAG, "Creating activity!");
@@ -140,9 +143,24 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     public void onNoGameDismiss(boolean launchSettings) {
         if (launchSettings) {
-            Intent intent = AlarmSettingsActivity.newIntent(this, mAlarm.getId());
-            startActivity(intent);
+            mEditingSettings = true;
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container,
+                    AlarmSettingsFragment.newInstance(mAlarmId.toString()),
+                    SETTINGS_FRAGMENT_TAG);
+            transaction.commit();
+        } else {
+            finishActivity();
         }
+    }
+
+    @Override
+    public void onSettingsSaveOrIgnoreChanges() {
+        finishActivity();
+    }
+
+    @Override
+    public void onSettingsDeleteOrThrowawayNew() {
         finishActivity();
     }
 
@@ -173,6 +191,10 @@ public class AlarmRingingActivity extends AppCompatActivity
     public void onBackPressed() {
         if (mIsGameRunning) {
             showFragment(mAlarmRingingFragment);
+        } else if (mEditingSettings) {
+            ((AlarmSettingsFragment)getSupportFragmentManager()
+                    .findFragmentByTag(SETTINGS_FRAGMENT_TAG))
+                    .onCancel();
         }
     }
 

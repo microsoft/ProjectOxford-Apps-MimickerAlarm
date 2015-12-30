@@ -9,6 +9,7 @@
     <string name="alarm_ringing_default_text">Wakey Wakey</string>
     <string name="alarm_list_weekend">Weekend</string>
     <string name="alarm_list_weekdays">Weekdays</string>
+    <string name="alarm_list_every_day">Every day</string>
     <string name="alarm_snooze_label">Snoozed</string>
     <string name="alarm_no_games_label">No Mimics selected</string>
     <string name="alarm_no_games_tap_to_add">Tap to add!</string>

@@ -38,8 +38,6 @@ public class RepeatingDaysPreference extends Preference {
         if (!mLayoutInitialized) {
             LinearLayout container = (LinearLayout) holder.findViewById(R.id.pref_repeating_container);
             for(DayView day : mDayViews){
-                day.setLayoutParams(new LinearLayout.LayoutParams(0,
-                        LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
                 container.addView(day);
             }
             mLayoutInitialized = true;
@@ -67,11 +65,10 @@ public class RepeatingDaysPreference extends Preference {
         return repeatingDays;
     }
 
-
     private class DayView extends TextView {
         private boolean mRepeating = false;
         private Paint mPaint;
-        private final static int PADDING = 20;
+        private int mPadding;
         private RepeatingDaysPreference mParent;
 
         public DayView(Context context, RepeatingDaysPreference parent) {
@@ -80,20 +77,18 @@ public class RepeatingDaysPreference extends Preference {
             mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mPaint.setColor(ContextCompat.getColor(context, R.color.yellow2));
 
+            mPadding = context.getResources().getDimensionPixelSize(R.dimen.repeating_day_padding);
+            setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+            setHeight(context.getResources().getDimensionPixelSize(R.dimen.repeating_day_height));
+            setPadding(mPadding, mPadding, mPadding, mPadding);
+            setGravity(Gravity.CENTER);
+
             setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     toggleRepeating();
                 }
             });
-            setGravity(Gravity.CENTER);
-        }
-
-        @Override
-        protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-            super.onLayout(changed, left, top, right, bottom);
-            setHeight(getMeasuredWidth());
-            setPadding(PADDING, PADDING, PADDING, PADDING);
         }
 
         @Override
@@ -101,7 +96,7 @@ public class RepeatingDaysPreference extends Preference {
             if (mRepeating){
                 float centerX = getWidth() / 2;
                 float centerY = getHeight() / 2;
-                canvas.drawCircle(centerX, centerY, centerX - PADDING, mPaint);
+                canvas.drawCircle(centerX, centerY, centerX - mPadding, mPaint);
                 setTypeface(null, Typeface.BOLD);
             }
             else{
@@ -112,12 +107,12 @@ public class RepeatingDaysPreference extends Preference {
 
         public void setRepeating(boolean repeating){
             mRepeating = repeating;
-            invalidate();
         }
 
         public void toggleRepeating(){
             setRepeating(!getRepeating());
             mParent.setChanged(true);
+            invalidate();
         }
 
         public boolean getRepeating() {

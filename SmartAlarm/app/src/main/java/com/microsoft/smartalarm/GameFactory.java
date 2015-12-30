@@ -41,8 +41,7 @@ public final class GameFactory {
                 int rand = new Random().nextInt(games.size());
                 game = games.get(rand);
             }
-            else
-            {
+            else {
                 game = GameNoNetworkFragment.class;
             }
         }

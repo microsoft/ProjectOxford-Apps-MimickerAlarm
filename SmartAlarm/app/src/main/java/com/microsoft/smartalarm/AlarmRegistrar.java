@@ -13,26 +13,8 @@ public class AlarmRegistrar extends BroadcastReceiver {
         refreshAlarms(context);
     }
 
-    public static void setAlarms(Context context) {
-        List<Alarm> alarms =  AlarmList.get(context).getAlarms();
-        for (Alarm alarm : alarms) {
-            if (alarm.isEnabled()) {
-                AlarmScheduler.scheduleAlarm(context, alarm);
-            }
-        }
-    }
-
-    public static void cancelAlarms(Context context) {
-        List<Alarm> alarms =  AlarmList.get(context).getAlarms();
-        for (Alarm alarm : alarms) {
-            if (alarm.isEnabled()) {
-                AlarmScheduler.cancelAlarm(context, alarm);
-            }
-        }
-    }
-
     private static void refreshAlarms(Context context) {
-        cancelAlarms(context);
-        setAlarms(context);
+        AlarmScheduler.cancelAlarms(context);
+        AlarmScheduler.setAlarms(context);
     }
 }

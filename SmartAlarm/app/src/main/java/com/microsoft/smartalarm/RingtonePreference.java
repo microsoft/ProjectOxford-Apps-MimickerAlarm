@@ -1,7 +1,6 @@
 package com.microsoft.smartalarm;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -12,6 +11,7 @@ import android.util.AttributeSet;
 public class RingtonePreference extends Preference {
     private boolean mChanged;
     private Uri mRingtone;
+    private Fragment mParent;
 
     public static final int RINGTONE_PICKER_REQUEST = 1000;
 
@@ -27,18 +27,15 @@ public class RingtonePreference extends Preference {
         mChanged = changed;
     }
 
+    public void setParent(Fragment parent) {
+        mParent = parent;
+    }
+
     @Override
     protected void onClick() {
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         onPrepareRingtonePickerIntent(intent);
-
-        AlarmSettingsActivity  settingsActivity = findSettingsActivity(getContext());
-        if (settingsActivity != null) {
-            Fragment owningFragment = settingsActivity.getSettingsFragment();
-            if (owningFragment != null) {
-                owningFragment.startActivityForResult(intent, RINGTONE_PICKER_REQUEST);
-            }
-        }
+        mParent.startActivityForResult(intent, RINGTONE_PICKER_REQUEST);
     }
 
     public Uri getRingtone() {
@@ -81,17 +78,5 @@ public class RingtonePreference extends Preference {
         ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true);
         ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL);
         ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getTitle());
-    }
-
-
-    private static AlarmSettingsActivity findSettingsActivity(Context context) {
-        if (context == null)
-            return null;
-        else if (context instanceof AlarmSettingsActivity)
-            return (AlarmSettingsActivity)context;
-        else if (context instanceof ContextWrapper)
-            return findSettingsActivity(((ContextWrapper) context).getBaseContext());
-
-        return null;
     }
 }

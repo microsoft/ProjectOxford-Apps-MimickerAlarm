@@ -12,6 +12,9 @@ import com.ibm.icu.text.SimpleDateFormat;
 
 public final class AlarmUtils {
 
+    // As per http://icu-project.org/apiref/icu4j/com/ibm/icu/text/SimpleDateFormat.html, we
+    // need the format 'EEEEEE' to get a short weekday name
+    private final static String TWO_CHARACTER_SHORT_DAY_PATTERN = "EEEEEE";
     private AlarmUtils() {}
 
     public static String getUserTimeString(Context context, int hour, int minute) {
@@ -31,9 +34,7 @@ public final class AlarmUtils {
 
     public static String[] getShortDayNames() {
         String[] dayNames = new String[7];
-        // As per http://icu-project.org/apiref/icu4j/com/ibm/icu/text/SimpleDateFormat.html, we
-        // need the format 'EEEEEE' to get a short weekday name
-        Format formatter = new SimpleDateFormat("EEEEEE", Locale.getDefault());
+        Format formatter = new SimpleDateFormat(TWO_CHARACTER_SHORT_DAY_PATTERN, Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
         for(int d = Calendar.SUNDAY, i = 0; d <= Calendar.SATURDAY; d++, i++) {
             calendar.set(Calendar.DAY_OF_WEEK, d);
@@ -44,7 +45,7 @@ public final class AlarmUtils {
 
     public static String getShortDayNamesString(int[] daysOfWeek) {
         String dayNames = null;
-        Format formatter = new SimpleDateFormat("EEEEEE", Locale.getDefault());
+        Format formatter = new SimpleDateFormat(TWO_CHARACTER_SHORT_DAY_PATTERN, Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
         for(int day = 0; day < daysOfWeek.length; day++) {
             calendar.set(Calendar.DAY_OF_WEEK, daysOfWeek[day]);
@@ -60,10 +61,13 @@ public final class AlarmUtils {
     public static String getDayPeriodSummaryString(Context context, int[] daysOfWeek) {
         int[] weekdays = { Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY };
         int[] weekend = { Calendar.SUNDAY, Calendar.SATURDAY };
+        int[] everyday = { Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY };
         if (Arrays.equals(daysOfWeek, weekend)) {
             return context.getString(R.string.alarm_list_weekend);
         } else if (Arrays.equals(daysOfWeek, weekdays)) {
             return context.getString(R.string.alarm_list_weekdays);
+        } else if (Arrays.equals(daysOfWeek, everyday)) {
+            return context.getString(R.string.alarm_list_every_day);
         } else {
             return getShortDayNamesString(daysOfWeek);
         }

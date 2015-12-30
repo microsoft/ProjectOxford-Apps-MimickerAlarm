@@ -45,7 +45,8 @@ public class NamePreference extends EditTextPreference {
 
     private void setSummary(String alarmName) {
         if (alarmName == null || alarmName.isEmpty()) {
-            super.setSummary(R.string.pref_title_description_hint);
+            String hint = getContext().getResources().getString(R.string.pref_title_description_hint);
+            super.setSummary("[" + hint + "]");
         } else {
             super.setSummary(alarmName);
         }

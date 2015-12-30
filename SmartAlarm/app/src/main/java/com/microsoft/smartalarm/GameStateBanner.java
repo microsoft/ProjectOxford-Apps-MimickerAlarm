@@ -77,9 +77,4 @@ public class GameStateBanner extends TextView {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         mWidth = MeasureSpec.getSize(widthMeasureSpec);
     }
-
-    public void setXPercentage(float value){
-        value /= 100f;
-        setX((mWidth > 0) ? (value * mWidth) : 0);
-    }
 }
