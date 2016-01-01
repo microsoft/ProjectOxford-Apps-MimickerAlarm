@@ -1,21 +1,28 @@
 package com.microsoft.smartalarm;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ShareFragment extends Fragment {
     ShareResultListener mCallback;
@@ -26,6 +33,7 @@ public class ShareFragment extends Fragment {
 
     public static final String SHAREABLE_URI = "shareable-uri";
     private final static int SHARE_REQUEST_CODE = 2;
+    private final static String MIMICKER_FILE_PREFIX = "Mimicker_";
     private String mShareableUri;
     private ImageView mShareableImage;
 
@@ -118,8 +126,40 @@ public class ShareFragment extends Fragment {
     }
 
     public void download() {
-        //TODO: implement
-        Toast.makeText(getActivity(), "(Coming soon) Saved to gallery", Toast.LENGTH_SHORT).show();
+        File cameraDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+
+        File sourceFile = new File(mShareableUri);
+        String dateTimeString = (new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date())); // Example: 2015-12-31-193205
+        String targetFileName = MIMICKER_FILE_PREFIX + dateTimeString + ".jpg" ; // "Mimicker_2015-12-31-193205.jpg
+        File targetFile = new File(cameraDirectory.getPath(), targetFileName);
+
+        try {
+            copyFile(sourceFile, targetFile);
+        } catch (IOException ex) {
+            Logger.trackException(ex);
+            return;
+        }
+
+        // Inform the media store about the new file
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.MediaColumns.DATA, targetFile.getPath());
+        getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    }
+
+    public void copyFile(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        // Transfer bytes from in to out
+        byte[] buf = new byte[4096];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
     }
 
     @Override
