@@ -25,12 +25,12 @@
     <string name="onboarding_tutorial_text_1">Tell us when you want to wake up and leave the rest to us</string>
     <string name="onboarding_tutorial_title_2">Act when you hear it</string>
     <string name="onboarding_tutorial_text_2">Decide between waking up or snoozing your alarm</string>
-    <string name="onboarding_tutorial_title_3">Play a game</string>
-    <string name="onboarding_tutorial_text_3">Turn off your alarm by playing a game</string>
+    <string name="onboarding_tutorial_title_3">Play a mimic game</string>
+    <string name="onboarding_tutorial_text_3">Turn off your alarm by playing a mimic game</string>
     <string name="onboarding_tutorial_title_4">Wake up</string>
     <string name="onboarding_tutorial_text_4">And enjoy your morning</string>
     <string name="onboarding_welcome_title">Welcome to Mimicker!</string>
-    <string name="onboarding_welcome_text">Play games to wake up and stay up</string>
+    <string name="onboarding_welcome_text">Play mimic games to wake up and stay up</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_skip">Skip</string>
     <string name="accept">accept</string>

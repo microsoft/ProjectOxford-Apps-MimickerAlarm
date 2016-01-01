@@ -131,7 +131,7 @@ public class OnboardingTutorialFragment extends Fragment {
                     textResId = R.string.onboarding_tutorial_text_2;
                     break;
                 case 2:
-                    imageResId = R.drawable.onboarding_tutorial_3;
+                    imageResId = R.drawable.onboarding_tutorial_game_animate1;
                     titleResId = R.string.onboarding_tutorial_title_3;
                     textResId = R.string.onboarding_tutorial_text_3;
                     break;
