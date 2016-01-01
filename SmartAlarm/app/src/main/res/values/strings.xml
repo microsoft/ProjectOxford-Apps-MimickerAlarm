@@ -51,8 +51,9 @@
     <string name="learn_more_other_link">Other links</string>
     <string name="share_button">Share</string>
     <string name="share_action_description">Share via …</string>
-    <string name="share_action_download_confirmation">(Coming soon) Save to gallery</string>
     <string name="share_text_template">I woke up this morning with Mimicker http://mimicker.ai</string>
     <string name="share_subject_template">I woke up!</string>
+    <string name="share_download_success">Your mimic picture has been saved!</string>
+    <string name="share_download_failure">Sorry, something went wrong and cannot save your picture</string>
     <string name="default_ringtone_name">Mimicker</string>
 </resources>

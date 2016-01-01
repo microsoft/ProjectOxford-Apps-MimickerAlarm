@@ -154,6 +154,7 @@ public class ShareFragment extends Fragment {
         try {
             copyFile(sourceFile, targetFile);
         } catch (IOException ex) {
+            Toast.makeText(getActivity(), R.string.share_download_failure, Toast.LENGTH_SHORT).show();
             Logger.trackException(ex);
             return;
         }
@@ -164,6 +165,8 @@ public class ShareFragment extends Fragment {
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
         values.put(MediaStore.MediaColumns.DATA, targetFile.getPath());
         getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        Toast.makeText(getActivity(), R.string.share_download_success, Toast.LENGTH_SHORT).show();
     }
 
     public void copyFile(File src, File dst) throws IOException {
