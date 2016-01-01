@@ -8,6 +8,7 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
@@ -22,8 +23,6 @@ import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import net.hockeyapp.android.CrashManager;
 
 import java.util.UUID;
 
@@ -65,8 +64,10 @@ public class AlarmRingingFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_alarm_ringing, container, false);
 
-        TextView timeField = (TextView) view.findViewById(R.id.alarm_ringing_time);
-        timeField.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
+        if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
+            TextView timeField = (TextView) view.findViewById(R.id.alarm_ringing_time);
+            timeField.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
+        }
 
         TextView dateField = (TextView) view.findViewById(R.id.alarm_ringing_date);
         dateField.setText(AlarmUtils.getFullDateStringForNow());
@@ -79,12 +80,6 @@ public class AlarmRingingFragment extends Fragment {
         titleField.setText(name);
 
         ImageView dismissButton = (ImageView) view.findViewById(R.id.alarm_ringing_dismiss);
-        dismissButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismissAlarm();
-            }
-        });
         dismissButton.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
@@ -115,7 +110,7 @@ public class AlarmRingingFragment extends Fragment {
             public boolean onDrag(View v, DragEvent event) {
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DROP:
-                        //snoozeAlarm();
+                        mCallback.onRingingSnooze();
                         break;
                     default:
                         break;
@@ -192,8 +187,7 @@ public class AlarmRingingFragment extends Fragment {
         mAlarmRingingClock.setVisibility(View.VISIBLE);
         mAnimateClock.start();
 
-        final String hockeyappToken = Util.getToken(getActivity(), "hockeyapp");
-        CrashManager.register(getActivity(), hockeyappToken);
+        Util.registerCrashReport(getActivity());
     }
 
     @Override

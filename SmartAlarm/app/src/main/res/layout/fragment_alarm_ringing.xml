@@ -6,6 +6,12 @@
     android:background="@color/material_grey"
     android:orientation="vertical">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:src="@drawable/sunrise_header"
+        android:scaleType="centerCrop" />
+
     <TextView
         android:id="@+id/alarm_ringing_time"
         android:layout_width="wrap_content"
@@ -47,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:src="@drawable/alarm_ring_button" />
+            android:src="@drawable/alarm_ringing_clock" />
 
         <ImageView
             android:id="@+id/alarm_ringing_dismiss"

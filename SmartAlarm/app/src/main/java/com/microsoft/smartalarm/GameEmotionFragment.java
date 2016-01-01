@@ -59,11 +59,16 @@ public class GameEmotionFragment extends GameWithCameraFragment {
     @Override
     public GameResult verify(Bitmap bitmap) {
         GameResult gameResult = new GameResult();
+        gameResult.question = ((TextView) getView().findViewById(R.id.instruction_text)).getText().toString();
+
         try{
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
             ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
+            Loggable.AppAction appAction = new Loggable.AppAction(Loggable.Key.APP_API_EMOTION);
+            Logger.trackDurationStart(appAction);
             List<RecognizeResult> result = mEmotionServiceRestClient.recognizeImage(inputStream);
+            Logger.track(appAction);
 
             String dominantEmotion = null;
             double dominantEmotionScore = 0;

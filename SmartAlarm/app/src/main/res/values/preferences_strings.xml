@@ -7,6 +7,7 @@
     <string name="pref_title_ring_duration">Alarm duration</string>
 
     <string-array name="pref_ring_duration_labels">
+        <item>1 minute</item>
         <item>5 minutes</item>
         <item>10 minutes</item>
         <item>30 minutes</item>
@@ -16,6 +17,7 @@
     </string-array>
 
     <string-array name="pref_ring_duration_values">
+        <item>60000</item>
         <item>300000</item>
         <item>600000</item>
         <item>1800000</item>
@@ -25,6 +27,7 @@
     </string-array>
 
     <string name="pref_title_snooze_duration">Snooze</string>
+    <string name="pref_default_snooze_duration">1 minute</string>
 
     <string-array name="pref_snooze_duration_labels">
         <item>5 seconds</item>
@@ -32,7 +35,7 @@
         <item>15 seconds</item>
         <item>20 seconds</item>
         <item>30 seconds</item>
-        <item>1 minute</item>
+        <item>@string/pref_default_snooze_duration</item>
         <item>2 minutes</item>
         <item>3 minutes</item>
         <item>4 minutes</item>
@@ -78,9 +81,9 @@
     <string name="pref_no_repeating">Does not repeat</string>
 
     <string-array name="pref_game_labels">
-        <item>Twist Up</item>
-        <item>Color Collector</item>
-        <item>Express Yourself</item>
+        <item>Color capture</item>
+        <item>Express yourself</item>
+        <item>Tongue twister</item>
     </string-array>
 
     <string name="pref_game_tongue_twister_id">tongue_twister</string>
@@ -88,17 +91,17 @@
     <string name="pref_game_express_yourself_id">express_yourself</string>
 
     <string-array name="pref_game_values">
-        <item>@string/pref_game_tongue_twister_id</item>
         <item>@string/pref_game_color_collector_id</item>
         <item>@string/pref_game_express_yourself_id</item>
+        <item>@string/pref_game_tongue_twister_id</item>
     </string-array>
 
     <string name="pref_title_new">Add alarm</string>
     <string name="pref_title_edit">Edit alarm</string>
     <string name="pref_title_name">Alarm name</string>
-    <string name="pref_title_description_hint">[Describe your alarm]</string>
+    <string name="pref_title_description_hint">Describe your alarm</string>
     <string name="pref_title_game">Mimics</string>
-    <string name="pref_no_game">No Mimic selected</string>
+    <string name="pref_no_game">No Mimics selected</string>
     <string name="pref_title_ringtone">Alarm ringtone</string>
     <string name="pref_no_ringtone">Silent</string>
     <string name="pref_title_vibrate">Vibration</string>

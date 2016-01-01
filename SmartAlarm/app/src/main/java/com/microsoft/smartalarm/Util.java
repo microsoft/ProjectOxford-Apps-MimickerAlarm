@@ -1,5 +1,6 @@
 package com.microsoft.smartalarm;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -11,6 +12,9 @@ import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.URLSpan;
 import android.widget.TextView;
+
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.CrashManagerListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -66,4 +70,19 @@ public class Util {
         }
         textView.setText(s);
     }
+
+    public static void registerCrashReport(Context context){
+        final String hockeyappToken = Util.getToken(context, "hockeyapp");
+        if (!BuildConfig.DEBUG) {
+            CrashManager.register(context, hockeyappToken, new CrashManagerListener() {
+                public boolean shouldAutoUploadCrashes() {
+                    return true;
+                }
+            });
+        }
+        else {
+            CrashManager.register(context, hockeyappToken);
+        }
+    }
+
 }

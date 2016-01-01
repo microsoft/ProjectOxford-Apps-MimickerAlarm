@@ -16,6 +16,10 @@ public class Logger {
     private static String sMixpanelToken;
     private final static String TAG = "Logger";
 
+    // These are only used to time event in debug mode
+    private static long debugTimerStart;
+    private static String debugTimerName = null;
+
     private static Boolean isLogging(){
         return !BuildConfig.DEBUG || LOG_IN_DEBUG;
     }
@@ -42,7 +46,9 @@ public class Logger {
     }
 
     public static void local(String s) {
-        Log.d(TAG, s);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, s);
+        }
     }
 
     public static void track(Loggable loggable){
@@ -55,6 +61,11 @@ public class Logger {
             }
         }
         else {
+            if (debugTimerName != null) {
+                long duration = System.currentTimeMillis() - debugTimerStart;
+                Log.d(TAG, debugTimerName + " took " + duration + " milliseconds");
+                debugTimerName = null;
+            }
             debugPrint(loggable);
         }
     }
@@ -69,6 +80,8 @@ public class Logger {
             }
         }
         else {
+            debugTimerName = loggable.Name;
+            debugTimerStart = System.currentTimeMillis();
             debugPrint(loggable);
         }
     }
@@ -98,7 +111,9 @@ public class Logger {
     }
 
     public static void debugPrint(Loggable loggable) {
-        Log.d(TAG, loggable.Name);
-        Log.d(TAG, loggable.Properties.toString());
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, loggable.Name);
+            Log.d(TAG, loggable.Properties.toString());
+        }
     }
 }

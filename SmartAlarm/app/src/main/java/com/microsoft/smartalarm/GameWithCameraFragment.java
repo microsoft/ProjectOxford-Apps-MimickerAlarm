@@ -7,7 +7,6 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Display;
@@ -27,6 +26,8 @@ abstract class GameWithCameraFragment extends Fragment {
     private static final String LOGTAG = "GameWithCameraFragment";
     private static final int TIMEOUT_MILLISECONDS = 30000;
     protected static int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
+    // Max width for sending to Project Oxford, reduce latency
+    private static final int MAX_WIDTH = 500;
 
     private CameraPreview   mCameraPreview;
     private ProgressButton  mCaptureButton;
@@ -122,6 +123,7 @@ abstract class GameWithCameraFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mTimer.stop();
         mCameraPreview.stop();
         mCaptureButton.stop();
         Logger.flush();
@@ -141,9 +143,14 @@ abstract class GameWithCameraFragment extends Fragment {
             GameResult gameResult = null;
             try{
                 if (bitmaps.length > 0) {
-                    gameResult = verify(bitmaps[0]);
+                    int width = bitmaps[0].getWidth();
+                    int height = bitmaps[0].getHeight();
+                    float ratio = (float) height / width;
+                    width = Math.min(width, MAX_WIDTH);
+                    height = (int)(width * ratio);
+                    gameResult = verify(Bitmap.createScaledBitmap(bitmaps[0], width, height, true));
                     if (gameResult.success) {
-                        gameResult.shareableUri = ShareFragment.saveShareableBitmap(getActivity(), bitmaps[0]);
+                        gameResult.shareableUri = ShareFragment.saveShareableBitmap(getActivity(), bitmaps[0], gameResult.question);
                         bitmaps[0].recycle();
                     }
                 }
@@ -213,6 +220,7 @@ abstract class GameWithCameraFragment extends Fragment {
         boolean success = false;
         String message = null;
         Uri shareableUri = null;
+        String question = null;
     }
     abstract protected GameResult verify(Bitmap bitmap);
 }

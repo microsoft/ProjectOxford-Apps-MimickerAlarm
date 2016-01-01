@@ -5,15 +5,24 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,8 +112,17 @@ public class ShareFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         if (mShareableUri != null && mShareableUri.length() > 0) {
-            File deleteFile = new File(mShareableUri);
-            deleteFile.delete();
+            new Thread(new Runnable(){
+                @Override
+                public void run() {
+                    File deleteFile = new File(mShareableUri);
+                    boolean deleted = deleteFile.delete();
+                    if (!deleted) {
+                        Loggable.AppError appError = new Loggable.AppError(Loggable.Key.APP_ERROR, "Failed to delete shareable");
+                        Logger.track(appError);
+                    }
+                }
+            }).start();
         }
     }
 
@@ -176,7 +194,9 @@ public class ShareFragment extends Fragment {
         mCallback.onShareCompleted();
     }
 
-    public static Uri saveShareableBitmap(Context context, Bitmap bitmap) {
+    public static Uri saveShareableBitmap(Context context, Bitmap bitmap, String question) {
+        drawStamp(context, bitmap, question);
+
         File tempFile;
         try {
             tempFile = File.createTempFile("mimicker", ".jpg", context.getCacheDir());
@@ -200,5 +220,47 @@ public class ShareFragment extends Fragment {
             }
         }
         return Uri.fromFile(tempFile);
+    }
+
+    private static void drawStamp(Context context, Bitmap bitmap, String question) {
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawBitmap(bitmap, 0, 0, null);
+
+        float opacity = 0.7f;
+        int horizontalPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, context.getResources().getDisplayMetrics());
+        int verticalPadding =  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, context.getResources().getDisplayMetrics());
+        int textSize = 20; // defined in SP
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 25, context.getResources().getDisplayMetrics());
+
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.setBackgroundResource(R.drawable.rounded_corners);
+        layout.getBackground().setAlpha((int) (opacity * 255));
+        layout.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
+
+        ImageView logo = new ImageView(context);
+        logo.setImageDrawable(ContextCompat.getDrawable(context, R.mipmap.ic_launcher_no_bg));
+        layout.addView(logo);
+
+        TextView textView = new TextView(context);
+        textView.setVisibility(View.VISIBLE);
+        if (question != null) {
+            textView.setText(question);
+        }
+        else {
+            textView.setText("Mimicker");
+        }
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+        textView.setPadding(horizontalPadding, 0, 0, 0);
+
+        LinearLayout.LayoutParams centerInParent = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        centerInParent.gravity = Gravity.CENTER_VERTICAL;
+        layout.addView(textView, centerInParent);
+
+        layout.measure(canvas.getWidth(), height);
+        layout.layout(0, 0, layout.getMeasuredWidth(), layout.getMeasuredHeight());
+
+        canvas.translate((canvas.getWidth() - layout.getMeasuredWidth()) / 2, (float) (canvas.getHeight() * 0.8 - height));
+        layout.draw(canvas);
     }
 }

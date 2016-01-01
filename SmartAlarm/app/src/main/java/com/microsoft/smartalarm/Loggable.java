@@ -130,6 +130,7 @@ public class Loggable {
             try {
                 Properties.put("Type", "Exception");
                 Properties.put("Message", ex);
+                Properties.put("Detailed Message", ex.getMessage());
             }
             catch (JSONException jsonEx) {
             }
@@ -153,6 +154,9 @@ public class Loggable {
         String APP_ALARM_RINGING = "An alarm rang";
         String APP_EXCEPTION = "Exception caught";
         String APP_ERROR = "Error occurred";
+        String APP_API_VISION = "Calling Vision API";
+        String APP_API_EMOTION = "Calling Emotion API";
+        String APP_API_SPEECH = "Calling Speech API";
 
         String ACTION_ALARM_SNOOZE = "Snoozed an alarm";
         String ACTION_ALARM_DISMISS = "Dismissed an alarm";

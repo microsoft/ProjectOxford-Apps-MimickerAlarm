@@ -1,10 +1,11 @@
 package com.microsoft.smartalarm;
 
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.v4.graphics.ColorUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +19,10 @@ import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
 public class GameColorFinderFragment extends GameWithCameraFragment {
-    private static final int COLOR_DIFF_ACCEPTANCE = 300;
     private VisionServiceRestClient mVisionServiceRestClient;
-    private String                  mQuestionColorName;
-    private int                     mQuestionColorCode;
+    private String mQuestionColorName;
+    private float[] mQuestionColorRangeLower;
+    private float[] mQuestionColorRangeUpper;
 
     public GameColorFinderFragment() {
         CameraFacing = Camera.CameraInfo.CAMERA_FACING_BACK;
@@ -36,13 +37,17 @@ public class GameColorFinderFragment extends GameWithCameraFragment {
         String subscriptionKey = Util.getToken(getActivity(), "vision");
         mVisionServiceRestClient = new VisionServiceRestClient(subscriptionKey);
 
-        String[] questions = resources.getStringArray(R.array.vision_color_codes);
-        String colorCode = questions[new Random().nextInt(questions.length)];
-        mQuestionColorCode = rgbToInt(colorCode);
+        String[] questions = resources.getStringArray(R.array.vision_color_questions);
         TextView instruction = (TextView) view.findViewById(R.id.instruction_text);
-        int colorNameId = resources.getIdentifier("_" + colorCode, "string", getActivity().getPackageName());
-        mQuestionColorName = resources.getString(colorNameId);
+        mQuestionColorName = questions[new Random().nextInt(questions.length)];
         instruction.setText(String.format(resources.getString(R.string.game_vision_prompt), mQuestionColorName));
+
+        TypedArray colorCodeLower = resources.obtainTypedArray(resources.getIdentifier(mQuestionColorName + "_range_lower", "array", getActivity().getPackageName()));
+        mQuestionColorRangeLower = new float[]{colorCodeLower.getFloat(0, 0f), colorCodeLower.getFloat(1, 0f), colorCodeLower.getFloat(2, 0f)};
+        colorCodeLower.recycle();
+        TypedArray colorCodeUpper = resources.obtainTypedArray(resources.getIdentifier(mQuestionColorName + "_range_upper", "array", getActivity().getPackageName()));
+        mQuestionColorRangeUpper = new float[]{colorCodeUpper.getFloat(0, 0f), colorCodeUpper.getFloat(1, 0f), colorCodeUpper.getFloat(2, 0f)};
+        colorCodeUpper.recycle();
 
         Logger.init(getActivity());
         Loggable playGameEvent = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR);
@@ -54,24 +59,30 @@ public class GameColorFinderFragment extends GameWithCameraFragment {
     @Override
     public GameResult verify(Bitmap bitmap) {
         GameResult gameResult = new GameResult();
-        try{
+        gameResult.question = ((TextView) getView().findViewById(R.id.instruction_text)).getText().toString();
+
+        try {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
             ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
             String[] features = {"Color"};
+            Loggable.AppAction appAction = new Loggable.AppAction(Loggable.Key.APP_API_VISION);
+            Logger.trackDurationStart(appAction);
             AnalyzeResult result = mVisionServiceRestClient.analyzeImage(inputStream, features);
+            Logger.track(appAction);
 
-            double colorDistance = colorDistance(mQuestionColorCode, rgbToInt(result.color.accentColor));
+            float[] accentHsl = new float[3];
+            int[] accentRgb = hexStringToRgb(result.color.accentColor);
+            ColorUtils.RGBToHSL(accentRgb[0], accentRgb[1], accentRgb[2], accentHsl);
+            boolean colorInRange = isColorInRange(mQuestionColorRangeLower, mQuestionColorRangeUpper, accentHsl);
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR_SUCCESS);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestionColorName);
-            userAction.putProp(Loggable.Key.PROP_DIFF, colorDistance);
             userAction.putVision(result);
 
             //TODO: this will not work for languages other than English.
-            if (colorDistance < COLOR_DIFF_ACCEPTANCE ||
+            if (colorInRange ||
                     result.color.dominantColorForeground.toLowerCase().equals(mQuestionColorName) ||
-                    result.color.dominantColorBackground.toLowerCase().equals(mQuestionColorName))
-            {
+                    result.color.dominantColorBackground.toLowerCase().equals(mQuestionColorName)) {
                 gameResult.success = true;
             }
 
@@ -87,8 +98,7 @@ public class GameColorFinderFragment extends GameWithCameraFragment {
             }
 
             Logger.track(userAction);
-        }
-        catch(Exception ex) {
+        } catch (Exception ex) {
             Logger.trackException(ex);
         }
 
@@ -97,7 +107,7 @@ public class GameColorFinderFragment extends GameWithCameraFragment {
 
     @Override
     protected void gameFailure(GameResult gameResult, boolean allowRetry) {
-        if (!allowRetry){
+        if (!allowRetry) {
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_COLOR_TIMEOUT);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestionColorName);
             Logger.track(userAction);
@@ -105,18 +115,31 @@ public class GameColorFinderFragment extends GameWithCameraFragment {
         super.gameFailure(gameResult, allowRetry);
     }
 
-    private int rgbToInt(String c) {
-        return Integer.parseInt(c, 16);
+    private int[] hexStringToRgb(String hex) {
+        int color = (int) Long.parseLong(hex, 16);
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = (color) & 0xFF;
+        return new int[]{r, g, b};
     }
 
-    private double colorDistance(int c1, int c2)
-    {
-        long rmean = ( (long)Color.red(c1) + (long)Color.red(c2) ) / 2;
-        long r = (long)Color.red(c1) - (long)Color.red(c2);
-        long g = (long)Color.green(c1) - (long)Color.green(c2);
-        long b = (long)Color.blue(c1) - (long)Color.blue(c2);
-        return Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
+    private boolean isColorInRange(float[] lowerHsl, float[] upperHsl, float[] queryHsl) {
+        boolean result = true;
+        for (int i = 0; i < 3; i++) {
+            //looped around the color wheel
+            if (upperHsl[i] < lowerHsl[i]) {
+                result &= (queryHsl[i] >= lowerHsl[i] && queryHsl[i] <= 360)
+                        || (queryHsl[i] >= 0 && queryHsl[i] <= upperHsl[i]);
+            } else {
+                result &= (queryHsl[i] >= lowerHsl[i] && queryHsl[i] <= upperHsl[i]);
+            }
+        }
+
+        Logger.local("HSL 1: " + lowerHsl[0] + " " + lowerHsl[1] + " " + lowerHsl[2]);
+        Logger.local("HSL 2: " + upperHsl[0] + " " + upperHsl[1] + " " + upperHsl[2]);
+        Logger.local("question HSL 2: " + queryHsl[0] + " " + queryHsl[1] + " " + queryHsl[2]);
+        Logger.local("result: " + result);
+
+        return result;
     }
 }
-
-
