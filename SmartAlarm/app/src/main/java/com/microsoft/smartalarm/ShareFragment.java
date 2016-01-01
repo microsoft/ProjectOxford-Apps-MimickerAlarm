@@ -143,6 +143,9 @@ public class ShareFragment extends Fragment {
         startActivityForResult(Intent.createChooser(shareIntent, getResources().getString(R.string.share_action_description)), SHARE_REQUEST_CODE);
     }
 
+    //
+    // Copy the temporary mimic picture to the camera folder with a filename with timestamp
+    //
     public void download() {
         File cameraDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 
@@ -169,18 +172,17 @@ public class ShareFragment extends Fragment {
         Toast.makeText(getActivity(), R.string.share_download_success, Toast.LENGTH_SHORT).show();
     }
 
-    public void copyFile(File src, File dst) throws IOException {
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
+    public void copyFile(File sourceFile, File targetFile) throws IOException {
+        InputStream inputStream = new FileInputStream(sourceFile);
+        OutputStream outputStream = new FileOutputStream(targetFile);
 
-        // Transfer bytes from in to out
-        byte[] buf = new byte[4096];
         int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
+        byte[] buffer = new byte[4096];
+        while ((len = inputStream.read(buffer)) > 0) {
+            outputStream.write(buffer, 0, len);
         }
-        in.close();
-        out.close();
+        inputStream.close();
+        outputStream.close();
     }
 
     @Override
