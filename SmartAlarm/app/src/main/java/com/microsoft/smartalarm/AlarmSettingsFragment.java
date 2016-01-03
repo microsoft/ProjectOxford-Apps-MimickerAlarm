@@ -157,11 +157,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
                 boolean rightButtonPressed = (boolean) o;
                 if (rightButtonPressed) {
                     // Save button was pressed
-                    if (haveSettingsChanged()) {
-                        saveSettingsAndExit();
-                    } else {
-                        discardSettingsAndExit();
-                    }
+                    saveSettingsAndExit();
                 } else {
                     // Cancel (when new) or Delete button was pressed
                     deleteSettingsAndExit();
@@ -215,14 +211,22 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     }
 
     private void saveSettingsAndExit() {
-        AlarmScheduler.cancelAlarms(getContext());
-        populateUpdatedSettings();
-        mAlarm.setNew(false);
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE);
         userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
+
+        populateUpdatedSettings();
+        mAlarm.setNew(false);
+
+        if (mAlarm.isEnabled()) {
+            AlarmScheduler.cancelAlarm(getContext(), mAlarm);
+        } else {
+            mAlarm.setIsEnabled(true);
+        }
+
         AlarmList.get(getActivity()).updateAlarm(mAlarm);
-        AlarmScheduler.setAlarms(getContext());
+        AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
+
         mCallback.onSettingsSaveOrIgnoreChanges();
     }
 
@@ -231,9 +235,11 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
 
-        AlarmScheduler.cancelAlarms(getContext());
+        if (mAlarm.isEnabled()) {
+            AlarmScheduler.cancelAlarm(getContext(), mAlarm);
+        }
         AlarmList.get(getActivity()).deleteAlarm(mAlarm);
-        AlarmScheduler.setAlarms(getContext());
+
         mCallback.onSettingsDeleteOrNewCancel();
     }
 
@@ -241,10 +247,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_SAVE_DISCARD);
         userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
-        if (mAlarm.isNew()) {
-            mAlarm.setNew(false);
-            AlarmList.get(getActivity()).updateAlarm(mAlarm);
-        }
+
         mCallback.onSettingsSaveOrIgnoreChanges();
     }
 

@@ -49,5 +49,18 @@ public class VolumeSliderPreference extends Preference
 
     }
 
+    public void increaseVolume() {
+        int current = mVolumeLevel.getProgress();
+        if (current < mVolumeLevel.getMax()) {
+            mVolumeLevel.setProgress(current + 1);
+        }
+    }
+
+    public void decreaseVolume() {
+        int current = mVolumeLevel.getProgress();
+        if (current > 0) {
+            mVolumeLevel.setProgress(current - 1);
+        }
+    }
 
 }

@@ -191,9 +191,11 @@ public class AlarmRingingActivity extends AppCompatActivity
         if (mIsGameRunning) {
             showFragment(mAlarmRingingFragment);
         } else if (mEditingSettings) {
-            ((AlarmSettingsFragment)getSupportFragmentManager()
-                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
-                    .onCancel();
+            AlarmSettingsFragment fragment = ((AlarmSettingsFragment)getSupportFragmentManager()
+                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG));
+            if (fragment != null) {
+                fragment.onCancel();
+            }
         }
     }
 

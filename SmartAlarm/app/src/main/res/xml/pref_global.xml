@@ -1,6 +1,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.microsoft.smartalarm.VolumeSliderPreference/>
+    <com.microsoft.smartalarm.VolumeSliderPreference
+        android:key="KEY_RING_VOLUME"/>
 
     <ListPreference
         android:key="KEY_RING_DURATION"

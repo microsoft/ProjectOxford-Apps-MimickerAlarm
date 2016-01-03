@@ -1,11 +1,14 @@
 package com.microsoft.smartalarm;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import net.hockeyapp.android.FeedbackManager;
@@ -23,6 +26,7 @@ public class AlarmMainActivity extends AppCompatActivity
     public final static String SHOULD_ONBOARD = "onboarding";
     public final static String SHOULD_TOS = "show-tos";
     private SharedPreferences mPreferences = null;
+    private AudioManager mAudioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,7 @@ public class AlarmMainActivity extends AppCompatActivity
         String packageName = getApplicationContext().getPackageName();
         mPreferences = getSharedPreferences(packageName, MODE_PRIVATE);
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         Logger.init(this);
     }
 
@@ -104,12 +109,30 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         if (mEditingAlarm) {
-            ((AlarmSettingsFragment)getSupportFragmentManager()
-                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
-                    .onCancel();
+            AlarmSettingsFragment fragment = ((AlarmSettingsFragment)getSupportFragmentManager()
+                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG));
+            if (fragment != null) {
+                fragment.onCancel();
+            }
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            mAudioManager.adjustStreamVolume(AudioManager.STREAM_ALARM,
+                    AudioManager.ADJUST_LOWER,
+                    AudioManager.FLAG_SHOW_UI | AudioManager.FLAG_PLAY_SOUND);
+        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            mAudioManager.adjustStreamVolume(AudioManager.STREAM_ALARM,
+                    AudioManager.ADJUST_RAISE,
+                    AudioManager.FLAG_SHOW_UI | AudioManager.FLAG_PLAY_SOUND);
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
+        return true;
     }
 
     public void showToS() {
@@ -122,7 +145,8 @@ public class AlarmMainActivity extends AppCompatActivity
         if (animateEntrance) {
             transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
         }
-        transaction.replace(R.id.fragment_container, new AlarmListFragment());
+        transaction.replace(R.id.fragment_container, new AlarmListFragment(),
+                AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
         transaction.commit();
         setTitle(R.string.alarm_list_title);
     }
@@ -136,7 +160,7 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     public void onSettingsDeleteOrNewCancel() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        transaction.setCustomAnimations(android.R.anim.fade_in, R.anim.slide_down);
         transaction.replace(R.id.fragment_container, new AlarmListFragment());
         transaction.commit();
         setTitle(R.string.alarm_list_title);

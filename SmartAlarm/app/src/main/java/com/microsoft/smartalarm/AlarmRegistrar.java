@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import java.util.List;
-
 public class AlarmRegistrar extends BroadcastReceiver {
 
     @Override
@@ -15,6 +13,6 @@ public class AlarmRegistrar extends BroadcastReceiver {
 
     private static void refreshAlarms(Context context) {
         AlarmScheduler.cancelAlarms(context);
-        AlarmScheduler.setAlarms(context);
+        AlarmScheduler.scheduleAlarms(context);
     }
 }

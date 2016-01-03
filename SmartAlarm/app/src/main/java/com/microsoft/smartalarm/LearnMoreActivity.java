@@ -27,4 +27,10 @@ public class LearnMoreActivity extends AppCompatActivity {
         super.onDestroy();
         Logger.flush();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
 }

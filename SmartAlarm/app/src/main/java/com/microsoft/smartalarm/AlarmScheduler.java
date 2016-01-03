@@ -14,7 +14,7 @@ public final class AlarmScheduler {
 
     public static final String ALARM_ID = "alarm_id";
 
-    public static void setAlarms(Context context) {
+    public static void scheduleAlarms(Context context) {
         List<Alarm> alarms =  AlarmList.get(context).getAlarms();
         for (Alarm alarm : alarms) {
             if (alarm.isEnabled()) {

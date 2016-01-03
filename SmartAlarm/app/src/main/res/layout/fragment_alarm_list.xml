@@ -43,7 +43,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context=".AlarmMainActivity"/>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.microsoft.smartalarm.AlarmFloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -56,29 +56,32 @@
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_marginTop="@dimen/app_bar_height">
 
         <TextView
             android:id="@+id/empty_view_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="72dp"
+            android:paddingTop="100dp"
             android:layout_centerHorizontal="true"
-            android:text="@string/empty_alarm_list_text" />
+            android:text="@string/empty_alarm_list_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="15dp"
-            android:layout_toRightOf="@id/empty_view_text"
-            android:layout_alignBottom="@id/empty_view_text"
-            android:src="@drawable/no_alarm_arrow" />
+            android:src="@drawable/no_alarm_arrow"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="35dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="25dp" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="40dp"
+            android:paddingTop="30dp"
             android:layout_below="@+id/empty_view_text"
             android:layout_centerHorizontal="true"
             android:src="@drawable/no_alarm_clock" />

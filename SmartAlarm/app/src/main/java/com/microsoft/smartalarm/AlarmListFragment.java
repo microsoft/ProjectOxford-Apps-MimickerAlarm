@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,17 +28,20 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class AlarmListFragment extends Fragment {
+public class AlarmListFragment extends Fragment implements
+    AlarmFloatingActionButton.OnVisibilityChangedListener {
 
+    public static final String ALARM_LIST_FRAGMENT_TAG = "alarm_list_fragment";
     private RecyclerView mAlarmRecyclerView;
     private RelativeLayout mEmptyView;
     private AlarmAdapter mAdapter;
     private CollapsingToolbarLayout mCollapsingLayout;
     private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
-    private FloatingActionButton mFab;
+    private AlarmFloatingActionButton mFab;
     private AlarmListListener mCallbacks;
     private List<Alarm> mAlarms;
+    private boolean mShowAddButtonInToolbar;
 
     public interface AlarmListListener {
         void onAlarmSelected(Alarm alarm);
@@ -70,17 +73,15 @@ public class AlarmListFragment extends Fragment {
                 .findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(mToolbar);
 
-        mFab = (FloatingActionButton) view.findViewById(R.id.fab);
+        mFab = (AlarmFloatingActionButton) view.findViewById(R.id.fab);
 
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Alarm alarm = new Alarm();
-                alarm.setNew(true);
-                AlarmList.get(getActivity()).addAlarm(alarm);
-                mCallbacks.onAlarmSelected(alarm);
+                addAlarm();
             }
         });
+        mFab.setVisibilityListener(this);
 
         mEmptyView = (RelativeLayout) view.findViewById(R.id.empty_view);
 
@@ -91,6 +92,10 @@ public class AlarmListFragment extends Fragment {
         mAlarmRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         updateUI();
+
+        ItemTouchHelper.Callback callback = new AlarmListItemTouchHelperCallback(mAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(mAlarmRecyclerView);
 
         return view;
     }
@@ -108,25 +113,34 @@ public class AlarmListFragment extends Fragment {
     }
 
     @Override
+    public void visibilityChanged(int visibility) {
+        if (View.GONE == visibility) {
+            mShowAddButtonInToolbar = true;
+        } else if (View.VISIBLE == visibility) {
+            mShowAddButtonInToolbar = false;
+        }
+        getActivity().invalidateOptionsMenu();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_alarm_list, menu);
+        MenuItem add = menu.findItem(R.id.action_add_alarm);
+        add.setVisible(mShowAddButtonInToolbar);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         int id = item.getItemId();
-
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(getActivity(), AlarmGlobalSettingsActivity.class);
-            startActivity(intent);
+            launchChildActivity(AlarmGlobalSettingsActivity.class);
             return true;
-        }
-        else if (id == R.id.action_learn_more) {
-            Intent intent = new Intent(getActivity(), LearnMoreActivity.class);
-            startActivity(intent);
+        } else if (id == R.id.action_learn_more) {
+            launchChildActivity(LearnMoreActivity.class);
             return true;
+        } else if (id == R.id.action_add_alarm) {
+            addAlarm();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -152,6 +166,19 @@ public class AlarmListFragment extends Fragment {
             mEmptyView.setVisibility(View.GONE);
             enableCollapsingBehaviour(true);
         }
+    }
+
+    private void addAlarm() {
+        Alarm alarm = new Alarm();
+        alarm.setNew(true);
+        AlarmList.get(getActivity()).addAlarm(alarm);
+        mCallbacks.onAlarmSelected(alarm);
+    }
+
+    private void launchChildActivity(Class childClass) {
+        Intent intent = new Intent(getActivity(), childClass);
+        startActivity(intent);
+        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     private void enableCollapsingBehaviour(boolean enableCollapse) {
@@ -255,7 +282,8 @@ public class AlarmListFragment extends Fragment {
         }
     }
 
-    private class AlarmAdapter extends RecyclerView.Adapter<AlarmHolder> {
+    private class AlarmAdapter extends RecyclerView.Adapter<AlarmHolder>
+        implements AlarmListItemTouchHelperCallback.ItemTouchHelperAdapter {
 
         private List<Alarm> mAlarms;
 
@@ -288,5 +316,35 @@ public class AlarmListFragment extends Fragment {
             mAlarms = alarms;
         }
 
+        @Override
+        public void onItemDismiss(int position) {
+            Alarm alarm = mAlarms.remove(position);
+
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DELETE);
+            userAction.putJSON(alarm.toJSON());
+            Logger.track(userAction);
+
+            if (alarm.isEnabled()) {
+                AlarmScheduler.cancelAlarm(getContext(), alarm);
+            }
+            AlarmList.get(getActivity()).deleteAlarm(alarm);
+
+            notifyItemRemoved(position);
+
+            // If we are down to the last item, ensure we show the empty list graphic
+            if (mAlarms.size() == 0) {
+                AlarmListFragment alarmList = (AlarmListFragment)getFragmentManager()
+                        .findFragmentByTag(ALARM_LIST_FRAGMENT_TAG);
+                if (alarmList != null) {
+                    alarmList.updateUI();
+                }
+            }
+        }
+
+        @Override
+        public void onItemDismissCancel(int position) {
+            notifyItemChanged(position);
+        }
     }
 }
+

@@ -81,8 +81,8 @@
     <string name="pref_no_repeating">Does not repeat</string>
 
     <string-array name="pref_game_labels">
-        <item>Color capture</item>
         <item>Express yourself</item>
+        <item>Color capture</item>
         <item>Tongue twister</item>
     </string-array>
 
