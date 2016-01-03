@@ -31,12 +31,12 @@
     <string name="onboarding_tutorial_text_1">Tell us when you want to wake up and leave the rest to us</string>
     <string name="onboarding_tutorial_title_2">Act when you hear it</string>
     <string name="onboarding_tutorial_text_2">Decide between waking up or snoozing your alarm</string>
-    <string name="onboarding_tutorial_title_3">Play a game</string>
-    <string name="onboarding_tutorial_text_3">Turn off your alarm by playing a game</string>
+    <string name="onboarding_tutorial_title_3">Play a mimic game</string>
+    <string name="onboarding_tutorial_text_3">Turn off your alarm by playing a mimic game</string>
     <string name="onboarding_tutorial_title_4">Wake up</string>
     <string name="onboarding_tutorial_text_4">And enjoy your morning</string>
     <string name="onboarding_welcome_title">Welcome to Mimicker!</string>
-    <string name="onboarding_welcome_text">Play games to wake up and stay up</string>
+    <string name="onboarding_welcome_text">Play mimic games to wake up and stay up</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_skip">Skip</string>
     <string name="accept">accept</string>
@@ -52,8 +52,9 @@
     <string name="learn_more_other_link">Other links</string>
     <string name="share_button">Share</string>
     <string name="share_action_description">Share via …</string>
-    <string name="share_action_download_confirmation">(Coming soon) Save to gallery</string>
     <string name="share_text_template">I woke up this morning with Mimicker http://mimicker.ai</string>
     <string name="share_subject_template">I woke up!</string>
+    <string name="share_download_success">Your mimic picture has been saved!</string>
+    <string name="share_download_failure">Sorry, something went wrong and cannot save your picture</string>
     <string name="default_ringtone_name">Mimicker</string>
 </resources>

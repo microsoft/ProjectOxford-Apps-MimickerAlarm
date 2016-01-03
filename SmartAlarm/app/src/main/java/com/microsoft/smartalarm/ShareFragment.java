@@ -1,6 +1,7 @@
 package com.microsoft.smartalarm;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +9,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
@@ -22,8 +25,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ShareFragment extends Fragment {
     ShareResultListener mCallback;
@@ -34,6 +42,7 @@ public class ShareFragment extends Fragment {
 
     public static final String SHAREABLE_URI = "shareable-uri";
     private final static int SHARE_REQUEST_CODE = 2;
+    private final static String MIMICKER_FILE_PREFIX = "Mimicker_";
     private String mShareableUri;
     private ImageView mShareableImage;
 
@@ -134,9 +143,46 @@ public class ShareFragment extends Fragment {
         startActivityForResult(Intent.createChooser(shareIntent, getResources().getString(R.string.share_action_description)), SHARE_REQUEST_CODE);
     }
 
+    //
+    // Copy the temporary mimic picture to the camera folder with a filename with timestamp
+    //
     public void download() {
-        //TODO: implement
-        Toast.makeText(getActivity(), getResources().getString(R.string.share_action_download_confirmation), Toast.LENGTH_SHORT).show();
+        File cameraDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+
+        File sourceFile = new File(mShareableUri);
+        String dateTimeString = (new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date())); // Example: 2015-12-31-193205
+        String targetFileName = MIMICKER_FILE_PREFIX + dateTimeString + ".jpg" ; // "Mimicker_2015-12-31-193205.jpg
+        File targetFile = new File(cameraDirectory.getPath(), targetFileName);
+
+        try {
+            copyFile(sourceFile, targetFile);
+        } catch (IOException ex) {
+            Toast.makeText(getActivity(), R.string.share_download_failure, Toast.LENGTH_SHORT).show();
+            Logger.trackException(ex);
+            return;
+        }
+
+        // Inform the media store about the new file
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.MediaColumns.DATA, targetFile.getPath());
+        getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        Toast.makeText(getActivity(), R.string.share_download_success, Toast.LENGTH_SHORT).show();
+    }
+
+    public void copyFile(File sourceFile, File targetFile) throws IOException {
+        InputStream inputStream = new FileInputStream(sourceFile);
+        OutputStream outputStream = new FileOutputStream(targetFile);
+
+        int len;
+        byte[] buffer = new byte[4096];
+        while ((len = inputStream.read(buffer)) > 0) {
+            outputStream.write(buffer, 0, len);
+        }
+        inputStream.close();
+        outputStream.close();
     }
 
     @Override
