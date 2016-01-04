@@ -80,7 +80,7 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
         public void onKeyDown(int keyCode) {
             if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
                 mAlarmVolume.decreaseVolume();
-            } else {
+            } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
                 mAlarmVolume.increaseVolume();
             }
         }
