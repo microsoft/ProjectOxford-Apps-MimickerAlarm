@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.microsoft.smartalarm">
+<manifest
+    package="com.microsoft.mimicker"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -18,14 +19,14 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:name=".AlarmApplication"
+        android:name="com.microsoft.mimicker.appcore.AlarmApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".AlarmMainActivity"
+            android:name="com.microsoft.mimicker.appcore.AlarmMainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -35,21 +36,21 @@
         </activity>
 
         <activity
-            android:name=".AlarmRingingActivity"
+            android:name="com.microsoft.mimicker.ringing.AlarmRingingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
 
         <receiver
-            android:name=".AlarmWakeReceiver"
+            android:name="com.microsoft.mimicker.ringing.AlarmWakeReceiver"
             android:enabled="true"
             android:exported="false"/>
 
         <service
-            android:name=".AlarmRingingService"
+            android:name="com.microsoft.mimicker.ringing.AlarmRingingService"
             android:enabled="true"/>
 
         <receiver
-            android:name=".AlarmRegistrar">
+            android:name="com.microsoft.mimicker.scheduling.AlarmRegistrar">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
@@ -59,23 +60,23 @@
         </receiver>
 
         <activity
-            android:name=".AlarmGlobalSettingsActivity"
+            android:name="com.microsoft.mimicker.globalsettings.AlarmGlobalSettingsActivity"
             android:label="@string/title_activity_alarm_settings"
-            android:parentActivityName=".AlarmMainActivity"
+            android:parentActivityName="com.microsoft.mimicker.appcore.AlarmMainActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".AlarmMainActivity"/>
+                android:value="com.microsoft.mimicker.appcore.AlarmMainActivity"/>
         </activity>
 
         <activity
-            android:name=".LearnMoreActivity"
+            android:name="com.microsoft.mimicker.appcore.LearnMoreActivity"
             android:label="@string/title_activity_learn_more"
-            android:parentActivityName=".AlarmMainActivity"
+            android:parentActivityName="com.microsoft.mimicker.appcore.AlarmMainActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".AlarmMainActivity"/>
+                android:value="com.microsoft.mimicker.appcore.AlarmMainActivity"/>
         </activity>
 
         <activity android:name="net.hockeyapp.android.UpdateActivity"/>
@@ -83,19 +84,19 @@
         <activity android:name="net.hockeyapp.android.PaintActivity"/>
 
         <meta-data
-            android:name="com.microsoft.smartalarm.token.mixpanel"
+            android:name="com.microsoft.mimicker.token.mixpanel"
             android:value="${MIXPANEL_TOKEN}"/>
         <meta-data
-            android:name="com.microsoft.smartalarm.token.speech"
+            android:name="com.microsoft.mimicker.token.speech"
             android:value="${SPEECH_TOKEN}"/>
         <meta-data
-            android:name="com.microsoft.smartalarm.token.vision"
+            android:name="com.microsoft.mimicker.token.vision"
             android:value="${VISION_TOKEN}"/>
         <meta-data
-            android:name="com.microsoft.smartalarm.token.emotion"
+            android:name="com.microsoft.mimicker.token.emotion"
             android:value="${EMOTION_TOKEN}"/>
         <meta-data
-            android:name="com.microsoft.smartalarm.token.hockeyapp"
+            android:name="com.microsoft.mimicker.token.hockeyapp"
             android:value="${HOCKEYAPP_TOKEN}"/>
     </application>
 

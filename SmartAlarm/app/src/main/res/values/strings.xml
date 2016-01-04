@@ -12,20 +12,20 @@
     <string name="alarm_list_weekdays">Weekdays</string>
     <string name="alarm_list_every_day">Every day</string>
     <string name="alarm_snooze_label">Snoozed</string>
-    <string name="alarm_no_games_label">No Mimics selected</string>
-    <string name="alarm_no_games_tap_to_add">Tap to add!</string>
+    <string name="alarm_no_mimics_label">No Mimics selected</string>
+    <string name="alarm_no_mimics_tap_to_add">Tap to add!</string>
 
-    <string name="game_twister_prompt">Say the following tongue twister</string>
-    <string name="game_twister_i_said">I said</string>
-    <string name="game_vision_prompt">Find something %s</string>
-    <string name="game_emotion_prompt">Make a %s face</string>
+    <string name="mimic_twister_prompt">Say the following tongue twister</string>
+    <string name="mimic_twister_i_said">I said</string>
+    <string name="mimic_vision_prompt">Find something %s</string>
+    <string name="mimic_emotion_prompt">Make a %s face</string>
     <string name="action_feedback">Feedback</string>
     <string name="action_tutorial">Tutorial</string>
-    <string name="game_time_up_message">Time\'s Up!</string>
-    <string name="game_failure_message">That does not look quite right</string>
-    <string name="game_success_message">You did it!</string>
-    <string name="game_emotion_failure">You look too %s, try again</string>
-    <string name="game_twister_perfect_message">Perfect!</string>
+    <string name="mimic_time_up_message">Time\'s Up!</string>
+    <string name="mimic_failure_message">That does not look quite right</string>
+    <string name="mimic_success_message">You did it!</string>
+    <string name="mimic_emotion_failure">You look too %s, try again</string>
+    <string name="mimic_twister_perfect_message">Perfect!</string>
 
     <string name="onboarding_tutorial_title_1">Set your alarm</string>
     <string name="onboarding_tutorial_text_1">Tell us when you want to wake up and leave the rest to us</string>

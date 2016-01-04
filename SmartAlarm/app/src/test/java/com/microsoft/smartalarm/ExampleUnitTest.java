@@ -1,4 +1,4 @@
-package com.microsoft.smartalarm;
+package com.microsoft.mimicker;
 
 import org.junit.Test;
 
