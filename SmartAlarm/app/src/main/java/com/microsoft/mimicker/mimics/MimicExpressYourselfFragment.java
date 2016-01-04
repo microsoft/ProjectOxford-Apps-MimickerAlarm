@@ -23,12 +23,12 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
 
-public class GameEmotionFragment extends GameWithCameraFragment {
+public class MimicExpressYourselfFragment extends MimicWithCameraFragment {
     private double mEmotionAcceptance = 0.5;
     private EmotionServiceRestClient mEmotionServiceRestClient;
     private String                  mEmotion;
 
-    public GameEmotionFragment() {
+    public MimicExpressYourselfFragment() {
         CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     }
 
@@ -47,7 +47,7 @@ public class GameEmotionFragment extends GameWithCameraFragment {
         TextView instruction = (TextView) view.findViewById(R.id.instruction_text);
         int adjectiveId = resources.getIdentifier("emotion_" + mEmotion, "string", getActivity().getPackageName());
         String adjective = resources.getString(adjectiveId);
-        instruction.setText(String.format(resources.getString(R.string.game_emotion_prompt), adjective));
+        instruction.setText(String.format(resources.getString(R.string.mimic_emotion_prompt), adjective));
 
         TypedArray acceptances = resources.obtainTypedArray(R.array.emotion_acceptance);
         mEmotionAcceptance = acceptances.getFloat(randomNumber, 0.5f);
@@ -106,7 +106,7 @@ public class GameEmotionFragment extends GameWithCameraFragment {
                     Resources resources = getResources();
                     int adjectiveId = resources.getIdentifier("emotion_" + dominantEmotion, "string", getActivity().getPackageName());
                     String adjective = resources.getString(adjectiveId);
-                    gameResult.message = String.format(resources.getString(R.string.game_emotion_failure), adjective);
+                    gameResult.message = String.format(resources.getString(R.string.mimic_emotion_failure), adjective);
                 }
             }
         }

@@ -34,13 +34,13 @@ public class AlarmNoGamesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_nogames, container, false);
+        View view = inflater.inflate(R.layout.fragment_no_mimics, container, false);
 
         Bundle args = getArguments();
         UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
         Alarm alarm = AlarmList.get(getContext()).getAlarm(alarmId);
 
-        TextView alarmTitle = (TextView) view.findViewById(R.id.alarm_no_games_label);
+        TextView alarmTitle = (TextView) view.findViewById(R.id.alarm_no_mimics_label);
 
         String name = alarm.getTitle();
         if (name == null || name.isEmpty()) {
@@ -49,7 +49,7 @@ public class AlarmNoGamesFragment extends Fragment {
 
         alarmTitle.setText(name);
 
-        view.findViewById(R.id.alarm_no_games_tap_to_add).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.alarm_no_mimics_tap_to_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mHandler.removeCallbacks(mAutoDismissTask);

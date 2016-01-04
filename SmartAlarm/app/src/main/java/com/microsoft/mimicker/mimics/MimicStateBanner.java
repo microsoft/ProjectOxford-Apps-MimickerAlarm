@@ -10,18 +10,18 @@ import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
 
-public class GameStateBanner extends TextView {
+public class MimicStateBanner extends TextView {
     private AnimatorSet mEnterLeftAnimation;
     private int mWidth;
     private int mSuccessColor, mFailureColor;
-    public GameStateBanner(Context context) {
+    public MimicStateBanner(Context context) {
         this(context, null);
     }
 
-    public GameStateBanner(Context context, AttributeSet attrs) {
+    public MimicStateBanner(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
-    public GameStateBanner(final Context context, AttributeSet attrs, int defStyle) {
+    public MimicStateBanner(final Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mSuccessColor = ContextCompat.getColor(context, R.color.green3);
         mFailureColor = ContextCompat.getColor(context, R.color.dark3);

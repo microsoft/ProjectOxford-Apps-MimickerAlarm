@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.microsoft.mimicker.mimics.GameStateBanner
-        android:id="@+id/game_state"
+    <com.microsoft.mimicker.mimics.MimicStateBanner
+        android:id="@+id/mimic_state"
         android:layout_width="match_parent"
         android:layout_height="90dp"
         android:layout_alignParentTop="true"
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="16dp"
-                android:text="@string/game_twister_prompt"
+                android:text="@string/mimic_twister_prompt"
                 android:textAllCaps="true"
                 android:textSize="16sp"
                 android:textStyle="normal"/>
@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:text="@string/game_twister_i_said"
+                android:text="@string/mimic_twister_i_said"
                 android:textSize="16sp"/>
             <TextView
                 android:id="@+id/understood_text"

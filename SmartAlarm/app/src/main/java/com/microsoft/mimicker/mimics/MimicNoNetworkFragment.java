@@ -19,24 +19,24 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.mimics.GameFactory.GameResultListener;
+import com.microsoft.mimicker.mimics.MimicFactory.MimicResultListener;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 
 import java.util.Random;
 
-public class GameNoNetworkFragment extends Fragment {
+public class MimicNoNetworkFragment extends Fragment {
     private final static int TIMEOUT_MILLISECONDS = 30000;
-    GameResultListener mCallback;
+    MimicResultListener mCallback;
     private CountDownTimerView mTimer;
     private TextView mInstructionText;
-    private GameStateBanner mStateBanner;
+    private MimicStateBanner mStateBanner;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_nonetwork_game, container, false);
+        View view = inflater.inflate(R.layout.fragment_no_network_mimic, container, false);
 
-        mStateBanner = (GameStateBanner) view.findViewById(R.id.game_state);
+        mStateBanner = (MimicStateBanner) view.findViewById(R.id.mimic_state);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1);
         Game game = new Game(this);
@@ -63,7 +63,7 @@ public class GameNoNetworkFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mCallback = (GameResultListener) context;
+        mCallback = (MimicResultListener) context;
     }
 
     @Override
@@ -85,26 +85,26 @@ public class GameNoNetworkFragment extends Fragment {
     }
 
     protected void gameFailure() {
-        String failureMessage = getString(R.string.game_time_up_message);
+        String failureMessage = getString(R.string.mimic_time_up_message);
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_NONETWORK_TIMEOUT);
         Logger.track(userAction);
-        mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
+        mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
             @Override
             public void execute() {
-                mCallback.onGameFailure();
+                mCallback.onMimicFailure();
             }
         });
     }
 
     protected void gameSuccess() {
         mTimer.stop();
-        String successMessage = getString(R.string.game_success_message);
+        String successMessage = getString(R.string.mimic_success_message);
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_NONETWORK_SUCCESS);
         Logger.track(userAction);
-        mStateBanner.success(successMessage, new GameStateBanner.Command() {
+        mStateBanner.success(successMessage, new MimicStateBanner.Command() {
             @Override
             public void execute() {
-                mCallback.onGameSuccess(null);
+                mCallback.onMimicSuccess(null);
             }
         });
     }
@@ -114,9 +114,9 @@ public class GameNoNetworkFragment extends Fragment {
         private int mWidth, mHeight;
         private GameLoop mGameLoop;
         private GameEngine mGameEngine;
-        private GameNoNetworkFragment mParentFragment;
+        private MimicNoNetworkFragment mParentFragment;
 
-        public Game(GameNoNetworkFragment parent) {
+        public Game(MimicNoNetworkFragment parent) {
             super(getActivity());
             addOnLayoutChangeListener(this);
             SurfaceHolder holder = getHolder();

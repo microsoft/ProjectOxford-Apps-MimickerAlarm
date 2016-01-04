@@ -47,9 +47,9 @@ public class AlarmList {
         }
         values.put(AlarmTable.Columns.DAYS, repeatingDays);
         values.put(AlarmTable.Columns.VIBRATE, alarm.shouldVibrate());
-        values.put(AlarmTable.Columns.TONGUETWISTER, alarm.isTongueTwisterEnabled());
-        values.put(AlarmTable.Columns.COLORCOLLECTOR, alarm.isColorCollectorEnabled());
-        values.put(AlarmTable.Columns.EXPRESSYOURSELF, alarm.isExpressYourselfEnabled());
+        values.put(AlarmTable.Columns.TONGUE_TWISTER, alarm.isTongueTwisterEnabled());
+        values.put(AlarmTable.Columns.COLOR_CAPTURE, alarm.isColorCaptureEnabled());
+        values.put(AlarmTable.Columns.EXPRESS_YOURSELF, alarm.isExpressYourselfEnabled());
         values.put(AlarmTable.Columns.NEW, alarm.isNew() ? 1 : 0);
 
         return values;

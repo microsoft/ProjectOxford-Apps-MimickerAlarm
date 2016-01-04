@@ -10,14 +10,14 @@ import com.microsoft.mimicker.R;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GamesPreference extends MultiSelectListPreferenceWithSummary {
+public class MimicsPreference extends MultiSelectListPreferenceWithSummary {
 
     private boolean mTongueTwisterEnabled;
-    private boolean mColorCollectorEnabled;
+    private boolean mColorCaptureEnabled;
     private boolean mExpressYourselfEnabled;
     private boolean mChanged;
 
-    public GamesPreference(Context context, AttributeSet attrs) {
+    public MimicsPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -52,12 +52,12 @@ public class GamesPreference extends MultiSelectListPreferenceWithSummary {
         mTongueTwisterEnabled = tongueTwisterEnabled;
     }
 
-    public boolean isColorCollectorEnabled() {
-        return mColorCollectorEnabled;
+    public boolean isColorCaptureEnabled() {
+        return mColorCaptureEnabled;
     }
 
-    public void setColorCollectorEnabled(boolean colorCollectorEnabled) {
-        mColorCollectorEnabled = colorCollectorEnabled;
+    public void setColorCaptureEnabled(boolean colorCaptureEnabled) {
+        mColorCaptureEnabled = colorCaptureEnabled;
     }
 
     public boolean isExpressYourselfEnabled() {
@@ -71,22 +71,22 @@ public class GamesPreference extends MultiSelectListPreferenceWithSummary {
     public void setInitialValues() {
         Set<String> values = new HashSet<>();
         if (isTongueTwisterEnabled()) {
-            values.add(getContext().getString(R.string.pref_game_tongue_twister_id));
+            values.add(getContext().getString(R.string.pref_mimic_tongue_twister_id));
         }
-        if (isColorCollectorEnabled()) {
-            values.add(getContext().getString(R.string.pref_game_color_collector_id));
+        if (isColorCaptureEnabled()) {
+            values.add(getContext().getString(R.string.pref_mimic_color_capture_id));
         }
         if (isExpressYourselfEnabled()) {
-            values.add(getContext().getString(R.string.pref_game_express_yourself_id));
+            values.add(getContext().getString(R.string.pref_mimic_express_yourself_id));
         }
         setValues(values);
-        setSummaryValues(values, R.string.pref_no_game);
+        setSummaryValues(values, R.string.pref_no_mimics);
     }
 
     private void setGamePreferences(Set<String> values) {
-        setTongueTwisterEnabled(values.contains(getContext().getString(R.string.pref_game_tongue_twister_id)));
-        setColorCollectorEnabled(values.contains(getContext().getString(R.string.pref_game_color_collector_id)));
-        setExpressYourselfEnabled(values.contains(getContext().getString(R.string.pref_game_express_yourself_id)));
-        setSummaryValues(values, R.string.pref_no_game);
+        setTongueTwisterEnabled(values.contains(getContext().getString(R.string.pref_mimic_tongue_twister_id)));
+        setColorCaptureEnabled(values.contains(getContext().getString(R.string.pref_mimic_color_capture_id)));
+        setExpressYourselfEnabled(values.contains(getContext().getString(R.string.pref_mimic_express_yourself_id)));
+        setSummaryValues(values, R.string.pref_no_mimics);
     }
 }

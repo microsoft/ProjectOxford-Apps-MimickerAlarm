@@ -25,22 +25,23 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper{
                 AlarmTable.Columns.DAYS + ", " +
                 AlarmTable.Columns.TONE + ", " +
                 AlarmTable.Columns.VIBRATE + ", " +
-                AlarmTable.Columns.TONGUETWISTER + ", " +
-                AlarmTable.Columns.COLORCOLLECTOR + ", " +
-                AlarmTable.Columns.EXPRESSYOURSELF + ", " +
+                AlarmTable.Columns.TONGUE_TWISTER + ", " +
+                AlarmTable.Columns.COLOR_CAPTURE + ", " +
+                AlarmTable.Columns.EXPRESS_YOURSELF + ", " +
                 AlarmTable.Columns.NEW +
                 ")"
         );
     }
 
+    // TODO: Clean this up before publish
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         switch (oldVersion) {
             case 1:
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.VIBRATE);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.TONGUETWISTER);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.COLORCOLLECTOR);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.EXPRESSYOURSELF);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.TONGUE_TWISTER);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.COLOR_CAPTURE);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.EXPRESS_YOURSELF);
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.NEW);
                 break;
             case 2:

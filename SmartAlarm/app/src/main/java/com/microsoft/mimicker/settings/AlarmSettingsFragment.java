@@ -38,7 +38,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     private TimePreference mTimePreference;
     private RepeatingDaysPreference mRepeatingDaysPreference;
     private NamePreference mNamePreference;
-    private GamesPreference mGamesPreference;
+    private MimicsPreference mMimicsPreference;
     private RingtonePreference mRingtonePreference;
     private VibratePreference mVibratePreference;
     private ButtonsPreference mButtonsPreference;
@@ -75,7 +75,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         initializeTimePreference();
         initializeRepeatingDaysPreference();
         initializeNamePreference();
-        initializeGamesPreference();
+        initializeMimicsPreference();
         initializeRingtonePreference();
         initializeVibratePreference();
         initializeButtons();
@@ -127,12 +127,12 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         mNamePreference.setAlarmName(mAlarm.getTitle());
     }
 
-    private void initializeGamesPreference() {
-        mGamesPreference = (GamesPreference) findPreference(getString(R.string.pref_games_key));
-        mGamesPreference.setTongueTwisterEnabled(mAlarm.isTongueTwisterEnabled());
-        mGamesPreference.setColorCollectorEnabled(mAlarm.isColorCollectorEnabled());
-        mGamesPreference.setExpressYourselfEnabled(mAlarm.isExpressYourselfEnabled());
-        mGamesPreference.setInitialValues();
+    private void initializeMimicsPreference() {
+        mMimicsPreference = (MimicsPreference) findPreference(getString(R.string.pref_mimics_key));
+        mMimicsPreference.setTongueTwisterEnabled(mAlarm.isTongueTwisterEnabled());
+        mMimicsPreference.setColorCaptureEnabled(mAlarm.isColorCaptureEnabled());
+        mMimicsPreference.setExpressYourselfEnabled(mAlarm.isExpressYourselfEnabled());
+        mMimicsPreference.setInitialValues();
     }
 
     private void initializeRingtonePreference() {
@@ -177,7 +177,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
             DialogFragment dialogFragment = NamePreferenceDialogFragmentCompat.newInstance(preference);
             dialogFragment.setTargetFragment(this, 0);
             dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);
-        } else if (preference instanceof GamesPreference) {
+        } else if (preference instanceof MimicsPreference) {
             DialogFragment dialogFragment = MultiSelectListPreferenceDialogFragmentCompat.newInstance(preference);
             dialogFragment.setTargetFragment(this, 0);
             dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);
@@ -255,7 +255,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         return mTimePreference.hasChanged() ||
                 mRepeatingDaysPreference.hasChanged() ||
                 mNamePreference.hasChanged() ||
-                mGamesPreference.hasChanged() ||
+                mMimicsPreference.hasChanged() ||
                 mRingtonePreference.hasChanged() ||
                 mVibratePreference.hasChanged();
     }
@@ -282,10 +282,10 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     }
 
     private void updateGamesSetting() {
-        if (mGamesPreference.hasChanged()) {
-            mAlarm.setTongueTwisterEnabled(mGamesPreference.isTongueTwisterEnabled());
-            mAlarm.setColorCollectorEnabled(mGamesPreference.isColorCollectorEnabled());
-            mAlarm.setExpressYourselfEnabled(mGamesPreference.isExpressYourselfEnabled());
+        if (mMimicsPreference.hasChanged()) {
+            mAlarm.setTongueTwisterEnabled(mMimicsPreference.isTongueTwisterEnabled());
+            mAlarm.setColorCaptureEnabled(mMimicsPreference.isColorCaptureEnabled());
+            mAlarm.setExpressYourselfEnabled(mMimicsPreference.isExpressYourselfEnabled());
         }
     }
 

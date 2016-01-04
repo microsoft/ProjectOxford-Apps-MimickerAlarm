@@ -15,39 +15,39 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-public final class GameFactory {
+public final class MimicFactory {
 
-    private static final String TAG = "GameFactory";
+    private static final String TAG = "MimicFactory";
 
-    public static Fragment getGameFragment(Activity caller, UUID alarmId) {
+    public static Fragment getMimicFragment(Activity caller, UUID alarmId) {
         Alarm alarm = AlarmList.get(caller).getAlarm(alarmId);
-        List<Class> games = new ArrayList<>();
+        List<Class> mimics = new ArrayList<>();
 
         if (alarm.isTongueTwisterEnabled()) {
-            games.add(GameTwisterFragment.class);
+            mimics.add(MimicTongueTwisterFragment.class);
         }
-        if (alarm.isColorCollectorEnabled()) {
-            games.add(GameColorFinderFragment.class);
+        if (alarm.isColorCaptureEnabled()) {
+            mimics.add(MimicColorCaptureFragment.class);
         }
         if (alarm.isExpressYourselfEnabled()) {
-            games.add(GameEmotionFragment.class);
+            mimics.add(MimicExpressYourselfFragment.class);
         }
 
-        Class game = null;
-        if (games.size() > 0) {
+        Class mimic = null;
+        if (mimics.size() > 0) {
             if (isNetworkAvailable(caller)) {
-                int rand = new Random().nextInt(games.size());
-                game = games.get(rand);
+                int rand = new Random().nextInt(mimics.size());
+                mimic = mimics.get(rand);
             }
             else {
-                game = GameNoNetworkFragment.class;
+                mimic = MimicNoNetworkFragment.class;
             }
         }
 
         Fragment fragment = null;
-        if (game != null) {
+        if (mimic != null) {
             try {
-                fragment = (Fragment) game.newInstance();
+                fragment = (Fragment) mimic.newInstance();
             } catch (Exception e) {
                 Log.e(TAG, "Couldn't create fragment:", e);
             }
@@ -62,9 +62,9 @@ public final class GameFactory {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public interface GameResultListener {
-        void onGameSuccess(String shareable);
+    public interface MimicResultListener {
+        void onMimicSuccess(String shareable);
 
-        void onGameFailure();
+        void onMimicFailure();
     }
 }

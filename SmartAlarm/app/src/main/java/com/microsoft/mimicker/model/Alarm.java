@@ -22,7 +22,7 @@ public class Alarm {
     private boolean mIsEnabled;
     private boolean mVibrate;
     private boolean mTongueTwisterEnabled;
-    private boolean mColorCollectorEnabled;
+    private boolean mColorCaptureEnabled;
     private boolean mExpressYourselfEnabled;
     private boolean mNew;
 
@@ -40,7 +40,7 @@ public class Alarm {
         mIsEnabled = true;
         mVibrate = true;
         mTongueTwisterEnabled = true;
-        mColorCollectorEnabled = true;
+        mColorCaptureEnabled = true;
         mExpressYourselfEnabled = true;
         mNew = false;
     }
@@ -113,12 +113,12 @@ public class Alarm {
         mExpressYourselfEnabled = expressYourselfEnabled;
     }
 
-    public boolean isColorCollectorEnabled() {
-        return mColorCollectorEnabled;
+    public boolean isColorCaptureEnabled() {
+        return mColorCaptureEnabled;
     }
 
-    public void setColorCollectorEnabled(boolean colorCollectorEnabled) {
-        mColorCollectorEnabled = colorCollectorEnabled;
+    public void setColorCaptureEnabled(boolean colorCaptureEnabled) {
+        mColorCaptureEnabled = colorCaptureEnabled;
     }
 
     public boolean isTongueTwisterEnabled() {

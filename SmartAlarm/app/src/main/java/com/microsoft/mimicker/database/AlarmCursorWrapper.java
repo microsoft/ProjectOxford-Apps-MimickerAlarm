@@ -25,9 +25,9 @@ public class AlarmCursorWrapper extends CursorWrapper {
         }
         String[] repeatingDays = getString(getColumnIndex(AlarmTable.Columns.DAYS)).split(",");
         boolean vibrate = (getInt(getColumnIndex(AlarmTable.Columns.VIBRATE)) != 0);
-        boolean tongueTwister = (getInt(getColumnIndex(AlarmTable.Columns.TONGUETWISTER)) != 0);
-        boolean colorCollector = (getInt(getColumnIndex(AlarmTable.Columns.COLORCOLLECTOR)) != 0);
-        boolean expressYourself = (getInt(getColumnIndex(AlarmTable.Columns.EXPRESSYOURSELF)) != 0);
+        boolean tongueTwister = (getInt(getColumnIndex(AlarmTable.Columns.TONGUE_TWISTER)) != 0);
+        boolean colorCollector = (getInt(getColumnIndex(AlarmTable.Columns.COLOR_CAPTURE)) != 0);
+        boolean expressYourself = (getInt(getColumnIndex(AlarmTable.Columns.EXPRESS_YOURSELF)) != 0);
         boolean isNew = (getInt(getColumnIndex(AlarmTable.Columns.NEW)) != 0);
 
         Alarm alarm = new Alarm(UUID.fromString(uuidString));
@@ -41,7 +41,7 @@ public class AlarmCursorWrapper extends CursorWrapper {
         }
         alarm.setVibrate(vibrate);
         alarm.setTongueTwisterEnabled(tongueTwister);
-        alarm.setColorCollectorEnabled(colorCollector);
+        alarm.setColorCaptureEnabled(colorCollector);
         alarm.setExpressYourselfEnabled(expressYourself);
         alarm.setNew(isNew);
 

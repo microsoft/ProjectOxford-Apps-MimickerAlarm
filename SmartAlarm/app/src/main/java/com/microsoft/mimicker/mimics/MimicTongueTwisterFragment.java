@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.mimics.GameFactory.GameResultListener;
+import com.microsoft.mimicker.mimics.MimicFactory.MimicResultListener;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 import com.microsoft.mimicker.utilities.Util;
@@ -27,27 +27,27 @@ import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionServiceFac
 
 import java.util.Random;
 
-public class GameTwisterFragment extends Fragment implements ISpeechRecognitionServerEvents {
+public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecognitionServerEvents {
     private final static int TIMEOUT_MILLISECONDS = 15000;
     private final static float DIFFERENCE_SUCCESS_THRESHOLD = 0.3f;
     private final static float DIFFERENCE_PERFECT_THRESHOLD = 0.1f;
-    private static String LOGTAG = "GameTwisterFragment";
-    GameResultListener mCallback;
+    private static String LOGTAG = "MimicTongueTwisterFragment";
+    MimicResultListener mCallback;
     private MicrophoneRecognitionClient mMicClient = null;
     private SpeechRecognitionMode mRecognitionMode;
     private String mUnderstoodText = null;
     private String mQuestion = null;
     private ProgressButton mCaptureButton;
     private CountDownTimerView mTimer;
-    private GameStateBanner mStateBanner;
+    private MimicStateBanner mStateBanner;
     private TextView mTextResponse;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_twister_game, container, false);
+        View view = inflater.inflate(R.layout.fragment_tongue_twister_mimic, container, false);
         mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
-        mStateBanner = (GameStateBanner) view.findViewById(R.id.game_state);
+        mStateBanner = (MimicStateBanner) view.findViewById(R.id.mimic_state);
         mTextResponse = (TextView) view.findViewById(R.id.understood_text);
 
         generateQuestion(view);
@@ -62,7 +62,7 @@ public class GameTwisterFragment extends Fragment implements ISpeechRecognitionS
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mCallback = (GameResultListener) context;
+        mCallback = (MimicResultListener) context;
     }
 
     @Override
@@ -98,21 +98,21 @@ public class GameTwisterFragment extends Fragment implements ISpeechRecognitionS
 
     protected void gameSuccess(double difference) {
         mTimer.stop();
-        String successMessage = getString(R.string.game_success_message);
+        String successMessage = getString(R.string.mimic_success_message);
         if (difference <= DIFFERENCE_PERFECT_THRESHOLD) {
-            successMessage = getString(R.string.game_twister_perfect_message);
+            successMessage = getString(R.string.mimic_twister_perfect_message);
         }
-        mStateBanner.success(successMessage, new GameStateBanner.Command() {
+        mStateBanner.success(successMessage, new MimicStateBanner.Command() {
             @Override
             public void execute() {
-                mCallback.onGameSuccess(null);
+                mCallback.onMimicSuccess(null);
             }
         });
     }
     protected void gameFailure(boolean allowRetry) {
         if (allowRetry) {
-            String failureMessage = getString(R.string.game_failure_message);
-            mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
+            String failureMessage = getString(R.string.mimic_failure_message);
+            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
                 @Override
                 public void execute() {
                     mCaptureButton.readyAudio();
@@ -123,11 +123,11 @@ public class GameTwisterFragment extends Fragment implements ISpeechRecognitionS
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER_TIMEOUT);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
             Logger.track(userAction);
-            String failureMessage = getString(R.string.game_time_up_message);
-            mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
+            String failureMessage = getString(R.string.mimic_time_up_message);
+            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
                 @Override
                 public void execute() {
-                    mCallback.onGameFailure();
+                    mCallback.onMimicFailure();
                 }
             });
         }

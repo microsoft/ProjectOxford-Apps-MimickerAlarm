@@ -15,7 +15,7 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.mimics.GameFactory;
+import com.microsoft.mimicker.mimics.MimicFactory;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
 import com.microsoft.mimicker.scheduling.AlarmScheduler;
@@ -27,7 +27,7 @@ import com.microsoft.mimicker.utilities.Util;
 import java.util.UUID;
 
 public class AlarmRingingActivity extends AppCompatActivity
-        implements GameFactory.GameResultListener,
+        implements MimicFactory.MimicResultListener,
         ShareFragment.ShareResultListener,
         AlarmRingingFragment.RingingResultListener,
         AlarmSnoozeFragment.SnoozeResultListener,
@@ -105,7 +105,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onGameSuccess(String shareable) {
+    public void onMimicSuccess(String shareable) {
         cancelAlarmTimeout();
         mIsGameRunning = false;
         if (shareable != null && shareable.length() > 0) {
@@ -116,7 +116,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onGameFailure() {
+    public void onMimicFailure() {
         mIsGameRunning = false;
         if (mAlarmTimedOut) {
             finishActivity();
@@ -132,7 +132,7 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     @Override
     public void onRingingDismiss() {
-        Fragment gameFragment = GameFactory.getGameFragment(this, mAlarmId);
+        Fragment gameFragment = MimicFactory.getMimicFragment(this, mAlarmId);
         if (gameFragment != null) {
             mIsGameRunning = true;
             showFragment(gameFragment);

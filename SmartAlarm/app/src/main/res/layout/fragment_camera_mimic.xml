@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.microsoft.mimicker.mimics.GameStateBanner
-        android:id="@+id/game_state"
+    <com.microsoft.mimicker.mimics.MimicStateBanner
+        android:id="@+id/mimic_state"
         android:layout_width="match_parent"
         android:layout_height="90dp"
         android:layout_alignParentTop="true"

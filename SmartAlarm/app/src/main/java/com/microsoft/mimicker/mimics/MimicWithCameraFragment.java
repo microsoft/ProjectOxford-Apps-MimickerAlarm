@@ -17,23 +17,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.mimics.GameFactory.GameResultListener;
+import com.microsoft.mimicker.mimics.MimicFactory.MimicResultListener;
 import com.microsoft.mimicker.ringing.ShareFragment;
 import com.microsoft.mimicker.utilities.Logger;
 
 @SuppressWarnings("deprecation")
-abstract class GameWithCameraFragment extends Fragment {
+abstract class MimicWithCameraFragment extends Fragment {
 
-    private static final String LOGTAG = "GameWithCameraFragment";
+    private static final String LOGTAG = "MimicWithCameraFragment";
     private static final int TIMEOUT_MILLISECONDS = 30000;
     // Max width for sending to Project Oxford, reduce latency
     private static final int MAX_WIDTH = 500;
     protected static int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
-    GameResultListener mCallback;
+    MimicResultListener mCallback;
     private CameraPreview   mCameraPreview;
     private ProgressButton  mCaptureButton;
     private CountDownTimerView      mTimer;
-    private GameStateBanner mStateBanner;
+    private MimicStateBanner mStateBanner;
 
     private Point mSize;
     private CameraPreview.ImageCallback onCaptureCallback = new CameraPreview.ImageCallback() {
@@ -45,9 +45,9 @@ abstract class GameWithCameraFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_camera_game, container, false);
+        View view = inflater.inflate(R.layout.fragment_camera_mimic, container, false);
 
-        mStateBanner = (GameStateBanner) view.findViewById(R.id.game_state);
+        mStateBanner = (MimicStateBanner) view.findViewById(R.id.mimic_state);
         SurfaceView previewView = (SurfaceView) view.findViewById(R.id.camera_preview_view);
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -97,7 +97,7 @@ abstract class GameWithCameraFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mCallback = (GameResultListener) context;
+        mCallback = (MimicResultListener) context;
     }
 
     @Override
@@ -138,15 +138,15 @@ abstract class GameWithCameraFragment extends Fragment {
 
     protected void gameSuccess(final GameResult gameResult) {
         mTimer.stop();
-        String successMessage = getString(R.string.game_success_message);
+        String successMessage = getString(R.string.mimic_success_message);
         if (gameResult != null && gameResult.message != null) {
             successMessage = gameResult.message;
         }
-        mStateBanner.success(successMessage, new GameStateBanner.Command() {
+        mStateBanner.success(successMessage, new MimicStateBanner.Command() {
             @Override
             public void execute() {
                 if (gameResult.shareableUri != null) {
-                    mCallback.onGameSuccess(gameResult.shareableUri.getPath());
+                    mCallback.onMimicSuccess(gameResult.shareableUri.getPath());
                 }
             }
         });
@@ -156,22 +156,22 @@ abstract class GameWithCameraFragment extends Fragment {
         if (allowRetry) {
             mCameraPreview.start();
             mCaptureButton.readyCamera();
-            String failureMessage = getString(R.string.game_failure_message);
+            String failureMessage = getString(R.string.mimic_failure_message);
             if (gameResult != null && gameResult.message != null) {
                 failureMessage = gameResult.message;
             }
-            mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
+            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
                 @Override
                 public void execute() {
                     mTimer.resume();
                 }
             });
         } else {
-            String failureMessage = getString(R.string.game_time_up_message);
-            mStateBanner.failure(failureMessage, new GameStateBanner.Command() {
+            String failureMessage = getString(R.string.mimic_time_up_message);
+            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
                 @Override
                 public void execute() {
-                    mCallback.onGameFailure();
+                    mCallback.onMimicFailure();
                 }
             });
         }

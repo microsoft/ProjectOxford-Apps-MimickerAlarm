@@ -13,11 +13,11 @@
         android:key="@string/pref_name_key"
         android:title="@string/pref_title_name"/>
 
-    <com.microsoft.mimicker.settings.GamesPreference
-        android:entries="@array/pref_game_labels"
-        android:entryValues="@array/pref_game_values"
-        android:key="@string/pref_games_key"
-        android:title="@string/pref_title_game"/>
+    <com.microsoft.mimicker.settings.MimicsPreference
+        android:entries="@array/pref_mimic_labels"
+        android:entryValues="@array/pref_mimic_values"
+        android:key="@string/pref_mimics_key"
+        android:title="@string/pref_title_mimics"/>
 
     <com.microsoft.mimicker.settings.RingtonePreference
         android:key="@string/pref_ringtone_key"

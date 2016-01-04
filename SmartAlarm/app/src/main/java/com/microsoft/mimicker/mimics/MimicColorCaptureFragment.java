@@ -22,13 +22,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
-public class GameColorFinderFragment extends GameWithCameraFragment {
+public class MimicColorCaptureFragment extends MimicWithCameraFragment {
     private VisionServiceRestClient mVisionServiceRestClient;
     private String mQuestionColorName;
     private float[] mQuestionColorRangeLower;
     private float[] mQuestionColorRangeUpper;
 
-    public GameColorFinderFragment() {
+    public MimicColorCaptureFragment() {
         CameraFacing = Camera.CameraInfo.CAMERA_FACING_BACK;
     }
 
@@ -44,7 +44,7 @@ public class GameColorFinderFragment extends GameWithCameraFragment {
         String[] questions = resources.getStringArray(R.array.vision_color_questions);
         TextView instruction = (TextView) view.findViewById(R.id.instruction_text);
         mQuestionColorName = questions[new Random().nextInt(questions.length)];
-        instruction.setText(String.format(resources.getString(R.string.game_vision_prompt), mQuestionColorName));
+        instruction.setText(String.format(resources.getString(R.string.mimic_vision_prompt), mQuestionColorName));
 
         TypedArray colorCodeLower = resources.obtainTypedArray(resources.getIdentifier(mQuestionColorName + "_range_lower", "array", getActivity().getPackageName()));
         mQuestionColorRangeLower = new float[]{colorCodeLower.getFloat(0, 0f), colorCodeLower.getFloat(1, 0f), colorCodeLower.getFloat(2, 0f)};
