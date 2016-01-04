@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.microsoft.smartalarm.GameStateBanner
+    <com.microsoft.mimicker.GameStateBanner
         android:id="@+id/game_state"
         android:layout_width="match_parent"
         android:layout_height="80dp"
@@ -22,7 +22,7 @@
         android:orientation="vertical"
         android:padding="0dp">
 
-        <com.microsoft.smartalarm.CountDownTimerView
+        <com.microsoft.mimicker.CountDownTimerView
             android:id="@+id/countdown_timer"
             android:layout_width="match_parent"
             android:layout_height="20dp" />

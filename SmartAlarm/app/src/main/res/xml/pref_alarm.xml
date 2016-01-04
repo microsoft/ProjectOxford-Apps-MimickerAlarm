@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.microsoft.smartalarm.TimePreference
+    <com.microsoft.mimicker.TimePreference
         android:key="@string/pref_time_key" />
 
-    <com.microsoft.smartalarm.RepeatingDaysPreference
+    <com.microsoft.mimicker.RepeatingDaysPreference
         android:key="@string/pref_repeating_days_key"
         android:layout="@layout/preference_repeatingdays"
         android:title="@string/pref_title_repeating"/>
 
-    <com.microsoft.smartalarm.NamePreference
+    <com.microsoft.mimicker.NamePreference
         android:key="@string/pref_name_key"
         android:title="@string/pref_title_name"/>
 
-    <com.microsoft.smartalarm.GamesPreference
-        android:key="@string/pref_games_key"
-        android:title="@string/pref_title_game"
+    <com.microsoft.mimicker.GamesPreference
         android:entries="@array/pref_game_labels"
-        android:entryValues="@array/pref_game_values" />
+        android:entryValues="@array/pref_game_values"
+        android:key="@string/pref_games_key"
+        android:title="@string/pref_title_game"/>
 
-    <com.microsoft.smartalarm.RingtonePreference
+    <com.microsoft.mimicker.RingtonePreference
         android:key="@string/pref_ringtone_key"
         android:title="@string/pref_title_ringtone" />
 
-    <com.microsoft.smartalarm.VibratePreference
+    <com.microsoft.mimicker.VibratePreference
         android:key="@string/pref_vibrate_key"
         android:title="@string/pref_title_vibrate" />
 
-    <com.microsoft.smartalarm.ButtonsPreference
+    <com.microsoft.mimicker.ButtonsPreference
         android:key="@string/pref_buttons_key" />
 
 </PreferenceScreen>

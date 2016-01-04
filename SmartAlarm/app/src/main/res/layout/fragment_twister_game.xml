@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.microsoft.smartalarm.GameStateBanner
+    <com.microsoft.mimicker.GameStateBanner
         android:id="@+id/game_state"
         android:layout_width="match_parent"
         android:layout_height="90dp"
@@ -21,7 +21,7 @@
         android:orientation="vertical"
         android:padding="0dp">
 
-        <com.microsoft.smartalarm.CountDownTimerView
+        <com.microsoft.mimicker.CountDownTimerView
             android:id="@+id/countdown_timer"
             android:layout_width="match_parent"
             android:layout_height="20dp" />
@@ -58,9 +58,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/game_twister_i_said"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
+                android:text="@string/game_twister_i_said"
                 android:textSize="16sp"/>
             <TextView
                 android:id="@+id/understood_text"
@@ -78,7 +78,7 @@
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <com.microsoft.smartalarm.ProgressButton
+                <com.microsoft.mimicker.ProgressButton
                     android:id="@+id/capture_button"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
