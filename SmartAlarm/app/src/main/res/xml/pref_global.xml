@@ -1,6 +1,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.microsoft.mimicker.VolumeSliderPreference
+    <com.microsoft.mimicker.globalsettings.VolumeSliderPreference
         android:key="KEY_RING_VOLUME"/>
 
     <ListPreference

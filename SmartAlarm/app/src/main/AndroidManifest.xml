@@ -19,14 +19,14 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:name="com.microsoft.mimicker.AlarmApplication"
+        android:name="com.microsoft.mimicker.appcore.AlarmApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="com.microsoft.mimicker.AlarmMainActivity"
+            android:name="com.microsoft.mimicker.appcore.AlarmMainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -36,21 +36,21 @@
         </activity>
 
         <activity
-            android:name="com.microsoft.mimicker.AlarmRingingActivity"
+            android:name="com.microsoft.mimicker.ringing.AlarmRingingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
 
         <receiver
-            android:name="com.microsoft.mimicker.AlarmWakeReceiver"
+            android:name="com.microsoft.mimicker.ringing.AlarmWakeReceiver"
             android:enabled="true"
             android:exported="false"/>
 
         <service
-            android:name="com.microsoft.mimicker.AlarmRingingService"
+            android:name="com.microsoft.mimicker.ringing.AlarmRingingService"
             android:enabled="true"/>
 
         <receiver
-            android:name="com.microsoft.mimicker.AlarmRegistrar">
+            android:name="com.microsoft.mimicker.scheduling.AlarmRegistrar">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
@@ -60,23 +60,23 @@
         </receiver>
 
         <activity
-            android:name="com.microsoft.mimicker.AlarmGlobalSettingsActivity"
+            android:name="com.microsoft.mimicker.globalsettings.AlarmGlobalSettingsActivity"
             android:label="@string/title_activity_alarm_settings"
-            android:parentActivityName="com.microsoft.mimicker.AlarmMainActivity"
+            android:parentActivityName="com.microsoft.mimicker.appcore.AlarmMainActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.microsoft.mimicker.AlarmMainActivity"/>
+                android:value="com.microsoft.mimicker.appcore.AlarmMainActivity"/>
         </activity>
 
         <activity
-            android:name="com.microsoft.mimicker.LearnMoreActivity"
+            android:name="com.microsoft.mimicker.appcore.LearnMoreActivity"
             android:label="@string/title_activity_learn_more"
-            android:parentActivityName="com.microsoft.mimicker.AlarmMainActivity"
+            android:parentActivityName="com.microsoft.mimicker.appcore.AlarmMainActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.microsoft.mimicker.AlarmMainActivity"/>
+                android:value="com.microsoft.mimicker.appcore.AlarmMainActivity"/>
         </activity>
 
         <activity android:name="net.hockeyapp.android.UpdateActivity"/>
