@@ -1,6 +1,8 @@
 package com.microsoft.smartalarm;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.Context;
@@ -19,6 +21,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,14 +33,18 @@ public class AlarmRingingFragment extends Fragment {
     private static final String ARGS_ALARM_ID = "alarm_id";
     private static final int CLOCK_ANIMATION_DURATION = 1500;
     private static final int SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY = 250;
+    private static final float ARROW_ANIMATING_WIDTH = 40f;
     public final String TAG = this.getClass().getSimpleName();
     RingingResultListener mCallback;
     private MediaPlayer mPlayer;
     private Vibrator mVibrator;
     private ImageView mAlarmRingingClock;
+    private ImageView mArrowLeft;
+    private ImageView mArrowRight;
+
     private UUID mAlarmId;
     private boolean mShowClockOnDragEnd;
-    private ObjectAnimator mAnimateClock;
+    private AnimatorSet mRingingAnimatorSet;
     private Alarm mAlarm;
 
     public interface RingingResultListener {
@@ -135,6 +143,9 @@ public class AlarmRingingFragment extends Fragment {
             }
         });
 
+        mArrowLeft = (ImageView) view.findViewById(R.id.alarm_ringing_left_arrow);
+        mArrowRight = (ImageView) view.findViewById(R.id.alarm_ringing_right_arrow);
+
         initializeClockAnimation();
         initializeMediaPlayer();
 
@@ -184,7 +195,7 @@ public class AlarmRingingFragment extends Fragment {
         vibrateDeviceIfDesired();
         mShowClockOnDragEnd = true;
         mAlarmRingingClock.setVisibility(View.VISIBLE);
-        mAnimateClock.start();
+        mRingingAnimatorSet.start();
 
         Util.registerCrashReport(getActivity());
     }
@@ -197,7 +208,7 @@ public class AlarmRingingFragment extends Fragment {
 
         cancelAlarmSound();
         cancelVibration();
-        mAnimateClock.cancel();
+        mRingingAnimatorSet.cancel();
     }
 
     @Override
@@ -273,9 +284,31 @@ public class AlarmRingingFragment extends Fragment {
     }
 
     private void initializeClockAnimation() {
-        mAnimateClock = ObjectAnimator.ofFloat(mAlarmRingingClock, "translationY", -35f, 0f);
-        mAnimateClock.setDuration(CLOCK_ANIMATION_DURATION);
-        mAnimateClock.setInterpolator(new BounceInterpolator());
-        mAnimateClock.setRepeatCount(ValueAnimator.INFINITE);
+        // Show a growing clock and then shrinking again repeatedly
+        PropertyValuesHolder scaleXAnimation = PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.5f, 1f);
+        PropertyValuesHolder scaleYAnimation = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.5f, 1f);
+
+        mRingingAnimatorSet = new AnimatorSet();
+
+        ObjectAnimator animateClock = ObjectAnimator.ofPropertyValuesHolder(mAlarmRingingClock, scaleXAnimation, scaleYAnimation);
+        animateClock.setDuration(CLOCK_ANIMATION_DURATION);
+        animateClock.setInterpolator(new AccelerateDecelerateInterpolator());
+        animateClock.setRepeatCount(ValueAnimator.INFINITE);
+
+        ObjectAnimator animatedLeftArrow = ObjectAnimator.ofFloat(mArrowLeft, "x", ARROW_ANIMATING_WIDTH, 0f);
+        animatedLeftArrow.setInterpolator(new AccelerateInterpolator());
+        animatedLeftArrow.setDuration(CLOCK_ANIMATION_DURATION);
+        animatedLeftArrow.setRepeatCount(ValueAnimator.INFINITE);
+
+        ObjectAnimator animatedRightArrow = ObjectAnimator.ofFloat(mArrowRight, "x", -ARROW_ANIMATING_WIDTH, 0f);
+        animatedRightArrow.setInterpolator(new AccelerateInterpolator());
+        animatedRightArrow.setDuration(CLOCK_ANIMATION_DURATION);
+        animatedRightArrow.setRepeatCount(ValueAnimator.INFINITE);
+
+        mRingingAnimatorSet
+                .play(animateClock)
+                .with(animatedLeftArrow)
+                .with(animatedRightArrow);
+
     }
 }
