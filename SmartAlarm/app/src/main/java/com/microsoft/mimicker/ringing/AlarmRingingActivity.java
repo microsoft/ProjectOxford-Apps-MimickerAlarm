@@ -31,7 +31,7 @@ public class AlarmRingingActivity extends AppCompatActivity
         ShareFragment.ShareResultListener,
         AlarmRingingFragment.RingingResultListener,
         AlarmSnoozeFragment.SnoozeResultListener,
-        AlarmNoGamesFragment.NoGameResultListener,
+        AlarmNoMimicsFragment.NoMimicResultListener,
         AlarmSettingsFragment.AlarmSettingsListener {
 
     private static final String DEFAULT_DURATION_STRING = "60000";
@@ -138,7 +138,7 @@ public class AlarmRingingActivity extends AppCompatActivity
             showFragment(gameFragment);
         } else {
             cancelAlarmTimeout();
-            showFragment(AlarmNoGamesFragment.newInstance(mAlarmId.toString()));
+            showFragment(AlarmNoMimicsFragment.newInstance(mAlarmId.toString()));
         }
     }
 
@@ -155,7 +155,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onNoGameDismiss(boolean launchSettings) {
+    public void onNoMimicDismiss(boolean launchSettings) {
         if (launchSettings) {
             mEditingSettings = true;
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
