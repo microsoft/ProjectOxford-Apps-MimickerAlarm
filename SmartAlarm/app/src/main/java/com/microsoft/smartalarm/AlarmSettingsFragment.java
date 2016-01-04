@@ -216,14 +216,14 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         Logger.track(userAction);
 
         populateUpdatedSettings();
-        mAlarm.setNew(false);
 
-        if (mAlarm.isEnabled()) {
+        if (mAlarm.isEnabled() && !mAlarm.isNew()) {
             AlarmScheduler.cancelAlarm(getContext(), mAlarm);
         } else {
             mAlarm.setIsEnabled(true);
         }
 
+        mAlarm.setNew(false);
         AlarmList.get(getActivity()).updateAlarm(mAlarm);
         AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
 
@@ -235,7 +235,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
 
-        if (mAlarm.isEnabled()) {
+        if (mAlarm.isEnabled() && !mAlarm.isNew()) {
             AlarmScheduler.cancelAlarm(getContext(), mAlarm);
         }
         AlarmList.get(getActivity()).deleteAlarm(mAlarm);

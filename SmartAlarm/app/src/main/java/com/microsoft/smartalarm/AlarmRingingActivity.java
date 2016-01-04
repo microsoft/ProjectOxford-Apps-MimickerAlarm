@@ -64,6 +64,11 @@ public class AlarmRingingActivity extends AppCompatActivity
         mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
         mAlarm = AlarmList.get(this).getAlarm(mAlarmId);
 
+        // Schedule the next repeating alarm if necessary
+        if (!mAlarm.isOneShot()) {
+            AlarmScheduler.scheduleAlarm(this, mAlarm);
+        }
+
         Log.d(TAG, "Creating activity!");
 
         // This call must be made before setContentView to avoid the view being refreshed

@@ -143,16 +143,16 @@ public class AlarmRingingFragment extends Fragment {
         appAction.putJSON(mAlarm.toJSON());
         Logger.track(appAction);
 
-        if (mAlarm.isOneShot()) {
-            mAlarm.setIsEnabled(false);
-            AlarmList.get(getContext()).updateAlarm(mAlarm);
-        }
-
         return view;
     }
 
     private void dismissAlarm() {
         mShowClockOnDragEnd = false;
+
+        if (mAlarm.isOneShot()) {
+            mAlarm.setIsEnabled(false);
+            AlarmList.get(getContext()).updateAlarm(mAlarm);
+        }
 
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
         Alarm alarm = AlarmList.get(getContext()).getAlarm(mAlarmId);

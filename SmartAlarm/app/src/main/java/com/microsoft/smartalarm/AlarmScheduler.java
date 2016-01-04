@@ -62,12 +62,11 @@ public final class AlarmScheduler {
 
         final int nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         final int nowMinute = Calendar.getInstance().get(Calendar.MINUTE);
-        final int nowDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 
         // if we cannot schedule today then set the alarm for tomorrow
         if ((alarm.getTimeHour() < nowHour) ||
             (alarm.getTimeHour() == nowHour && alarm.getTimeMinute() <= nowMinute)) {
-            calendarAlarm.set(Calendar.DAY_OF_WEEK, getNextWeekday(nowDay));
+            calendarAlarm.add(Calendar.DATE, 1);
         }
 
         PendingIntent pendingIntent = createPendingIntent(context, alarm);
@@ -85,12 +84,15 @@ public final class AlarmScheduler {
         final int nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         final int nowMinute = Calendar.getInstance().get(Calendar.MINUTE);
 
-        // First check if it's later in the week
+        // First check if it's later today or later in the week
         for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; ++dayOfWeek) {
             if (alarm.getRepeatingDay(dayOfWeek - 1) && dayOfWeek >= nowDay &&
                     !(dayOfWeek == nowDay && alarm.getTimeHour() < nowHour) &&
                     !(dayOfWeek == nowDay && alarm.getTimeHour() == nowHour && alarm.getTimeMinute() <= nowMinute)) {
-                calendarAlarm.set(Calendar.DAY_OF_WEEK, dayOfWeek);
+                // Only increment the calendar if the alarm isn't for later today
+                if (dayOfWeek > nowDay) {
+                    calendarAlarm.add(Calendar.DATE, dayOfWeek - nowDay);
+                }
                 thisWeek = true;
                 break;
             }
@@ -99,15 +101,13 @@ public final class AlarmScheduler {
         if (!thisWeek) {
             for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; ++dayOfWeek) {
                 if (alarm.getRepeatingDay(dayOfWeek - 1) && dayOfWeek <= nowDay) {
-                    calendarAlarm.set(Calendar.DAY_OF_WEEK, dayOfWeek);
-                    calendarAlarm.add(Calendar.WEEK_OF_YEAR, 1);
+                    calendarAlarm.add(Calendar.DATE, (7 - nowDay) + dayOfWeek);
                     break;
                 }
             }
         }
 
         PendingIntent pendingIntent = createPendingIntent(context, alarm);
-        // TODO Ensure we make repeating beyond a week
         setAlarm(context, calendarAlarm, pendingIntent);
     }
 
@@ -115,23 +115,15 @@ public final class AlarmScheduler {
         Intent intent = new Intent(context, AlarmWakeReceiver.class);
         intent.putExtra(ALARM_ID, alarm.getId());
 
-        return PendingIntent.getBroadcast(context, (int) alarm.getId().getLeastSignificantBits(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(context, (int)Math.abs(alarm.getId().getLeastSignificantBits()), intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private static void setAlarm(Context context, Calendar calendar, PendingIntent pIntent) {
+    private static void setAlarm(Context context, Calendar calendar, PendingIntent pendingIntent) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pIntent);
-        }
-    }
-
-    private static int getNextWeekday(int day) {
-        if (day == Calendar.SATURDAY) {
-            return Calendar.SUNDAY;
-        } else {
-            return day + 1;
+            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }
     }
 }

@@ -42,6 +42,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper{
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.COLORCOLLECTOR);
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.EXPRESSYOURSELF);
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.NEW);
+                break;
             case 2:
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.NEW);
 
