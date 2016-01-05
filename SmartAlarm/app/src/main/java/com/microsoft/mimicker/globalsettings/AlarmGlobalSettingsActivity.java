@@ -2,12 +2,18 @@ package com.microsoft.mimicker.globalsettings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.microsoft.mimicker.R;
 
@@ -56,6 +62,17 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
             mRingDuration = (ListPreference)findPreference("KEY_RING_DURATION");
             mAlarmVolume = (VolumeSliderPreference)findPreference("KEY_RING_VOLUME");
             setDefaultSummaryValues();
+        }
+
+        @Override
+        public RecyclerView onCreateRecyclerView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+            LinearLayout rootLayout = (LinearLayout) parent.getParent();
+            AppBarLayout appBarLayout = (AppBarLayout) LayoutInflater.from(getContext()).inflate(R.layout.settings_toolbar, rootLayout, false);
+            rootLayout.addView(appBarLayout, 0); // insert at top
+            Toolbar bar = (Toolbar) appBarLayout.findViewById(R.id.settings_toolbar);
+            ((AppCompatActivity) getActivity()).setSupportActionBar(bar);
+            RecyclerView recyclerView =  super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+            return recyclerView;
         }
 
         @Override

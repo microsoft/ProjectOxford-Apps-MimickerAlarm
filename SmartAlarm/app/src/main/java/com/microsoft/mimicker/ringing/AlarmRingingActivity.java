@@ -99,7 +99,10 @@ public class AlarmRingingActivity extends AppCompatActivity
             }
         };
         mHandler = new Handler();
-        mHandler.postDelayed(mAlarmCancelTask, getAlarmRingingDuration());
+        int ringingDuration = getAlarmRingingDuration();
+        if (ringingDuration > 0) {
+            mHandler.postDelayed(mAlarmCancelTask, ringingDuration);
+        }
 
         bindRingingService();
     }

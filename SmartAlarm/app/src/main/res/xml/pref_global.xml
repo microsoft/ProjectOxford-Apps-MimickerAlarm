@@ -4,14 +4,14 @@
         android:key="KEY_RING_VOLUME"/>
 
     <ListPreference
-        android:defaultValue="1800000"
+        android:defaultValue="@string/pref_default_ring_duration_value"
         android:entries="@array/pref_ring_duration_labels"
         android:entryValues="@array/pref_ring_duration_values"
         android:key="KEY_RING_DURATION"
         android:title="@string/pref_title_ring_duration"/>
 
     <ListPreference
-        android:defaultValue="60000"
+        android:defaultValue="@string/pref_default_snooze_duration_value"
         android:entries="@array/pref_snooze_duration_labels"
         android:entryValues="@array/pref_snooze_duration_values"
         android:key="KEY_SNOOZE_DURATION"

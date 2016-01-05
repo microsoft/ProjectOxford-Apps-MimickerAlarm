@@ -27,8 +27,7 @@
 
         <activity
             android:name="com.microsoft.mimicker.appcore.AlarmMainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -71,7 +70,6 @@
 
         <activity
             android:name="com.microsoft.mimicker.appcore.LearnMoreActivity"
-            android:label="@string/title_activity_learn_more"
             android:parentActivityName="com.microsoft.mimicker.appcore.AlarmMainActivity"
             android:screenOrientation="portrait">
             <meta-data
