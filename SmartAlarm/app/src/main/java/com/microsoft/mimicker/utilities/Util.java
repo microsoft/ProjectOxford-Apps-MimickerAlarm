@@ -39,8 +39,7 @@ public class Util {
     }
 
     public static Uri defaultRingtone() {
-        Uri defaultUri = Uri.parse("android.resource://" + BuildConfig.APPLICATION_ID + "/" + R.raw.mimicker_ringtone);
-        return defaultUri;
+        return Uri.parse("android.resource://" + BuildConfig.APPLICATION_ID + "/" + R.raw.mimicker_ringtone);
     }
 
     public static void stripUnderlines(TextView textView) {

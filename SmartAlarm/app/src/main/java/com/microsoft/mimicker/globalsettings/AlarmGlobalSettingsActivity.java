@@ -71,8 +71,7 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
             rootLayout.addView(appBarLayout, 0); // insert at top
             Toolbar bar = (Toolbar) appBarLayout.findViewById(R.id.settings_toolbar);
             ((AppCompatActivity) getActivity()).setSupportActionBar(bar);
-            RecyclerView recyclerView =  super.onCreateRecyclerView(inflater, parent, savedInstanceState);
-            return recyclerView;
+            return super.onCreateRecyclerView(inflater, parent, savedInstanceState);
         }
 
         @Override
