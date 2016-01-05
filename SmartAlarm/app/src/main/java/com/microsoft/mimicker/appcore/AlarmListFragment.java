@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.globalsettings.AlarmGlobalSettingsActivity;
@@ -229,7 +230,11 @@ public class AlarmListFragment extends Fragment implements
                     mAlarm.setIsEnabled(mAlarmEnabled.isChecked());
                     AlarmList.get(getActivity()).updateAlarm(mAlarm);
                     if (mAlarm.isEnabled()) {
-                        AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
+                        long alarmTime = AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
+                        Toast.makeText(getActivity(),
+                                AlarmUtils.getTimeUntilAlarmDisplayString(getActivity(), alarmTime),
+                                Toast.LENGTH_LONG)
+                                .show();
                     } else {
                         AlarmScheduler.cancelAlarm(getContext(), mAlarm);
                     }
@@ -343,12 +348,8 @@ public class AlarmListFragment extends Fragment implements
             notifyItemRemoved(position);
 
             // If we are down to the last item, ensure we show the empty list graphic
-            if (mAlarms.size() == 0) {
-                AlarmListFragment alarmList = (AlarmListFragment)getFragmentManager()
-                        .findFragmentByTag(ALARM_LIST_FRAGMENT_TAG);
-                if (alarmList != null) {
-                    alarmList.updateUI();
-                }
+            if (getItemCount() == 0) {
+                updateUI();
             }
         }
 

@@ -17,11 +17,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
 import com.microsoft.mimicker.scheduling.AlarmScheduler;
+import com.microsoft.mimicker.utilities.AlarmUtils;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 
@@ -225,7 +227,11 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
 
         mAlarm.setNew(false);
         AlarmList.get(getActivity()).updateAlarm(mAlarm);
-        AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
+        long alarmTime = AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
+        Toast.makeText(getActivity(),
+                AlarmUtils.getTimeUntilAlarmDisplayString(getActivity(), alarmTime),
+                Toast.LENGTH_LONG)
+                .show();
 
         mCallback.onSettingsSaveOrIgnoreChanges();
     }

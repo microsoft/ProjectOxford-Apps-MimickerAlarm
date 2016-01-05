@@ -5,12 +5,17 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.ibm.icu.text.SimpleDateFormat;
+import com.ibm.icu.util.Calendar;
+import com.ibm.icu.text.MessageFormat;
 import com.microsoft.mimicker.R;
+
 
 import java.text.Format;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public final class AlarmUtils {
 
@@ -73,6 +78,54 @@ public final class AlarmUtils {
         } else {
             return getShortDayNamesString(daysOfWeek);
         }
+    }
+
+    public static String getTimeUntilAlarmDisplayString(Context context, long timeUntilAlarm) {
+        Calendar calendarNow = Calendar.getInstance();
+        Calendar calendarAlarm = Calendar.getInstance();
+        calendarAlarm.setTimeInMillis(timeUntilAlarm);
+        Date alarmTime = calendarAlarm.getTime();
+
+        // It's very important we make the fieldDifference calls in this order.  Each time
+        // calendarNow moves closer to alarmTime by the difference units it returns. This implies
+        // that you start with the largest calendar unit and move to smaller ones if you want
+        // accurate results for different units between the two times.
+        int days = Math.max(0, calendarNow.fieldDifference(alarmTime, Calendar.DATE));
+        int hours = Math.max(0, calendarNow.fieldDifference(alarmTime, Calendar.HOUR_OF_DAY));
+        int minutes = Math.max(0, calendarNow.fieldDifference(alarmTime, Calendar.MINUTE));
+
+        Map<String,Integer> args = new HashMap<>();
+        try {
+            args.put("days", days);
+            args.put("hours", hours);
+            args.put("minutes", minutes);
+        } catch (Exception e) {
+            Logger.trackException(e);
+        }
+
+        int resourceIdForDisplayString;
+        if (days > 0) {
+            if (hours > 0 && minutes > 0) {
+                resourceIdForDisplayString = R.string.alarm_set_day_hour_minute;
+            } else if (hours > 0) {
+                resourceIdForDisplayString = R.string.alarm_set_day_hour;
+            } else if (minutes > 0) {
+                resourceIdForDisplayString = R.string.alarm_set_day_minute;
+            } else {
+                resourceIdForDisplayString = R.string.alarm_set_day;
+            }
+        } else if (hours > 0) {
+            if (minutes > 0) {
+                resourceIdForDisplayString = R.string.alarm_set_hour_minute;
+            } else {
+                resourceIdForDisplayString = R.string.alarm_set_hour;
+            }
+        } else if (minutes > 0) {
+            resourceIdForDisplayString = R.string.alarm_set_minute;
+        } else {
+            resourceIdForDisplayString = R.string.alarm_set_less_than_minute;
+        }
+        return new MessageFormat(context.getString(resourceIdForDisplayString)).format(args);
     }
 
     public static void setLockScreenFlags(Window window) {

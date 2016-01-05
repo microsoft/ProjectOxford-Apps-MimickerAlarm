@@ -37,11 +37,19 @@ public final class AlarmScheduler {
         }
     }
 
-    public static void scheduleAlarm(Context context, Alarm alarm) {
+    public static long scheduleAlarm(Context context, Alarm alarm) {
+        PendingIntent pendingIntent = createPendingIntent(context, alarm);
+        Calendar calenderNow = Calendar.getInstance();
+        long time = getTimeUntilAlarm(calenderNow, alarm);
+        setAlarm(context, time, pendingIntent);
+        return time;
+    }
+
+    public static long getTimeUntilAlarm(Calendar calendarFrom, Alarm alarm) {
         if (alarm.isOneShot()) {
-            scheduleOneShot(context, alarm);
+            return getTimeUntilOneShotAlarm(calendarFrom, alarm);
         } else {
-            scheduleRepeating(context, alarm);
+            return getTimeUntilRepeatingAlarm(calendarFrom, alarm);
         }
     }
 
@@ -50,7 +58,7 @@ public final class AlarmScheduler {
         long now = calendarAlarm.getTimeInMillis();
         calendarAlarm.setTimeInMillis(now + snoozePeriod);
         PendingIntent pendingIntent = createPendingIntent(context, alarm);
-        setAlarm(context, calendarAlarm, pendingIntent);
+        setAlarm(context, calendarAlarm.getTimeInMillis(), pendingIntent);
     }
 
     public static void cancelAlarm(Context context, Alarm alarm) {
@@ -59,14 +67,14 @@ public final class AlarmScheduler {
         alarmManager.cancel(pIntent);
     }
 
-    private static void scheduleOneShot(Context context, Alarm alarm) {
+    private static long getTimeUntilOneShotAlarm(Calendar calendarFrom, Alarm alarm) {
         Calendar calendarAlarm = Calendar.getInstance();
         calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
         calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
         calendarAlarm.set(Calendar.SECOND, 0);
 
-        final int nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        final int nowMinute = Calendar.getInstance().get(Calendar.MINUTE);
+        final int nowHour = calendarFrom.get(Calendar.HOUR_OF_DAY);
+        final int nowMinute = calendarFrom.get(Calendar.MINUTE);
 
         // if we cannot schedule today then set the alarm for tomorrow
         if ((alarm.getTimeHour() < nowHour) ||
@@ -74,20 +82,19 @@ public final class AlarmScheduler {
             calendarAlarm.add(Calendar.DATE, 1);
         }
 
-        PendingIntent pendingIntent = createPendingIntent(context, alarm);
-        setAlarm(context, calendarAlarm, pendingIntent);
+        return calendarAlarm.getTimeInMillis();
     }
 
-    private static void scheduleRepeating(Context context, Alarm alarm) {
+    private static long getTimeUntilRepeatingAlarm(Calendar calendarFrom, Alarm alarm) {
         Calendar calendarAlarm = Calendar.getInstance();
         calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
         calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
         calendarAlarm.set(Calendar.SECOND, 0);
         boolean thisWeek = false;
 
-        final int nowDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-        final int nowHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        final int nowMinute = Calendar.getInstance().get(Calendar.MINUTE);
+        final int nowDay = calendarFrom.get(Calendar.DAY_OF_WEEK);
+        final int nowHour = calendarFrom.get(Calendar.HOUR_OF_DAY);
+        final int nowMinute = calendarFrom.get(Calendar.MINUTE);
 
         // First check if it's later today or later in the week
         for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; ++dayOfWeek) {
@@ -112,8 +119,7 @@ public final class AlarmScheduler {
             }
         }
 
-        PendingIntent pendingIntent = createPendingIntent(context, alarm);
-        setAlarm(context, calendarAlarm, pendingIntent);
+        return calendarAlarm.getTimeInMillis();
     }
 
     private static PendingIntent createPendingIntent(Context context, Alarm alarm) {
@@ -123,12 +129,12 @@ public final class AlarmScheduler {
         return PendingIntent.getBroadcast(context, (int)Math.abs(alarm.getId().getLeastSignificantBits()), intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private static void setAlarm(Context context, Calendar calendar, PendingIntent pendingIntent) {
+    private static void setAlarm(Context context, long time, PendingIntent pendingIntent) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
         } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
         }
     }
 }
