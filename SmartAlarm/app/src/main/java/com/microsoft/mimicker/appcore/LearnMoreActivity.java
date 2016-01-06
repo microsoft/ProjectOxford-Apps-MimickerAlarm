@@ -2,6 +2,7 @@ package com.microsoft.mimicker.appcore;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,6 +16,9 @@ public class LearnMoreActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_more);
+
+        Toolbar bar = (Toolbar) findViewById(R.id.learn_more_toolbar);
+        setSupportActionBar(bar);
 
         LinearLayout linksHolder = (LinearLayout) findViewById(R.id.learn_more_links);
         for( int i = 0; i < linksHolder.getChildCount(); i++ ) {

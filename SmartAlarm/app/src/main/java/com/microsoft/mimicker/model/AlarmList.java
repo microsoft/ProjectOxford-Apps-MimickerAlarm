@@ -15,6 +15,8 @@ import java.util.UUID;
 
 public class AlarmList {
     private static AlarmList sAlarmList;
+    private static final String ORDER_BY = AlarmTable.Columns.HOUR + ", " +
+                                            AlarmTable.Columns.MINUTE;
 
     private Context mContext;
     private SQLiteDatabase mDatabase;
@@ -64,7 +66,7 @@ public class AlarmList {
     public List<Alarm> getAlarms() {
         List<Alarm> alarms = new ArrayList<>();
 
-        AlarmCursorWrapper cursor = queryAlarms(null, null);
+        AlarmCursorWrapper cursor = queryAlarms(null, null, ORDER_BY);
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -79,7 +81,8 @@ public class AlarmList {
     public Alarm getAlarm(UUID id) {
         AlarmCursorWrapper cursor = queryAlarms(
                 AlarmTable.Columns.UUID + " = ?",
-                new String[]{id.toString()}
+                new String[]{id.toString()},
+                null
         );
 
         try {
@@ -108,7 +111,7 @@ public class AlarmList {
                 new String[] { alarm.getId().toString() });
     }
 
-    private AlarmCursorWrapper queryAlarms(String queryClause, String[] queryArgs) {
+    private AlarmCursorWrapper queryAlarms(String queryClause, String[] queryArgs, String orderBy) {
         Cursor cursor = mDatabase.query(
                 AlarmTable.NAME,
                 null, // gets all columns
@@ -116,7 +119,7 @@ public class AlarmList {
                 queryArgs,
                 null,
                 null,
-                null
+                orderBy
         );
 
         return new AlarmCursorWrapper(cursor);

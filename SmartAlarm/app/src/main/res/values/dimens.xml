@@ -7,6 +7,6 @@
     <dimen name="alarm_list_item_height">90dp</dimen>
     <dimen name="alarm_list_item_height_tall">115dp</dimen>
     <dimen name="repeating_day_height">40dp</dimen>
-    <dimen name="repeating_day_padding">6dp</dimen>
+    <dimen name="repeating_day_padding">3dp</dimen>
     <dimen name="alarm_list_delete_icon_padding">16dp</dimen>
 </resources>

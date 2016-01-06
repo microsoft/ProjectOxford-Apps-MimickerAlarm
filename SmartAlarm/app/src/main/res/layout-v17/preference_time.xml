@@ -4,6 +4,9 @@
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeightSmall"
     android:gravity="center_vertical"
+    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+    android:background="?android:attr/selectableItemBackground"
     android:clipToPadding="false"
     android:focusable="true" >
 
@@ -11,26 +14,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingTop="16dp"
+        android:paddingTop="36dp"
         android:paddingBottom="16dp">
 
         <TextView
-            android:id="@+id/volume_label"
+            android:id="@+id/time_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pref_title_volume"
+            android:text="@string/pref_title_repeating"
             android:singleLine="true"
-            android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:ellipsize="marquee"
-            android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-            android:paddingRight="?android:attr/listPreferredItemPaddingRight"
             />
-
-        <SeekBar
-            android:id="@+id/volume_level"
-            android:layout_below="@id/volume_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
     </RelativeLayout>
 

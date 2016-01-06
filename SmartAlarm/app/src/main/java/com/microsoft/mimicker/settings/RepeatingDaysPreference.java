@@ -98,7 +98,7 @@ public class RepeatingDaysPreference extends Preference {
             if (mRepeating){
                 float centerX = getWidth() / 2;
                 float centerY = getHeight() / 2;
-                canvas.drawCircle(centerX, centerY, centerX - mPadding, mPaint);
+                canvas.drawCircle(centerX, centerY, centerY - mPadding, mPaint);
                 setTypeface(null, Typeface.BOLD);
             }
             else{
