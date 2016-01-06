@@ -1,20 +1,20 @@
 Contributing to Project Oxford Mimicker Alaram
 ===============================================
 
-So, you enjoy the Mimicker Alarm and want to contribute on it. Here's what you need to know.
+So, you enjoy the Mimicker Alarm and want to contribute. Here's what you need to know.
 
 Coding Guidelines for Android
 -------------------------
 
-We follow this guideline for Java coding convention: http://source.android.com/source/code-style.html 
+We follow this guideline for Java coding convention: http://source.android.com/source/code-style.html
 
 Pull Request 
 -------------------------
 
-We will welcome your contributions and will review your contributions. Microsoft reserves the right to reject a contribution based on technical reasons, product reasons, and licesncing reasons.
+We welcome your contributions to our project! Develop in your own fork and once you submit your pull request, we will review your changes. Microsoft reserves the right to reject a contribution based on technical, product, and/or licensing reasons.
 
 Project Oxford Subscription Keys
 -------------------------
-For you to fully build and test your contribution, you should use your own subscription keys for Project Oxford, and SmartAlarm\gradle.properties. You can request free keys from https://www.projectoxford.ai/Subscription
+For you to fully build and test your contribution, you should use your own subscription keys for Project Oxford, and add them in SmartAlarm\gradle.properties. You can request free keys from https://www.projectoxford.ai/Subscription
 
  
