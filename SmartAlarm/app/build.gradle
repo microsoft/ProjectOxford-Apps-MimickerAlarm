@@ -80,6 +80,8 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.4'
 
     compile "com.mixpanel.android:mixpanel-android:4.6.4"
+    compile 'com.uservoice:uservoice-android-sdk:+'
+
     compile files('libs/gson-2.3.1.jar')
 }
 

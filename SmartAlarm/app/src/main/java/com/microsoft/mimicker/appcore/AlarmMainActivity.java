@@ -20,6 +20,7 @@ import com.microsoft.mimicker.settings.AlarmSettingsFragment;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 import com.microsoft.mimicker.utilities.Util;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
@@ -93,6 +94,13 @@ public class AlarmMainActivity extends AppCompatActivity
         FeedbackManager.register(this, hockeyappToken, null);
         FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
         FeedbackManager.showFeedbackActivity(this);
+    }
+
+    //
+    // Launch User Voice forum form to allow user feedback submission
+    //
+    public void showUserVoiceFeedback(MenuItem item){
+        UserVoice.launchUserVoice(this);
     }
 
     public void showTutorial(MenuItem item){
