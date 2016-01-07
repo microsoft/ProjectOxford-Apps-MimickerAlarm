@@ -48,6 +48,32 @@
             android:layout_alignParentLeft="true"
             android:src="@drawable/snooze_button" />
 
+        <!-- Left arrows and right arrows surroudning the clock -->
+        <!-- Make these two lower in the z-order so that the clock is above both arrows -->
+        <!-- FrameLayout is used to animate arrows inside the frame -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/alarm_ringing_clock"
+            android:layout_centerVertical="true">
+            <ImageView
+                android:id="@+id/alarm_ringing_left_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/dragelineleft"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/alarm_ringing_clock"
+            android:layout_centerVertical="true">
+            <ImageView
+                android:id="@+id/alarm_ringing_right_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/draglineright"/>
+        </FrameLayout>
         <ImageView
             android:id="@+id/alarm_ringing_clock"
             android:layout_width="wrap_content"
