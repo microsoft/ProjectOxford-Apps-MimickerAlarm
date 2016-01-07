@@ -288,8 +288,8 @@ public class AlarmRingingFragment extends Fragment {
 
     private void initializeClockAnimation() {
         // Show a growing clock and then shrinking again repeatedly
-        PropertyValuesHolder scaleXAnimation = PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.5f, 1f);
-        PropertyValuesHolder scaleYAnimation = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.5f, 1f);
+        PropertyValuesHolder scaleXAnimation = PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.2f, 1f);
+        PropertyValuesHolder scaleYAnimation = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.2f, 1f);
 
         mRingingAnimatorSet = new AnimatorSet();
 
