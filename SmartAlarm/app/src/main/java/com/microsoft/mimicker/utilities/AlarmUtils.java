@@ -130,7 +130,9 @@ public final class AlarmUtils {
     }
 
     public static String getDateAndTimeAlarmDisplayString(Context context, long timeUntilAlarm) {
-        return DateUtils.formatDateTime(context, timeUntilAlarm, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME  | DateUtils.FORMAT_SHOW_WEEKDAY);
+        return DateUtils.formatDateTime(context, timeUntilAlarm,
+                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME |
+                DateUtils.FORMAT_SHOW_WEEKDAY);
     }
 
     public static void setLockScreenFlags(Window window) {

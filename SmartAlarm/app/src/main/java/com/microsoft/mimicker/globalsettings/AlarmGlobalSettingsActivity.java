@@ -108,6 +108,8 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
                 mRingDuration.setSummary(mRingDuration.getEntry());
             } else if (key.equals(getString(R.string.pref_enable_notifications_key))) {
                 boolean notificationsEnabled = mEnableNotifications.isChecked();
+                // As the reliability setting is dependant on notifications, we enable or
+                // disable appropriately
                 mEnableReliability.setEnabled(notificationsEnabled);
                 if (notificationsEnabled) {
                     AlarmNotificationManager.get(getContext()).handleAlarmNotificationStatus();
