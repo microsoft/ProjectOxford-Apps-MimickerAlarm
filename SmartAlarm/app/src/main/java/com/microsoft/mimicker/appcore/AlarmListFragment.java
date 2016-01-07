@@ -352,6 +352,8 @@ public class AlarmListFragment extends Fragment implements
             if (getItemCount() == 0) {
                 updateUI();
             }
+
+            mCallbacks.onAlarmChanged();
         }
 
         @Override

@@ -88,7 +88,7 @@ public class AlarmNotificationManager {
             }
         }
 
-        //  We will now decide whether we need to do nothing, update or remove the notification
+        //  Decide whether we need to enable, update or remove the notification, or do nothing
         if (!alarmValues.isEmpty()) {
             Long alarmTime = alarmValues.firstKey();
             UUID alarmId = alarmValues.get(alarmTime);
@@ -106,6 +106,7 @@ public class AlarmNotificationManager {
     }
 
     public void disableNotifications() {
+        // We only attempt to disable the notification if it is already active
         if (mNotificationsActive) {
             AlarmRingingService.stopForegroundService(mContext);
             resetState();

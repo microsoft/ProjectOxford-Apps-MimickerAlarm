@@ -2,6 +2,14 @@
 <resources>
     <!-- Strings related to Settings -->
     <!-- Global settings -->
+
+    <string name="pref_enable_notifications_key">KEY_ENABLE_NOTIFICATIONS</string>
+    <string name="pref_ring_volume_key">KEY_RING_VOLUME</string>
+    <string name="pref_ring_duration_key">KEY_RING_DURATION</string>
+    <string name="pref_snooze_duration_key">KEY_SNOOZE_DURATION</string>
+    <string name="pref_enable_reliability_key">KEY_ENABLE_RELIABILITY</string>
+    <string name="pref_snooze_duration_display_key">KEY_SNOOZE_DURATION_DISPLAY</string>
+
     <string name="pref_title_volume">Volume</string>
 
     <string name="pref_title_ring_duration">Alarm duration</string>
@@ -49,15 +57,8 @@
     </string-array>
 
     <string name="pref_title_enable_notifications">Show Notifications</string>
-    <string name="pref_title_enable_reliability">Improve Reliability</string>
-    <string name="pref_title_enable_reliability_description">Alarms will ring more reliably but at the cost of battery life</string>
-
-    <string name="pref_enable_notifications_key">KEY_ENABLE_NOTIFICATIONS</string>
-    <string name="pref_ring_volume_key">KEY_RING_VOLUME</string>
-    <string name="pref_ring_duration_key">KEY_RING_DURATION</string>
-    <string name="pref_snooze_duration_key">KEY_SNOOZE_DURATION</string>
-    <string name="pref_enable_reliability_key">KEY_ENABLE_RELIABILITY</string>
-    <string name="pref_snooze_duration_display_key">KEY_SNOOZE_DURATION_DISPLAY</string>
+    <string name="pref_title_enable_reliability">Improve Alarm Reliability</string>
+    <string name="pref_title_enable_reliability_description">Alarms will ring more reliably, but at the cost of battery life</string>
 
     <!-- Alarm settings -->
 
