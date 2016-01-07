@@ -49,7 +49,7 @@ public class AlarmSnoozeFragment extends Fragment {
 
     private String getAlarmSnoozeDuration() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        return preferences.getString("KEY_SNOOZE_DURATION_DISPLAY", getString(R.string.pref_default_snooze_duration_label));
+        return preferences.getString(getString(R.string.pref_snooze_duration_display_key), getString(R.string.pref_default_snooze_duration_label));
     }
 
     public interface SnoozeResultListener {

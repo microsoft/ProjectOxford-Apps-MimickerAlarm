@@ -3,6 +3,7 @@ package com.microsoft.mimicker.ringing;
 import android.content.Context;
 import android.content.Intent;
 
+import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
 import com.microsoft.mimicker.utilities.SharedWakeLock;
 
 import java.util.LinkedList;
@@ -23,7 +24,7 @@ public final class AlarmRingingDispatcher {
         // We use 'offer' here rather than 'add' as it is non-throwing
         if (mAlarmIntentQueue.offer(intent) &&
                 mAlarmIntentQueue.size() == 1) {
-            SharedWakeLock.get(mContext).acquireWakeLock();
+            SharedWakeLock.get(mContext).acquireFullWakeLock();
             dispatch(mAlarmIntentQueue.peek());
         }
     }
@@ -44,7 +45,8 @@ public final class AlarmRingingDispatcher {
             dispatch(mAlarmIntentQueue.peek());
         }
         if (mAlarmIntentQueue.isEmpty()) {
-            SharedWakeLock.get(mContext).releaseWakeLock();
+            SharedWakeLock.get(mContext).releaseFullWakeLock();
+            AlarmNotificationManager.get(mContext).handleAlarmNotificationStatus();
         }
     }
 }
