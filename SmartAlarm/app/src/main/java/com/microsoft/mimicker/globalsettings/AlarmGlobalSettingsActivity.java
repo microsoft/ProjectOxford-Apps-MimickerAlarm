@@ -32,9 +32,9 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        List<Fragment> fragments = getSupportFragmentManager().getFragments();
         if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) ||
             (keyCode == KeyEvent.KEYCODE_VOLUME_UP)) {
+            List<Fragment> fragments = getSupportFragmentManager().getFragments();
             ((AlarmGlobalSettingsFragment)fragments.get(0)).onKeyDown(keyCode);
         } else {
             return super.onKeyDown(keyCode, event);
