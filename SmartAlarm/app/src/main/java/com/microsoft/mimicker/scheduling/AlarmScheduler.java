@@ -19,13 +19,16 @@ public final class AlarmScheduler {
     private AlarmScheduler() {
     }
 
-    public static void scheduleAlarms(Context context) {
+    public static boolean scheduleAlarms(Context context) {
         List<Alarm> alarms =  AlarmList.get(context).getAlarms();
+        boolean alarmsScheduled = false;
         for (Alarm alarm : alarms) {
             if (alarm.isEnabled()) {
                 scheduleAlarm(context, alarm);
+                alarmsScheduled = true;
             }
         }
+        return alarmsScheduled;
     }
 
     public static void cancelAlarms(Context context) {
@@ -72,6 +75,7 @@ public final class AlarmScheduler {
         calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
         calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
         calendarAlarm.set(Calendar.SECOND, 0);
+        calendarAlarm.set(Calendar.MILLISECOND, 0);
 
         final int nowHour = calendarFrom.get(Calendar.HOUR_OF_DAY);
         final int nowMinute = calendarFrom.get(Calendar.MINUTE);
@@ -90,6 +94,7 @@ public final class AlarmScheduler {
         calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
         calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
         calendarAlarm.set(Calendar.SECOND, 0);
+        calendarAlarm.set(Calendar.MILLISECOND, 0);
         boolean thisWeek = false;
 
         final int nowDay = calendarFrom.get(Calendar.DAY_OF_WEEK);

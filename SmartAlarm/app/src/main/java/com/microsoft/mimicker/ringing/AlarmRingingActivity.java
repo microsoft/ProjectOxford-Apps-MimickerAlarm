@@ -229,11 +229,11 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     private int getAlarmRingingDuration() {
-        return getDurationSetting("KEY_RING_DURATION");
+        return getDurationSetting(getString(R.string.pref_ring_duration_key));
     }
 
     private int getAlarmSnoozeDuration() {
-        return getDurationSetting("KEY_SNOOZE_DURATION");
+        return getDurationSetting(getString(R.string.pref_snooze_duration_key));
     }
 
     private int getDurationSetting(String setting) {

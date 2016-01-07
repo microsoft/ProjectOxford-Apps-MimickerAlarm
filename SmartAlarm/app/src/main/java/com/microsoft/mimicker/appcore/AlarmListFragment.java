@@ -43,7 +43,6 @@ import java.util.List;
 public class AlarmListFragment extends Fragment implements
     AlarmFloatingActionButton.OnVisibilityChangedListener {
 
-    public static final String ALARM_LIST_FRAGMENT_TAG = "alarm_list_fragment";
     private RecyclerView mAlarmRecyclerView;
     private RelativeLayout mEmptyView;
     private AlarmAdapter mAdapter;
@@ -203,6 +202,7 @@ public class AlarmListFragment extends Fragment implements
 
     public interface AlarmListListener {
         void onAlarmSelected(Alarm alarm);
+        void onAlarmChanged();
     }
 
     private class AlarmHolder extends RecyclerView.ViewHolder
@@ -238,6 +238,7 @@ public class AlarmListFragment extends Fragment implements
                     } else {
                         AlarmScheduler.cancelAlarm(getContext(), mAlarm);
                     }
+                    mCallbacks.onAlarmChanged();
                 }
             });
         }

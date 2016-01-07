@@ -14,11 +14,9 @@ import android.view.MenuItem;
 import com.microsoft.mimicker.BuildConfig;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.model.Alarm;
-import com.microsoft.mimicker.model.AlarmList;
 import com.microsoft.mimicker.onboarding.OnboardingToSFragment;
 import com.microsoft.mimicker.onboarding.OnboardingTutorialFragment;
-import com.microsoft.mimicker.ringing.AlarmRingingService;
-import com.microsoft.mimicker.scheduling.AlarmScheduler;
+import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
 import com.microsoft.mimicker.settings.AlarmSettingsFragment;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
@@ -27,13 +25,6 @@ import com.microsoft.mimicker.utilities.Util;
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
-
-import java.util.Calendar;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.UUID;
-
 
 public class AlarmMainActivity extends AppCompatActivity
         implements AlarmListFragment.AlarmListListener,
@@ -56,6 +47,7 @@ public class AlarmMainActivity extends AppCompatActivity
         mPreferences = getSharedPreferences(packageName, MODE_PRIVATE);
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        AlarmNotificationManager.get(this).handleAlarmNotificationStatus();
         Logger.init(this);
     }
 
@@ -165,17 +157,16 @@ public class AlarmMainActivity extends AppCompatActivity
         if (animateEntrance) {
             transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
         }
-        transaction.replace(R.id.fragment_container, new AlarmListFragment(),
-                AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
+        transaction.replace(R.id.fragment_container, new AlarmListFragment());
         transaction.commit();
         setTitle(R.string.alarm_list_title);
-        setClosestAlarm();
     }
 
     @Override
     public void onSettingsSaveOrIgnoreChanges() {
         showAlarmList(true);
         mEditingAlarm = false;
+        onAlarmChanged();
     }
 
     @Override
@@ -185,12 +176,18 @@ public class AlarmMainActivity extends AppCompatActivity
         transaction.replace(R.id.fragment_container, new AlarmListFragment());
         transaction.commit();
         setTitle(R.string.alarm_list_title);
+        onAlarmChanged();
     }
 
     @Override
     public void onAlarmSelected(Alarm alarm) {
         showAlarmSettingsFragment(alarm.getId().toString());
         mEditingAlarm = true;
+    }
+
+    @Override
+    public void onAlarmChanged() {
+        AlarmNotificationManager.get(this).handleAlarmNotificationStatus();
     }
 
     private void showFragment(Fragment fragment) {
@@ -206,21 +203,5 @@ public class AlarmMainActivity extends AppCompatActivity
                 AlarmSettingsFragment.newInstance(alarmId),
                 AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
         transaction.commit();
-    }
-
-    private void setClosestAlarm() {
-        List<Alarm> alarms = AlarmList.get(this).getAlarms();
-        Calendar now = Calendar.getInstance();
-        SortedMap<Long, UUID> durationValues = new TreeMap<>();
-        for (Alarm alarm : alarms) {
-            if (alarm.isEnabled()) {
-                durationValues.put(AlarmScheduler.getTimeUntilAlarm(now, alarm), alarm.getId());
-            }
-        }
-        if (!durationValues.isEmpty()) {
-            Long lowestTime = durationValues.firstKey();
-            AlarmRingingService.sendAlarmNotification(this, durationValues.get(lowestTime), lowestTime);
-        }
-
     }
 }
