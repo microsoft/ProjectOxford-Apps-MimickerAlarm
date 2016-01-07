@@ -14,8 +14,11 @@ import android.view.MenuItem;
 import com.microsoft.mimicker.BuildConfig;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.model.Alarm;
+import com.microsoft.mimicker.model.AlarmList;
 import com.microsoft.mimicker.onboarding.OnboardingToSFragment;
 import com.microsoft.mimicker.onboarding.OnboardingTutorialFragment;
+import com.microsoft.mimicker.ringing.AlarmRingingService;
+import com.microsoft.mimicker.scheduling.AlarmScheduler;
 import com.microsoft.mimicker.settings.AlarmSettingsFragment;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
@@ -24,6 +27,13 @@ import com.microsoft.mimicker.utilities.Util;
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
+
+import java.util.Calendar;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.UUID;
+
 
 public class AlarmMainActivity extends AppCompatActivity
         implements AlarmListFragment.AlarmListListener,
@@ -34,7 +44,7 @@ public class AlarmMainActivity extends AppCompatActivity
     public final static String SHOULD_ONBOARD = "onboarding";
     public final static String SHOULD_TOS = "show-tos";
     private boolean mEditingAlarm = false;
-    private boolean mOboardingStarted = false;
+    private boolean mOnboardingStarted = false;
     private SharedPreferences mPreferences = null;
     private AudioManager mAudioManager;
 
@@ -58,8 +68,8 @@ public class AlarmMainActivity extends AppCompatActivity
         Util.registerCrashReport(this);
 
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
-            if (!mOboardingStarted) {
-                mOboardingStarted = true;
+            if (!mOnboardingStarted) {
+                mOnboardingStarted = true;
 
                 Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING);
                 Logger.track(userAction);
@@ -159,6 +169,7 @@ public class AlarmMainActivity extends AppCompatActivity
                 AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
         transaction.commit();
         setTitle(R.string.alarm_list_title);
+        setClosestAlarm();
     }
 
     @Override
@@ -192,8 +203,24 @@ public class AlarmMainActivity extends AppCompatActivity
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
         transaction.replace(R.id.fragment_container,
-                            AlarmSettingsFragment.newInstance(alarmId),
-                            AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+                AlarmSettingsFragment.newInstance(alarmId),
+                AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
         transaction.commit();
+    }
+
+    private void setClosestAlarm() {
+        List<Alarm> alarms = AlarmList.get(this).getAlarms();
+        Calendar now = Calendar.getInstance();
+        SortedMap<Long, UUID> durationValues = new TreeMap<>();
+        for (Alarm alarm : alarms) {
+            if (alarm.isEnabled()) {
+                durationValues.put(AlarmScheduler.getTimeUntilAlarm(now, alarm), alarm.getId());
+            }
+        }
+        if (!durationValues.isEmpty()) {
+            Long lowestTime = durationValues.firstKey();
+            AlarmRingingService.sendAlarmNotification(this, durationValues.get(lowestTime), lowestTime);
+        }
+
     }
 }

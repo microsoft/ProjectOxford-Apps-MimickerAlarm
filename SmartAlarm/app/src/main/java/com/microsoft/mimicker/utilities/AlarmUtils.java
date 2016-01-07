@@ -1,6 +1,7 @@
 package com.microsoft.mimicker.utilities;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -126,6 +127,10 @@ public final class AlarmUtils {
             resourceIdForDisplayString = R.string.alarm_set_less_than_minute;
         }
         return new MessageFormat(context.getString(resourceIdForDisplayString)).format(args);
+    }
+
+    public static String getDateAndTimeAlarmDisplayString(Context context, long timeUntilAlarm) {
+        return DateUtils.formatDateTime(context, timeUntilAlarm, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME  | DateUtils.FORMAT_SHOW_WEEKDAY);
     }
 
     public static void setLockScreenFlags(Window window) {
