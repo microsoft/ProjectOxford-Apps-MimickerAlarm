@@ -11,7 +11,6 @@ import android.support.v7.app.NotificationCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
-import com.ibm.icu.text.MessageFormat;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.appcore.AlarmMainActivity;
 import com.microsoft.mimicker.model.Alarm;
@@ -20,9 +19,7 @@ import com.microsoft.mimicker.ringing.AlarmRingingService;
 import com.microsoft.mimicker.utilities.AlarmUtils;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -58,14 +55,8 @@ public class AlarmNotificationManager {
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_no_bg);
         builder.setLargeIcon(icon);
 
-        String alarmDisplayString = AlarmUtils.getDateAndTimeAlarmDisplayString(context, alarmTime);
-        builder.setContentText(context.getString(R.string.notification_content));
-        builder.setContentTitle(context.getString(R.string.app_name));
-        Map<String, String> args = new HashMap<>();
-        args.put("time", alarmDisplayString);
-        String ticker = new MessageFormat(context.getString(R.string.notification_ticker)).format(args);
-        builder.setTicker(ticker);
-        builder.setSubText(alarmDisplayString);
+        builder.setContentTitle(context.getString(R.string.notification_content_title));
+        builder.setContentText(AlarmUtils.getDayAndTimeAlarmDisplayString(context, alarmTime));
 
         Intent startIntent = new Intent(context, AlarmMainActivity.class);
         startIntent.putExtra(AlarmRingingService.ALARM_ID, alarmId);

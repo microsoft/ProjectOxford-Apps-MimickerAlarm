@@ -1,6 +1,5 @@
 package com.microsoft.mimicker.ringing;
 
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
@@ -23,8 +22,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -48,7 +45,6 @@ public class AlarmRingingFragment extends Fragment {
     private static final String ARGS_ALARM_ID = "alarm_id";
     private static final int CLOCK_ANIMATION_DURATION = 1500;
     private static final int SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY = 250;
-    private static final float ARROW_ANIMATING_WIDTH = 40f;
     public final String TAG = this.getClass().getSimpleName();
     RingingResultListener mCallback;
     private MediaPlayer mPlayer;

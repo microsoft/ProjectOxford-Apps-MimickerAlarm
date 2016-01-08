@@ -34,8 +34,7 @@ public class AlarmRingingActivity extends AppCompatActivity
         AlarmNoMimicsFragment.NoMimicResultListener,
         AlarmSettingsFragment.AlarmSettingsListener {
 
-    private static final String DEFAULT_DURATION_STRING = "60000";
-    private static final int DEFAULT_DURATION_INTEGER = 60 * 1000;
+    private static final int DEFAULT_DURATION_INTEGER = (10 * 60) * 1000;
     public final String TAG = this.getClass().getSimpleName();
     private UUID mAlarmId;
     private Alarm mAlarm;
@@ -229,16 +228,16 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     private int getAlarmRingingDuration() {
-        return getDurationSetting(getString(R.string.pref_ring_duration_key));
+        return getDurationSetting(getString(R.string.pref_ring_duration_key), R.string.pref_default_ring_duration_value);
     }
 
     private int getAlarmSnoozeDuration() {
-        return getDurationSetting(getString(R.string.pref_snooze_duration_key));
+        return getDurationSetting(getString(R.string.pref_snooze_duration_key), R.string.pref_default_snooze_duration_value);
     }
 
-    private int getDurationSetting(String setting) {
+    private int getDurationSetting(String setting, int defaultSettingStringResId) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String durationPreference = preferences.getString(setting, DEFAULT_DURATION_STRING);
+        String durationPreference = preferences.getString(setting, getString(defaultSettingStringResId));
 
         int alarmRingingDuration = DEFAULT_DURATION_INTEGER;
         try {
