@@ -41,8 +41,6 @@ public class AlarmRingingActivity extends AppCompatActivity
     private Fragment mAlarmRingingFragment;
     private Handler mHandler;
     private Runnable mAlarmCancelTask;
-    private boolean mIsGameRunning;
-    private boolean mEditingSettings;
     private boolean mAlarmTimedOut;
     private AlarmRingingService mRingingService;
     private boolean mIsServiceBound;
@@ -86,13 +84,18 @@ public class AlarmRingingActivity extends AppCompatActivity
         setContentView(R.layout.activity_fragment);
 
         mAlarmRingingFragment = AlarmRingingFragment.newInstance(mAlarmId.toString());
-        showFragment(mAlarmRingingFragment);
+
+        // We do not want any animations when the ringing fragment is launched for the first time
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, mAlarmRingingFragment,
+                AlarmRingingFragment.RINGING_FRAGMENT_TAG);
+        transaction.commit();
 
         mAlarmCancelTask = new Runnable() {
             @Override
             public void run() {
                 mAlarmTimedOut = true;
-                if (!mIsGameRunning) {
+                if (!isGameRunning()) {
                     finishActivity();
                 }
             }
@@ -109,9 +112,8 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     public void onMimicSuccess(String shareable) {
         cancelAlarmTimeout();
-        mIsGameRunning = false;
         if (shareable != null && shareable.length() > 0) {
-            showFragment(ShareFragment.newInstance(shareable));
+            showFragment(ShareFragment.newInstance(shareable), ShareFragment.SHARE_FRAGMENT_TAG);
         } else {
             finishActivity();
         }
@@ -119,11 +121,10 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     @Override
     public void onMimicFailure() {
-        mIsGameRunning = false;
         if (mAlarmTimedOut) {
             finishActivity();
         } else {
-            showFragment(mAlarmRingingFragment);
+            transitionBackToRingingScreen();
         }
     }
 
@@ -134,20 +135,22 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     @Override
     public void onRingingDismiss() {
-        Fragment gameFragment = MimicFactory.getMimicFragment(this, mAlarmId);
-        if (gameFragment != null) {
-            mIsGameRunning = true;
-            showFragment(gameFragment);
+        silenceAlarmRinging();
+        Fragment mimicFragment = MimicFactory.getMimicFragment(this, mAlarmId);
+        if (mimicFragment != null) {
+            showFragment(mimicFragment, MimicFactory.MIMIC_FRAGMENT_TAG);
         } else {
             cancelAlarmTimeout();
-            showFragment(AlarmNoMimicsFragment.newInstance(mAlarmId.toString()));
+            showFragment(AlarmNoMimicsFragment.newInstance(mAlarmId.toString()),
+                    AlarmNoMimicsFragment.NO_MIMICS_FRAGMENT_TAG);
         }
     }
 
     @Override
     public void onRingingSnooze() {
+        silenceAlarmRinging();
         cancelAlarmTimeout();
-        showFragment(new AlarmSnoozeFragment());
+        showFragment(new AlarmSnoozeFragment(), AlarmSnoozeFragment.SNOOZE_FRAGMENT_TAG);
         AlarmScheduler.snoozeAlarm(this, mAlarm, getAlarmSnoozeDuration());
     }
 
@@ -159,12 +162,8 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     public void onNoMimicDismiss(boolean launchSettings) {
         if (launchSettings) {
-            mEditingSettings = true;
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container,
-                    AlarmSettingsFragment.newInstance(mAlarmId.toString()),
+            showFragment(AlarmSettingsFragment.newInstance(mAlarmId.toString()),
                     AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
-            transaction.commit();
         } else {
             finishActivity();
         }
@@ -193,46 +192,74 @@ public class AlarmRingingActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "Entered onPause!");
+        reportRingingDismissed();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "Entered onDestroy!");
-        reportRingingCompleted();
         unbindRingingService();
     }
 
     @Override
     public void onBackPressed() {
-        if (mIsGameRunning) {
-            showFragment(mAlarmRingingFragment);
-        } else if (mEditingSettings) {
-            AlarmSettingsFragment fragment = ((AlarmSettingsFragment)getSupportFragmentManager()
-                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG));
-            if (fragment != null) {
-                fragment.onCancel();
-            }
+        if (isGameRunning()) {
+            transitionBackToRingingScreen();
+        } else if (areEditingSettings()) {
+            ((AlarmSettingsFragment) getSupportFragmentManager()
+                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
+                    .onCancel();
+        } else if (!isAlarmRinging()) {
+            finishActivity();
         }
     }
 
     private void finishActivity() {
-        AlarmUtils.clearLockScreenFlags(getWindow());
+        // We only want to report that ringing completed as a result of correct user action
+        reportRingingCompleted();
         finish();
     }
 
-    private void showFragment(Fragment fragment) {
+    private void showFragment(Fragment fragment, String fragmentTag) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
+        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+        transaction.replace(R.id.fragment_container, fragment, fragmentTag);
         transaction.commit();
     }
 
+    private void transitionBackToRingingScreen() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        transaction.replace(R.id.fragment_container, mAlarmRingingFragment,
+                AlarmRingingFragment.RINGING_FRAGMENT_TAG);
+        transaction.commit();
+        startAlarmRinging();
+    }
+
+    private boolean isAlarmRinging() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(AlarmRingingFragment.RINGING_FRAGMENT_TAG) != null);
+    }
+
+    private boolean isGameRunning() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(MimicFactory.MIMIC_FRAGMENT_TAG) != null);
+    }
+
+    private boolean areEditingSettings() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null);
+    }
+
     private int getAlarmRingingDuration() {
-        return getDurationSetting(getString(R.string.pref_ring_duration_key), R.string.pref_default_ring_duration_value);
+        return getDurationSetting(getString(R.string.pref_ring_duration_key),
+                R.string.pref_default_ring_duration_value);
     }
 
     private int getAlarmSnoozeDuration() {
-        return getDurationSetting(getString(R.string.pref_snooze_duration_key), R.string.pref_default_snooze_duration_value);
+        return getDurationSetting(getString(R.string.pref_snooze_duration_key),
+                R.string.pref_default_snooze_duration_value);
     }
 
     private int getDurationSetting(String setting, int defaultSettingStringResId) {
@@ -267,9 +294,27 @@ public class AlarmRingingActivity extends AppCompatActivity
         }
     }
 
-    private void reportRingingCompleted () {
+    private void reportRingingCompleted() {
         if (mRingingService != null) {
-            mRingingService.reportAlarmRingingCompleted();
+            mRingingService.reportAlarmUXCompleted();
+        }
+    }
+
+    private void silenceAlarmRinging() {
+        if (mRingingService != null) {
+            mRingingService.silenceAlarmRinging();
+        }
+    }
+
+    private void startAlarmRinging() {
+        if (mRingingService != null) {
+            mRingingService.startAlarmRinging();
+        }
+    }
+
+    private void reportRingingDismissed() {
+        if (mRingingService != null) {
+            mRingingService.reportAlarmUXDismissed();
         }
     }
 

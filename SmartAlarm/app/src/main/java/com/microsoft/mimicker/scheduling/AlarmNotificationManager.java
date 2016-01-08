@@ -49,7 +49,7 @@ public class AlarmNotificationManager {
         return sManager;
     }
 
-    public static Notification createNotification(Context context, UUID alarmId, long alarmTime) {
+    public static Notification createNextAlarmNotification(Context context, UUID alarmId, long alarmTime) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.ic_alarm_on_white_18dp);
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_no_bg);
@@ -59,6 +59,7 @@ public class AlarmNotificationManager {
         builder.setContentText(AlarmUtils.getDayAndTimeAlarmDisplayString(context, alarmTime));
 
         Intent startIntent = new Intent(context, AlarmMainActivity.class);
+        startIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startIntent.putExtra(AlarmRingingService.ALARM_ID, alarmId);
         PendingIntent contentIntent = PendingIntent.getActivity(context, (int)Math.abs(alarmId.getLeastSignificantBits()), startIntent, 0);
         builder.setContentIntent(contentIntent);

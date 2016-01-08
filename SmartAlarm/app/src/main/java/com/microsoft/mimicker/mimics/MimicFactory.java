@@ -17,6 +17,7 @@ import java.util.UUID;
 
 public final class MimicFactory {
 
+    public static final String MIMIC_FRAGMENT_TAG = "mimic_fragment";
     private static final String TAG = "MimicFactory";
 
     public static Fragment getMimicFragment(Activity caller, UUID alarmId) {
