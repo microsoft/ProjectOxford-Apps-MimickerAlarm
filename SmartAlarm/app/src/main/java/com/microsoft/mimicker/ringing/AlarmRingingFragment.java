@@ -6,6 +6,7 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -37,6 +38,12 @@ import com.microsoft.mimicker.utilities.Util;
 
 import java.util.UUID;
 
+enum DragZone {
+    NEAR_MIDDLE_OF_VIEW,
+    DRAGGING_TO_LEFT,
+    DRAGGING_TO_RIGHT
+}
+
 public class AlarmRingingFragment extends Fragment {
     private static final String ARGS_ALARM_ID = "alarm_id";
     private static final int CLOCK_ANIMATION_DURATION = 1500;
@@ -47,12 +54,20 @@ public class AlarmRingingFragment extends Fragment {
     private MediaPlayer mPlayer;
     private Vibrator mVibrator;
     private ImageView mAlarmRingingClock;
-    private ImageView mArrowLeft;
-    private ImageView mArrowRight;
+    private ImageView mLeftArrowImage;
+    private ImageView mRightArrowImage;
+
+    private ObjectAnimator mClockAnimation;
+    private AnimationDrawable mLeftArrowAnimation;
+    private AnimationDrawable mRightArrowAnimation;
+    // A zone value to tell us If the current dragged clock is on the left of the clock, right of the clock, or near the middle of view.
+    private DragZone mDragZone;
+    // The threshold of gap to decide if the drag of the clock should cause
+    // us to hide left arrow or right arrow
+    private float mDragThreshold;
 
     private UUID mAlarmId;
     private boolean mShowClockOnDragEnd;
-    private AnimatorSet mRingingAnimatorSet;
     private Alarm mAlarm;
 
     public static AlarmRingingFragment newInstance(String alarmId) {
@@ -129,6 +144,29 @@ public class AlarmRingingFragment extends Fragment {
             }
         });
 
+        // Allow the view to listen to the drag event to update arrow animations accordingly
+        view.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DRAG_LOCATION:
+                        // Update the left/right arrow visibility based on the current drag location.
+                        onClockDragLocation(event.getX(), event.getY(), v.getWidth()/2);
+                        break;
+                    case DragEvent.ACTION_DROP:
+                        // The user has dropped the drag, but it is dropped within the view, instead of the target
+                        // drop zones to dismiss or snooze.
+                        // Restore to show both left arrow and right arrow animations.
+                        mDragZone = DragZone.NEAR_MIDDLE_OF_VIEW;
+                        updateArrowsBasedOnDragZone(mDragZone);
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+
         mAlarmRingingClock = (ImageView) view.findViewById(R.id.alarm_ringing_clock);
         mAlarmRingingClock.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -146,10 +184,7 @@ public class AlarmRingingFragment extends Fragment {
             }
         });
 
-        mArrowLeft = (ImageView) view.findViewById(R.id.alarm_ringing_left_arrow);
-        mArrowRight = (ImageView) view.findViewById(R.id.alarm_ringing_right_arrow);
-
-        initializeClockAnimation();
+        initializeClockAnimation(view);
         initializeMediaPlayer();
 
         Loggable.AppAction appAction = new Loggable.AppAction(Loggable.Key.APP_ALARM_RINGING);
@@ -158,6 +193,42 @@ public class AlarmRingingFragment extends Fragment {
         Logger.track(appAction);
 
         return view;
+    }
+
+    private void onClockDragLocation(float x, float y, int viewMiddleX) {
+        DragZone newDrageZone;
+        if (x < viewMiddleX - mDragThreshold) {
+            newDrageZone = DragZone.DRAGGING_TO_LEFT;
+        } else if (x > viewMiddleX + mDragThreshold){
+            newDrageZone = DragZone.DRAGGING_TO_RIGHT;
+        } else {
+            newDrageZone = DragZone.NEAR_MIDDLE_OF_VIEW;
+        }
+
+        if (newDrageZone != mDragZone) {
+            mDragZone = newDrageZone;
+            updateArrowsBasedOnDragZone(mDragZone);
+        }
+    }
+
+    private void updateArrowsBasedOnDragZone(DragZone dragZone) {
+        switch (mDragZone) {
+            case NEAR_MIDDLE_OF_VIEW:
+                // Show both arrow animations
+                mLeftArrowImage.setVisibility(View.VISIBLE);
+                mRightArrowImage.setVisibility(View.VISIBLE);
+                break;
+            case DRAGGING_TO_LEFT:
+                // Show only the left arrow animation to guide user to drag to the left
+                mLeftArrowImage.setVisibility(View.VISIBLE);
+                mRightArrowImage.setVisibility(View.INVISIBLE);
+                break;
+            case DRAGGING_TO_RIGHT:
+                // Show only the right arrow animation to guide user to drag to the left
+                mLeftArrowImage.setVisibility(View.INVISIBLE);
+                mRightArrowImage.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 
     private void dismissAlarm() {
@@ -197,8 +268,13 @@ public class AlarmRingingFragment extends Fragment {
         playAlarmSound();
         vibrateDeviceIfDesired();
         mShowClockOnDragEnd = true;
+        mDragZone = DragZone.NEAR_MIDDLE_OF_VIEW;
+        mDragThreshold = mAlarmRingingClock.getWidth() / 2;
+
         mAlarmRingingClock.setVisibility(View.VISIBLE);
-        mRingingAnimatorSet.start();
+        mClockAnimation.start();
+        mLeftArrowAnimation.start();
+        mRightArrowAnimation.start();
 
         Util.registerCrashReport(getActivity());
     }
@@ -211,7 +287,7 @@ public class AlarmRingingFragment extends Fragment {
 
         cancelAlarmSound();
         cancelVibration();
-        mRingingAnimatorSet.cancel();
+        mClockAnimation.cancel();
     }
 
     @Override
@@ -286,33 +362,24 @@ public class AlarmRingingFragment extends Fragment {
         }
     }
 
-    private void initializeClockAnimation() {
+    private void initializeClockAnimation(View view) {
         // Show a growing clock and then shrinking again repeatedly
         PropertyValuesHolder scaleXAnimation = PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.2f, 1f);
         PropertyValuesHolder scaleYAnimation = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.2f, 1f);
 
-        mRingingAnimatorSet = new AnimatorSet();
+        mClockAnimation = ObjectAnimator.ofPropertyValuesHolder(mAlarmRingingClock, scaleXAnimation, scaleYAnimation);
+        mClockAnimation.setDuration(CLOCK_ANIMATION_DURATION);
+        mClockAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        mClockAnimation.setRepeatCount(ValueAnimator.INFINITE);
 
-        ObjectAnimator animateClock = ObjectAnimator.ofPropertyValuesHolder(mAlarmRingingClock, scaleXAnimation, scaleYAnimation);
-        animateClock.setDuration(CLOCK_ANIMATION_DURATION);
-        animateClock.setInterpolator(new AccelerateDecelerateInterpolator());
-        animateClock.setRepeatCount(ValueAnimator.INFINITE);
+        mLeftArrowImage = (ImageView) view.findViewById(R.id.alarm_ringing_left_arrow);
+        mLeftArrowImage.setBackgroundResource(R.anim.ringing_left_arrow_animation);
 
-        ObjectAnimator animatedLeftArrow = ObjectAnimator.ofFloat(mArrowLeft, "x", ARROW_ANIMATING_WIDTH, 0f);
-        animatedLeftArrow.setInterpolator(new AccelerateInterpolator());
-        animatedLeftArrow.setDuration(CLOCK_ANIMATION_DURATION);
-        animatedLeftArrow.setRepeatCount(ValueAnimator.INFINITE);
+        mRightArrowImage = (ImageView) view.findViewById(R.id.alarm_ringing_right_arrow);
+        mRightArrowImage.setBackgroundResource(R.anim.ringing_right_arrow_animation);
 
-        ObjectAnimator animatedRightArrow = ObjectAnimator.ofFloat(mArrowRight, "x", -ARROW_ANIMATING_WIDTH, 0f);
-        animatedRightArrow.setInterpolator(new AccelerateInterpolator());
-        animatedRightArrow.setDuration(CLOCK_ANIMATION_DURATION);
-        animatedRightArrow.setRepeatCount(ValueAnimator.INFINITE);
-
-        mRingingAnimatorSet
-                .play(animateClock)
-                .with(animatedLeftArrow)
-                .with(animatedRightArrow);
-
+        mLeftArrowAnimation = (AnimationDrawable) mLeftArrowImage.getBackground();
+        mRightArrowAnimation = (AnimationDrawable) mRightArrowImage.getBackground();
     }
 
     public interface RingingResultListener {
