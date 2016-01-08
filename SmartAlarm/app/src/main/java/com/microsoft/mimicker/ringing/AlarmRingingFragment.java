@@ -373,10 +373,10 @@ public class AlarmRingingFragment extends Fragment {
         mClockAnimation.setRepeatCount(ValueAnimator.INFINITE);
 
         mLeftArrowImage = (ImageView) view.findViewById(R.id.alarm_ringing_left_arrow);
-        mLeftArrowImage.setBackgroundResource(R.anim.ringing_left_arrow_animation);
+        mLeftArrowImage.setBackgroundResource(R.drawable.ringing_left_arrow_animation);
 
         mRightArrowImage = (ImageView) view.findViewById(R.id.alarm_ringing_right_arrow);
-        mRightArrowImage.setBackgroundResource(R.anim.ringing_right_arrow_animation);
+        mRightArrowImage.setBackgroundResource(R.drawable.ringing_right_arrow_animation);
 
         mLeftArrowAnimation = (AnimationDrawable) mLeftArrowImage.getBackground();
         mRightArrowAnimation = (AnimationDrawable) mRightArrowImage.getBackground();
