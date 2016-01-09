@@ -35,7 +35,6 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     private static final String PREFERENCE_DIALOG_FRAGMENT_CLASS = "android.support.v7.preference.PreferenceFragment.DIALOG";
     public final String TAG = this.getClass().getSimpleName();
     AlarmSettingsListener mCallback;
-    private UUID mAlarmId;
     private Alarm mAlarm;
     private TimePreference mTimePreference;
     private RepeatingDaysPreference mRepeatingDaysPreference;
@@ -71,8 +70,8 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         addPreferencesFromResource(R.xml.pref_alarm);
 
         Bundle args = getArguments();
-        mAlarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
-        mAlarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
+        UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
+        mAlarm = AlarmList.get(getContext()).getAlarm(alarmId);
 
         initializeTimePreference();
         initializeRepeatingDaysPreference();
@@ -224,7 +223,8 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         } else {
             mAlarm.setIsEnabled(true);
         }
-
+        // If someone edits alarm settings while in a snooze period we reset the snooze
+        mAlarm.setSnoozed(false);
         mAlarm.setNew(false);
         AlarmList.get(getActivity()).updateAlarm(mAlarm);
         long alarmTime = AlarmScheduler.scheduleAlarm(getContext(), mAlarm);

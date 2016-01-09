@@ -1,6 +1,7 @@
 package com.microsoft.mimicker.appcore;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.onboarding.OnboardingToSFragment;
 import com.microsoft.mimicker.onboarding.OnboardingTutorialFragment;
 import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
+import com.microsoft.mimicker.scheduling.AlarmScheduler;
 import com.microsoft.mimicker.settings.AlarmSettingsFragment;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
@@ -26,6 +28,8 @@ import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
+import java.util.UUID;
+
 public class AlarmMainActivity extends AppCompatActivity
         implements AlarmListFragment.AlarmListListener,
         OnboardingTutorialFragment.OnOnboardingTutorialListener,
@@ -34,8 +38,6 @@ public class AlarmMainActivity extends AppCompatActivity
 
     public final static String SHOULD_ONBOARD = "onboarding";
     public final static String SHOULD_TOS = "show-tos";
-    private boolean mEditingAlarm = false;
-    private boolean mOnboardingStarted = false;
     private SharedPreferences mPreferences = null;
     private AudioManager mAudioManager;
 
@@ -48,7 +50,23 @@ public class AlarmMainActivity extends AppCompatActivity
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         AlarmNotificationManager.get(this).handleAlarmNotificationStatus();
+
+        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
+        if (alarmId != null) {
+            showFragment(AlarmSettingsFragment.newInstance(alarmId.toString()),
+                    AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+        }
+
         Logger.init(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        UUID alarmId = (UUID) intent.getSerializableExtra(AlarmScheduler.ALARM_ID);
+        if (alarmId != null) {
+            showAlarmSettingsFragment(alarmId.toString());
+        }
     }
 
     @Override
@@ -60,9 +78,7 @@ public class AlarmMainActivity extends AppCompatActivity
         Util.registerCrashReport(this);
 
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
-            if (!mOnboardingStarted) {
-                mOnboardingStarted = true;
-
+            if (!hasOnboardingStarted()) {
                 Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING);
                 Logger.track(userAction);
 
@@ -71,8 +87,7 @@ public class AlarmMainActivity extends AppCompatActivity
         }
         else if (mPreferences.getBoolean(SHOULD_TOS, true)) {
             showToS();
-        }
-        else if (!mEditingAlarm) {
+        } else if (!areEditingSettings()) {
             showAlarmList(false);
         }
     }
@@ -98,7 +113,8 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     public void showTutorial(MenuItem item){
-        showFragment(new OnboardingTutorialFragment());
+        showFragment(new OnboardingTutorialFragment(),
+                OnboardingTutorialFragment.ONBOARDING_FRAGMENT_TAG);
     }
 
     @Override
@@ -120,12 +136,10 @@ public class AlarmMainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (mEditingAlarm) {
-            AlarmSettingsFragment fragment = ((AlarmSettingsFragment)getSupportFragmentManager()
-                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG));
-            if (fragment != null) {
-                fragment.onCancel();
-            }
+        if (areEditingSettings()) {
+            ((AlarmSettingsFragment) getSupportFragmentManager()
+                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
+                    .onCancel();
         } else {
             super.onBackPressed();
         }
@@ -149,7 +163,7 @@ public class AlarmMainActivity extends AppCompatActivity
 
     public void showToS() {
         mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
-        showFragment(new OnboardingToSFragment());
+        showFragment(new OnboardingToSFragment(), OnboardingToSFragment.TOS_FRAGMENT_TAG);
     }
 
     public void showAlarmList(boolean animateEntrance) {
@@ -162,10 +176,19 @@ public class AlarmMainActivity extends AppCompatActivity
         setTitle(R.string.alarm_list_title);
     }
 
+    private boolean areEditingSettings() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null);
+    }
+
+    private boolean hasOnboardingStarted() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(OnboardingTutorialFragment.ONBOARDING_FRAGMENT_TAG) != null);
+    }
+
     @Override
     public void onSettingsSaveOrIgnoreChanges() {
         showAlarmList(true);
-        mEditingAlarm = false;
         onAlarmChanged();
     }
 
@@ -182,7 +205,6 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     public void onAlarmSelected(Alarm alarm) {
         showAlarmSettingsFragment(alarm.getId().toString());
-        mEditingAlarm = true;
     }
 
     @Override
@@ -190,9 +212,9 @@ public class AlarmMainActivity extends AppCompatActivity
         AlarmNotificationManager.get(this).handleAlarmNotificationStatus();
     }
 
-    private void showFragment(Fragment fragment) {
+    private void showFragment(Fragment fragment, String fragmentTag) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
+        transaction.replace(R.id.fragment_container, fragment, fragmentTag);
         transaction.commit();
     }
 

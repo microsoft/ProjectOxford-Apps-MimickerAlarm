@@ -17,6 +17,7 @@ import com.microsoft.mimicker.model.AlarmList;
 import java.util.UUID;
 
 public class AlarmNoMimicsFragment extends Fragment {
+    public static final String NO_MIMICS_FRAGMENT_TAG = "no_mimics_fragment";
     private static final String ARGS_ALARM_ID = "alarm_id";
     private static final int NOGAME_SCREEN_TIMEOUT_DURATION = 5 * 1000;
     NoMimicResultListener mCallback;
@@ -63,10 +64,7 @@ public class AlarmNoMimicsFragment extends Fragment {
                 mCallback.onNoMimicDismiss(false);
             }
         };
-
         mHandler = new Handler();
-        mHandler.postDelayed(mAutoDismissTask, NOGAME_SCREEN_TIMEOUT_DURATION);
-
         return view;
     }
 
@@ -80,6 +78,18 @@ public class AlarmNoMimicsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mCallback = null;
+    }
+
+    @Override
+    public void onPause() {
+        mHandler.removeCallbacks(mAutoDismissTask);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mHandler.postDelayed(mAutoDismissTask, NOGAME_SCREEN_TIMEOUT_DURATION);
     }
 
     public interface NoMimicResultListener {
