@@ -46,6 +46,8 @@ public class ShareFragment extends Fragment {
     private static final int SHARING_FRAGMENT_SAVE_STAY_DURATION = 60 * 1000;   // 1 minute
     // The time to auto-dismiss share screen after pressing share button
     private static final int SHARING_FRAGMENT_SHARE_STAY_DURATION = 300 * 1000; // 5 minutes
+    // Delay to dismiss the toast message
+    private static final long TOAST_IN_FRAGMENT_DELAY = 1500;    // 1.5 seconds
 
     private ShareResultListener mCallback;
     private String mShareableUri;
@@ -249,7 +251,7 @@ public class ShareFragment extends Fragment {
         try {
             copyFile(sourceFile, targetFile);
         } catch (IOException ex) {
-            Toast.makeText(getActivity(), R.string.share_download_failure, Toast.LENGTH_SHORT).show();
+            showToastInFragment(R.string.share_download_failure);
             Logger.trackException(ex);
             return;
         }
@@ -261,7 +263,7 @@ public class ShareFragment extends Fragment {
         values.put(MediaStore.MediaColumns.DATA, targetFile.getPath());
         getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-        Toast.makeText(getActivity(), R.string.share_download_success, Toast.LENGTH_SHORT).show();
+        showToastInFragment(R.string.share_download_success);
     }
 
     public void copyFile(File sourceFile, File targetFile) throws IOException {
@@ -294,5 +296,25 @@ public class ShareFragment extends Fragment {
 
     public interface ShareResultListener {
         void onShareCompleted();
+    }
+
+    // Display the home-made toast message with the specified string resource ID
+    //
+    // We create our own toast message, instead of using android.widget.toast, because
+    // system toast won't work in lock screen.
+    private void showToastInFragment(int resourceId) {
+        String message = getResources().getString(resourceId);
+        final TextView textView = (TextView)getView().findViewById(R.id.share_toast_message);
+        textView.setText(message);
+        textView.setVisibility(View.VISIBLE);
+
+        Handler handler = new Handler();
+        Runnable dismissToast = new Runnable() {
+            @Override
+            public void run() {
+                textView.setVisibility(View.INVISIBLE);
+            }
+        };
+        handler.postDelayed(dismissToast, TOAST_IN_FRAGMENT_DELAY);
     }
 }

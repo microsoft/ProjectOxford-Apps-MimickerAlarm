@@ -73,4 +73,30 @@
             android:layout_width="1dp"
             android:layout_height="40dp"/>
     </RelativeLayout>
+
+    <!-- Home-made toast message at the bottom of the screen -->
+    <!-- We cannot use android.widget.toast because system toast does not work in lock screen -->
+    <!-- This is invisible until being programmatically shown -->
+    <RelativeLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp">
+
+        <TextView
+            style="@style/Font.Title"
+            android:id="@+id/share_toast_message"
+            android:visibility="invisible"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            android:textStyle="normal"
+            android:background="@drawable/share_toast_border"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
 </RelativeLayout>
