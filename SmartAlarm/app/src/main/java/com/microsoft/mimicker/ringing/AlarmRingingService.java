@@ -26,19 +26,21 @@ public class AlarmRingingService extends Service {
     public static final String ALARM_ID = "alarm_id";
     private static final String ALARM_TIME = "alarm_time";
     private static final String WAKELOCK_ENABLE = "wakelock_enable";
+    private static final String NOTIFICATION_TYPE = "notification_type";
     public final String TAG = this.getClass().getSimpleName();
+
     private final IBinder mBinder = new LocalBinder();
     AlarmRingingController mController;
 
     public static void startForegroundService(Context context,
                                               UUID alarmId,
                                               long alarmTime,
-                                              boolean wakelockEnable) {
+                                              String notificationType) {
         Intent serviceIntent = new Intent(AlarmRingingService.ACTION_START_FOREGROUND);
         serviceIntent.setClass(context, AlarmRingingService.class);
         serviceIntent.putExtra(ALARM_ID, alarmId);
         serviceIntent.putExtra(ALARM_TIME, alarmTime);
-        serviceIntent.putExtra(WAKELOCK_ENABLE, wakelockEnable);
+        serviceIntent.putExtra(NOTIFICATION_TYPE, notificationType);
         context.startService(serviceIntent);
     }
 
@@ -121,10 +123,15 @@ public class AlarmRingingService extends Service {
 
     private void enableForegroundService(Intent intent) {
         UUID alarmId = (UUID) intent.getSerializableExtra(ALARM_ID);
-        long alarmTime = intent.getLongExtra(ALARM_TIME, 0);
-        startForeground(AlarmNotificationManager.NOTIFICATION_ID,
-                AlarmNotificationManager.createNextAlarmNotification(this, alarmId, alarmTime));
-        toggleWakeLock(intent.getBooleanExtra(WAKELOCK_ENABLE, false));
+        String notificationType = intent.getStringExtra(NOTIFICATION_TYPE);
+        if (notificationType.equalsIgnoreCase(AlarmNotificationManager.NOTIFICATION_NEXT_ALARM)) {
+            long alarmTime = intent.getLongExtra(ALARM_TIME, 0);
+            startForeground(AlarmNotificationManager.NOTIFICATION_ID,
+                    AlarmNotificationManager.createNextAlarmNotification(this, alarmId, alarmTime));
+        } else if (notificationType.equalsIgnoreCase(AlarmNotificationManager.NOTIFICATION_ALARM_RUNNING)) {
+            startForeground(AlarmNotificationManager.NOTIFICATION_ID,
+                    AlarmNotificationManager.createAlarmRunningNotification(this, alarmId));
+        }
     }
 
     private void disableForegroundService() {

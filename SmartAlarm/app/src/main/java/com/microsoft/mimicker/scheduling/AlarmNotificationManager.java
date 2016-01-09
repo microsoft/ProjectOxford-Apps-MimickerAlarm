@@ -15,6 +15,7 @@ import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.appcore.AlarmMainActivity;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
+import com.microsoft.mimicker.ringing.AlarmRingingActivity;
 import com.microsoft.mimicker.ringing.AlarmRingingService;
 import com.microsoft.mimicker.utilities.AlarmUtils;
 
@@ -26,6 +27,8 @@ import java.util.UUID;
 
 public class AlarmNotificationManager {
     public final static int NOTIFICATION_ID = 60653426;
+    public static final String NOTIFICATION_NEXT_ALARM = "next_alarm";
+    public static final String NOTIFICATION_ALARM_RUNNING = "alarm_running";
 
     private static final String TAG = "AlarmNotificationMgr";
     private static AlarmNotificationManager sManager;
@@ -55,13 +58,33 @@ public class AlarmNotificationManager {
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_no_bg);
         builder.setLargeIcon(icon);
 
-        builder.setContentTitle(context.getString(R.string.notification_content_title));
+        builder.setContentTitle(context.getString(R.string.notification_next_alarm_content_title));
         builder.setContentText(AlarmUtils.getDayAndTimeAlarmDisplayString(context, alarmTime));
 
         Intent startIntent = new Intent(context, AlarmMainActivity.class);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startIntent.putExtra(AlarmRingingService.ALARM_ID, alarmId);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, (int)Math.abs(alarmId.getLeastSignificantBits()), startIntent, 0);
+        PendingIntent contentIntent = PendingIntent.getActivity(context,
+                (int) Math.abs(alarmId.getLeastSignificantBits()), startIntent, 0);
+        builder.setContentIntent(contentIntent);
+        return builder.build();
+    }
+
+    public static Notification createAlarmRunningNotification(Context context, UUID alarmId) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        builder.setSmallIcon(R.drawable.ic_alarm_on_white_18dp);
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_no_bg);
+        builder.setLargeIcon(icon);
+
+        builder.setContentTitle(context.getString(R.string.notification_alarm_ringing_content_title));
+        builder.setContentText(context.getString(R.string.alarm_ringing_default_text));
+
+        Intent ringingIntent = new Intent(context, AlarmRingingActivity.class);
+        ringingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        ringingIntent.putExtra(AlarmRingingService.ALARM_ID, alarmId);
+        PendingIntent contentIntent = PendingIntent.getActivity(context,
+                (int) Math.abs(alarmId.getLeastSignificantBits()), ringingIntent, 0);
         builder.setContentIntent(contentIntent);
         return builder.build();
     }
@@ -76,7 +99,7 @@ public class AlarmNotificationManager {
         SortedMap<Long, UUID> alarmValues = new TreeMap<>();
         for (Alarm alarm : alarms) {
             if (alarm.isEnabled()) {
-                alarmValues.put(AlarmScheduler.getTimeUntilAlarm(now, alarm), alarm.getId());
+                alarmValues.put(AlarmScheduler.getTimeUntilAlarmIncludeSnoozed(now, alarm), alarm.getId());
             }
         }
 
@@ -90,7 +113,8 @@ public class AlarmNotificationManager {
                 AlarmRingingService.startForegroundService(mContext,
                         mCurrentAlarmId,
                         mCurrentAlarmTime,
-                        mWakeLockEnable);
+                        NOTIFICATION_NEXT_ALARM);
+                AlarmRingingService.toggleWakeLock(mContext, wakelockEnable);
             }
         } else {
             disableNotifications();

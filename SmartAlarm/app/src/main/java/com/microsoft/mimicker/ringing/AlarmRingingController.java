@@ -56,6 +56,7 @@ public final class AlarmRingingController extends AlarmRingingSessionDispatcher 
         mPlayer = null;
         SharedWakeLock.get(mContext).releaseFullWakeLock();
         // We should now update the notification to show the next alarm if appropriate
+        AlarmRingingService.stopForegroundService(mContext);
         AlarmNotificationManager.get(mContext).handleAlarmNotificationStatus();
     }
 
@@ -66,6 +67,8 @@ public final class AlarmRingingController extends AlarmRingingSessionDispatcher 
             mCurrentAlarm = AlarmList.get(mContext).getAlarm(alarmId);
             startAlarmRinging();
             launchRingingUserExperience(alarmId);
+            AlarmRingingService.startForegroundService(mContext, alarmId, 0,
+                    AlarmNotificationManager.NOTIFICATION_ALARM_RUNNING);
         }
     }
 

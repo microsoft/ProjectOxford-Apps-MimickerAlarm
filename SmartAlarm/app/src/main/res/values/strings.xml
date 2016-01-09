@@ -67,5 +67,6 @@
     <string name="alarm_set_minute">Alarm will ring in {minutes, plural, =1{# minute} other{# minutes}}</string>
     <string name="alarm_set_less_than_minute">Alarm will ring in less than a minute</string>
 
-    <string name="notification_content_title">Next Mimicker alarm</string>
+    <string name="notification_next_alarm_content_title">Next Mimicker alarm</string>
+    <string name="notification_alarm_ringing_content_title">Mimicker alarm is ringing</string>
 </resources>

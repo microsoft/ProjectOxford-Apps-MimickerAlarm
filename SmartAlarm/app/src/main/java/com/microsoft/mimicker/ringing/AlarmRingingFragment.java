@@ -224,8 +224,18 @@ public class AlarmRingingFragment extends Fragment {
     private void dismissAlarm() {
         mShowClockOnDragEnd = false;
 
+        boolean updateAlarm = false;
+        if (mAlarm.isSnoozed()) {
+            mAlarm.setSnoozed(false);
+            updateAlarm = true;
+        }
+
         if (mAlarm.isOneShot()) {
             mAlarm.setIsEnabled(false);
+            updateAlarm = true;
+        }
+
+        if (updateAlarm) {
             AlarmList.get(getContext()).updateAlarm(mAlarm);
         }
 
@@ -274,6 +284,8 @@ public class AlarmRingingFragment extends Fragment {
         Log.d(TAG, "Entered onPause!");
 
         mClockAnimation.cancel();
+        mLeftArrowAnimation.stop();
+        mRightArrowAnimation.stop();
     }
 
     @Override

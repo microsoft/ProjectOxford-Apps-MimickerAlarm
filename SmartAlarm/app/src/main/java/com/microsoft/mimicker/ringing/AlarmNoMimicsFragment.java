@@ -58,6 +58,13 @@ public class AlarmNoMimicsFragment extends Fragment {
             }
         });
 
+        mAutoDismissTask = new Runnable() {
+            @Override
+            public void run() {
+                mCallback.onNoMimicDismiss(false);
+            }
+        };
+        mHandler = new Handler();
         return view;
     }
 
@@ -82,13 +89,6 @@ public class AlarmNoMimicsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mAutoDismissTask = new Runnable() {
-            @Override
-            public void run() {
-                mCallback.onNoMimicDismiss(false);
-            }
-        };
-        mHandler = new Handler();
         mHandler.postDelayed(mAutoDismissTask, NOGAME_SCREEN_TIMEOUT_DURATION);
     }
 

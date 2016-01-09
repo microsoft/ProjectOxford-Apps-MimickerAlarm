@@ -27,6 +27,13 @@ public class AlarmSnoozeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_snooze, container, false);
         TextView snoozeDuration = (TextView) view.findViewById(R.id.alarm_snoozed_duration);
         snoozeDuration.setText(getAlarmSnoozeDuration());
+        mAutoDismissTask = new Runnable() {
+            @Override
+            public void run() {
+                mCallback.onSnoozeDismiss();
+            }
+        };
+        mHandler = new Handler();
         return view;
     }
 
@@ -51,20 +58,14 @@ public class AlarmSnoozeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mAutoDismissTask = new Runnable() {
-            @Override
-            public void run() {
-                mCallback.onSnoozeDismiss();
-            }
-        };
-        mHandler = new Handler();
         mHandler.postDelayed(mAutoDismissTask, SNOOZE_SCREEN_TIMEOUT_DURATION);
 
     }
 
     private String getAlarmSnoozeDuration() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        return preferences.getString(getString(R.string.pref_snooze_duration_display_key), getString(R.string.pref_default_snooze_duration_label));
+        return preferences.getString(getString(R.string.pref_snooze_duration_display_key),
+                getString(R.string.pref_default_snooze_duration_label));
     }
 
     public interface SnoozeResultListener {

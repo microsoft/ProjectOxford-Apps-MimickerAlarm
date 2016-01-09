@@ -24,6 +24,7 @@ import com.microsoft.mimicker.utilities.AlarmUtils;
 import com.microsoft.mimicker.utilities.Logger;
 import com.microsoft.mimicker.utilities.Util;
 
+import java.util.Calendar;
 import java.util.UUID;
 
 public class AlarmRingingActivity extends AppCompatActivity
@@ -150,8 +151,18 @@ public class AlarmRingingActivity extends AppCompatActivity
     public void onRingingSnooze() {
         silenceAlarmRinging();
         cancelAlarmTimeout();
+
+        // Schedule the snooze and update the alarm data with the details
+        long snoozeTime = AlarmScheduler.snoozeAlarm(this, mAlarm, getAlarmSnoozeDuration());
+        Calendar snoozeCalendar = Calendar.getInstance();
+        snoozeCalendar.setTimeInMillis(snoozeTime);
+        mAlarm.setSnoozeHour(snoozeCalendar.get(Calendar.HOUR_OF_DAY));
+        mAlarm.setSnoozeMinute(snoozeCalendar.get(Calendar.MINUTE));
+        mAlarm.setSnoozed(true);
+        AlarmList.get(this).updateAlarm(mAlarm);
+
+        // Show the snooze user interface
         showFragment(new AlarmSnoozeFragment(), AlarmSnoozeFragment.SNOOZE_FRAGMENT_TAG);
-        AlarmScheduler.snoozeAlarm(this, mAlarm, getAlarmSnoozeDuration());
     }
 
     @Override

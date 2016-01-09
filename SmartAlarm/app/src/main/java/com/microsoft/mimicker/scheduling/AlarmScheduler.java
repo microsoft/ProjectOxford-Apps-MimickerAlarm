@@ -43,25 +43,31 @@ public final class AlarmScheduler {
     public static long scheduleAlarm(Context context, Alarm alarm) {
         PendingIntent pendingIntent = createPendingIntent(context, alarm);
         Calendar calenderNow = Calendar.getInstance();
-        long time = getTimeUntilAlarm(calenderNow, alarm);
+        long time = getTimeUntilAlarm(calenderNow, alarm, false);
         setAlarm(context, time, pendingIntent);
         return time;
     }
 
-    public static long getTimeUntilAlarm(Calendar calendarFrom, Alarm alarm) {
+    public static long getTimeUntilAlarm(Calendar calendarFrom, Alarm alarm, boolean includeSnoozed) {
         if (alarm.isOneShot()) {
-            return getTimeUntilOneShotAlarm(calendarFrom, alarm);
+            return getTimeUntilOneShotAlarm(calendarFrom, alarm, includeSnoozed);
         } else {
-            return getTimeUntilRepeatingAlarm(calendarFrom, alarm);
+            return getTimeUntilRepeatingAlarm(calendarFrom, alarm, includeSnoozed);
         }
     }
 
-    public static void snoozeAlarm(Context context, Alarm alarm, int snoozePeriod) {
+    public static long getTimeUntilAlarmIncludeSnoozed(Calendar calendarFrom, Alarm alarm) {
+        return getTimeUntilAlarm(calendarFrom, alarm, true);
+    }
+
+    public static long snoozeAlarm(Context context, Alarm alarm, int snoozePeriod) {
+        PendingIntent pendingIntent = createPendingIntent(context, alarm);
         Calendar calendarAlarm = Calendar.getInstance();
         long now = calendarAlarm.getTimeInMillis();
         calendarAlarm.setTimeInMillis(now + snoozePeriod);
-        PendingIntent pendingIntent = createPendingIntent(context, alarm);
-        setAlarm(context, calendarAlarm.getTimeInMillis(), pendingIntent);
+        long snoozeTime = calendarAlarm.getTimeInMillis();
+        setAlarm(context, snoozeTime, pendingIntent);
+        return snoozeTime;
     }
 
     public static void cancelAlarm(Context context, Alarm alarm) {
@@ -70,10 +76,15 @@ public final class AlarmScheduler {
         alarmManager.cancel(pIntent);
     }
 
-    private static long getTimeUntilOneShotAlarm(Calendar calendarFrom, Alarm alarm) {
+    private static long getTimeUntilOneShotAlarm(Calendar calendarFrom, Alarm alarm, boolean includeSnoozed) {
         Calendar calendarAlarm = Calendar.getInstance();
-        calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
-        calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
+        if (includeSnoozed && alarm.isSnoozed()) {
+            calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getSnoozeHour());
+            calendarAlarm.set(Calendar.MINUTE, alarm.getSnoozeMinute());
+        } else {
+            calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
+            calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
+        }
         calendarAlarm.set(Calendar.SECOND, 0);
         calendarAlarm.set(Calendar.MILLISECOND, 0);
 
@@ -89,10 +100,16 @@ public final class AlarmScheduler {
         return calendarAlarm.getTimeInMillis();
     }
 
-    private static long getTimeUntilRepeatingAlarm(Calendar calendarFrom, Alarm alarm) {
+    private static long getTimeUntilRepeatingAlarm(Calendar calendarFrom, Alarm alarm, boolean giveSnoozed) {
         Calendar calendarAlarm = Calendar.getInstance();
-        calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
-        calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
+
+        if (giveSnoozed && alarm.isSnoozed()) {
+            calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getSnoozeHour());
+            calendarAlarm.set(Calendar.MINUTE, alarm.getSnoozeMinute());
+        } else {
+            calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
+            calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
+        }
         calendarAlarm.set(Calendar.SECOND, 0);
         calendarAlarm.set(Calendar.MILLISECOND, 0);
         boolean thisWeek = false;

@@ -228,7 +228,6 @@ public class AlarmListFragment extends Fragment implements
                 @Override
                 public void onClick(View v) {
                     mAlarm.setIsEnabled(mAlarmEnabled.isChecked());
-                    AlarmList.get(getActivity()).updateAlarm(mAlarm);
                     if (mAlarm.isEnabled()) {
                         long alarmTime = AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
                         Toast.makeText(getActivity(),
@@ -236,8 +235,11 @@ public class AlarmListFragment extends Fragment implements
                                 Toast.LENGTH_LONG)
                                 .show();
                     } else {
+                        // Reset the snooze state if we are cancelling the alarm
+                        mAlarm.setSnoozed(false);
                         AlarmScheduler.cancelAlarm(getContext(), mAlarm);
                     }
+                    AlarmList.get(getActivity()).updateAlarm(mAlarm);
                     mCallbacks.onAlarmChanged();
                 }
             });
