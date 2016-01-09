@@ -15,8 +15,11 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 
 public class AlarmSnoozeFragment extends Fragment {
+    public static final String SNOOZE_FRAGMENT_TAG = "snooze_fragment";
     private static final int SNOOZE_SCREEN_TIMEOUT_DURATION = 3 * 1000;
     SnoozeResultListener mCallback;
+    private Handler mHandler;
+    private Runnable mAutoDismissTask;
 
     @Nullable
     @Override
@@ -24,14 +27,13 @@ public class AlarmSnoozeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_snooze, container, false);
         TextView snoozeDuration = (TextView) view.findViewById(R.id.alarm_snoozed_duration);
         snoozeDuration.setText(getAlarmSnoozeDuration());
-
-        new Handler().postDelayed(new Runnable() {
+        mAutoDismissTask = new Runnable() {
             @Override
             public void run() {
                 mCallback.onSnoozeDismiss();
             }
-        }, SNOOZE_SCREEN_TIMEOUT_DURATION);
-
+        };
+        mHandler = new Handler();
         return view;
     }
 
@@ -47,9 +49,23 @@ public class AlarmSnoozeFragment extends Fragment {
         mCallback = null;
     }
 
+    @Override
+    public void onPause() {
+        mHandler.removeCallbacks(mAutoDismissTask);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mHandler.postDelayed(mAutoDismissTask, SNOOZE_SCREEN_TIMEOUT_DURATION);
+
+    }
+
     private String getAlarmSnoozeDuration() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        return preferences.getString(getString(R.string.pref_snooze_duration_display_key), getString(R.string.pref_default_snooze_duration_label));
+        return preferences.getString(getString(R.string.pref_snooze_duration_display_key),
+                getString(R.string.pref_default_snooze_duration_label));
     }
 
     public interface SnoozeResultListener {

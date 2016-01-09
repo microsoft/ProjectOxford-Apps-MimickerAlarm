@@ -37,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ShareFragment extends Fragment {
+    public static final String SHARE_FRAGMENT_TAG = "share_fragment";
     public static final String SHAREABLE_URI = "shareable-uri";
     private final static int SHARE_REQUEST_CODE = 2;
     private final static String MIMICKER_FILE_PREFIX = "Mimicker_";

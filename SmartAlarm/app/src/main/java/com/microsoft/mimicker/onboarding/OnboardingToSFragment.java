@@ -17,6 +17,7 @@ import com.microsoft.mimicker.utilities.Logger;
 import com.microsoft.mimicker.utilities.Util;
 
 public class OnboardingToSFragment extends Fragment {
+    public static final String TOS_FRAGMENT_TAG = "tos_fragment";
     OnOnboardingToSListener mCallback;
     View mRootToSView;
 

@@ -25,6 +25,9 @@ public class Alarm {
     private boolean mColorCaptureEnabled;
     private boolean mExpressYourselfEnabled;
     private boolean mNew;
+    private boolean mSnoozed;
+    private int mSnoozeHour;
+    private int mSnoozeMinute;
 
     public Alarm () {
         this(UUID.randomUUID());
@@ -43,6 +46,9 @@ public class Alarm {
         mColorCaptureEnabled = true;
         mExpressYourselfEnabled = true;
         mNew = false;
+        mSnoozed = false;
+        mSnoozeHour = 0;
+        mSnoozeMinute = 0;
     }
 
     public String getTitle() {
@@ -135,6 +141,30 @@ public class Alarm {
 
     public void setNew(boolean isNew) {
         mNew = isNew;
+    }
+
+    public boolean isSnoozed() {
+        return mSnoozed;
+    }
+
+    public void setSnoozed(boolean snoozed) {
+        mSnoozed = snoozed;
+    }
+
+    public int getSnoozeHour() {
+        return mSnoozeHour;
+    }
+
+    public void setSnoozeHour(int snoozeHour) {
+        mSnoozeHour = snoozeHour;
+    }
+
+    public int getSnoozeMinute() {
+        return mSnoozeMinute;
+    }
+
+    public void setSnoozeMinute(int snoozeMinute) {
+        this.mSnoozeMinute = snoozeMinute;
     }
 
     public boolean isOneShot() {

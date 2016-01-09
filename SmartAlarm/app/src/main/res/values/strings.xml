@@ -58,15 +58,15 @@
     <string name="share_download_failure">Sorry, something went wrong and we cannot save your picture</string>
     <string name="default_ringtone_name">Mimicker</string>
 
-    <string name="alarm_set_day_hour_minute">An alarm will ring in {days, plural, =1{# day} other{# days}}, {hours, plural, =1{# hour} other{# hours}} and {minutes, plural, =1 {# minute} other {# minutes}} from now</string>
-    <string name="alarm_set_day_hour">An alarm will ring in {days, plural, =1{# day} other{# days}} and {hours, plural, =1{# hour} other{# hours}} from now</string>
-    <string name="alarm_set_day_minute">An alarm will ring in {days, plural, =1{# day} other{# days}} and {minutes, plural, =1 {# minute} other {# minutes}} from now</string>
-    <string name="alarm_set_day">An alarm will ring in {days, plural, =1{# day} other{# days}} from now</string>
-    <string name="alarm_set_hour_minute">An alarm will ring in {hours, plural, =1{# hour} other{# hours}} and {minutes, plural, =1 {# minute} other {# minutes}} from now</string>
-    <string name="alarm_set_hour">An alarm will ring in {hours, plural, =1{# hour} other{# hours}} from now</string>
-    <string name="alarm_set_minute">An alarm will ring in {minutes, plural, =1{# minute} other{# minutes}} from now</string>
-    <string name="alarm_set_less_than_minute">An alarm will ring in less than a minute from now</string>
+    <string name="alarm_set_day_hour_minute">Alarm will ring in {days, plural, =1{# day} other{# days}}, {hours, plural, =1{# hour} other{# hours}} and {minutes, plural, =1 {# minute} other {# minutes}}</string>
+    <string name="alarm_set_day_hour">Alarm will ring in {days, plural, =1{# day} other{# days}} and {hours, plural, =1{# hour} other{# hours}}</string>
+    <string name="alarm_set_day_minute">Alarm will ring in {days, plural, =1{# day} other{# days}} and {minutes, plural, =1 {# minute} other {# minutes}}</string>
+    <string name="alarm_set_day">Alarm will ring in {days, plural, =1{# day} other{# days}}</string>
+    <string name="alarm_set_hour_minute">Alarm will ring in {hours, plural, =1{# hour} other{# hours}} and {minutes, plural, =1 {# minute} other {# minutes}}</string>
+    <string name="alarm_set_hour">Alarm will ring in {hours, plural, =1{# hour} other{# hours}}</string>
+    <string name="alarm_set_minute">Alarm will ring in {minutes, plural, =1{# minute} other{# minutes}}</string>
+    <string name="alarm_set_less_than_minute">Alarm will ring in less than a minute</string>
 
-    <string name="notification_content">The next alarm will ring</string>
-    <string name="notification_ticker">The next Mimicker alarm will ring: {time}</string>
+    <string name="notification_next_alarm_content_title">Next Mimicker alarm</string>
+    <string name="notification_alarm_ringing_content_title">Mimicker alarm is ringing</string>
 </resources>

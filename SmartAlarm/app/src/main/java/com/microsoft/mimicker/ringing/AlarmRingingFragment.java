@@ -1,19 +1,13 @@
 package com.microsoft.mimicker.ringing;
 
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -23,8 +17,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -45,14 +37,13 @@ enum DragZone {
 }
 
 public class AlarmRingingFragment extends Fragment {
+    public static final String RINGING_FRAGMENT_TAG = "ringing_fragment";
     private static final String ARGS_ALARM_ID = "alarm_id";
     private static final int CLOCK_ANIMATION_DURATION = 1500;
     private static final int SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY = 250;
-    private static final float ARROW_ANIMATING_WIDTH = 40f;
     public final String TAG = this.getClass().getSimpleName();
     RingingResultListener mCallback;
-    private MediaPlayer mPlayer;
-    private Vibrator mVibrator;
+
     private ImageView mAlarmRingingClock;
     private ImageView mLeftArrowImage;
     private ImageView mRightArrowImage;
@@ -185,7 +176,6 @@ public class AlarmRingingFragment extends Fragment {
         });
 
         initializeClockAnimation(view);
-        initializeMediaPlayer();
 
         Loggable.AppAction appAction = new Loggable.AppAction(Loggable.Key.APP_ALARM_RINGING);
 
@@ -196,17 +186,17 @@ public class AlarmRingingFragment extends Fragment {
     }
 
     private void onClockDragLocation(float x, float y, int viewMiddleX) {
-        DragZone newDrageZone;
+        DragZone newDragZone;
         if (x < viewMiddleX - mDragThreshold) {
-            newDrageZone = DragZone.DRAGGING_TO_LEFT;
+            newDragZone = DragZone.DRAGGING_TO_LEFT;
         } else if (x > viewMiddleX + mDragThreshold){
-            newDrageZone = DragZone.DRAGGING_TO_RIGHT;
+            newDragZone = DragZone.DRAGGING_TO_RIGHT;
         } else {
-            newDrageZone = DragZone.NEAR_MIDDLE_OF_VIEW;
+            newDragZone = DragZone.NEAR_MIDDLE_OF_VIEW;
         }
 
-        if (newDrageZone != mDragZone) {
-            mDragZone = newDrageZone;
+        if (newDragZone != mDragZone) {
+            mDragZone = newDragZone;
             updateArrowsBasedOnDragZone(mDragZone);
         }
     }
@@ -234,8 +224,18 @@ public class AlarmRingingFragment extends Fragment {
     private void dismissAlarm() {
         mShowClockOnDragEnd = false;
 
+        boolean updateAlarm = false;
+        if (mAlarm.isSnoozed()) {
+            mAlarm.setSnoozed(false);
+            updateAlarm = true;
+        }
+
         if (mAlarm.isOneShot()) {
             mAlarm.setIsEnabled(false);
+            updateAlarm = true;
+        }
+
+        if (updateAlarm) {
             AlarmList.get(getContext()).updateAlarm(mAlarm);
         }
 
@@ -265,8 +265,6 @@ public class AlarmRingingFragment extends Fragment {
 
         Log.d(TAG, "Entered onResume!");
 
-        playAlarmSound();
-        vibrateDeviceIfDesired();
         mShowClockOnDragEnd = true;
         mDragZone = DragZone.NEAR_MIDDLE_OF_VIEW;
         mDragThreshold = mAlarmRingingClock.getWidth() / 2;
@@ -285,9 +283,9 @@ public class AlarmRingingFragment extends Fragment {
 
         Log.d(TAG, "Entered onPause!");
 
-        cancelAlarmSound();
-        cancelVibration();
         mClockAnimation.cancel();
+        mLeftArrowAnimation.stop();
+        mRightArrowAnimation.stop();
     }
 
     @Override
@@ -295,71 +293,6 @@ public class AlarmRingingFragment extends Fragment {
         super.onDestroy();
 
         Log.d(TAG, "Entered onDestroy!");
-
-        if (mPlayer != null) {
-            mPlayer.release();
-            mPlayer = null;
-        }
-    }
-
-    private void vibrateDeviceIfDesired() {
-        if (mAlarm.shouldVibrate()) {
-            mVibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-            // Start immediately
-            // Vibrate for 200 milliseconds
-            // Sleep for 500 milliseconds
-            long[] vibrationPattern = {0, 200, 500};
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                mVibrator.vibrate(vibrationPattern, 0, new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build());
-            } else {
-                mVibrator.vibrate(vibrationPattern, 0);
-            }
-        }
-    }
-
-    private void cancelVibration() {
-        if (mVibrator != null) {
-            mVibrator.cancel();
-        }
-    }
-
-    private void initializeMediaPlayer() {
-        try {
-            Uri toneUri = mAlarm.getAlarmTone();
-            if (toneUri != null) {
-                mPlayer = new MediaPlayer();
-                mPlayer.setDataSource(getActivity(), toneUri);
-                mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-                mPlayer.setLooping(true);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Logger.trackException(e);
-        }
-    }
-
-    private void playAlarmSound() {
-        try {
-            if (mPlayer != null && !mPlayer.isPlaying()) {
-                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mp) {
-                        mp.start();
-                    }
-                });
-                mPlayer.prepareAsync();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Logger.trackException(e);
-        }
-    }
-
-    private void cancelAlarmSound() {
-        if (mPlayer != null && mPlayer.isPlaying())
-        {
-            mPlayer.stop();
-        }
     }
 
     private void initializeClockAnimation(View view) {
