@@ -56,6 +56,7 @@ public class ShareFragment extends Fragment {
 
     private Handler mHandler;
     private Runnable mSharingFragmentDismissTask;
+    private Runnable mToastAutoDismiss;
 
     public static ShareFragment newInstance(String shareableUri) {
         ShareFragment fragment = new ShareFragment();
@@ -219,6 +220,9 @@ public class ShareFragment extends Fragment {
                 }
             }).start();
         }
+        if (mToastAutoDismiss != null) {
+            mHandler.removeCallbacks(mToastAutoDismiss);
+        }
     }
 
     public void share() {
@@ -310,12 +314,12 @@ public class ShareFragment extends Fragment {
         textView.setVisibility(View.VISIBLE);
 
         Handler handler = new Handler();
-        Runnable dismissToast = new Runnable() {
+        mToastAutoDismiss = new Runnable() {
             @Override
             public void run() {
                 textView.setVisibility(View.INVISIBLE);
             }
         };
-        handler.postDelayed(dismissToast, TOAST_IN_FRAGMENT_DELAY);
+        handler.postDelayed(mToastAutoDismiss, TOAST_IN_FRAGMENT_DELAY);
     }
 }
