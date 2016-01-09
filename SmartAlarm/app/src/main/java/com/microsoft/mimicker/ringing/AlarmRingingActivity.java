@@ -37,7 +37,6 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     private static final int DEFAULT_DURATION_INTEGER = (10 * 60) * 1000;
     public final String TAG = this.getClass().getSimpleName();
-    private UUID mAlarmId;
     private Alarm mAlarm;
     private Fragment mAlarmRingingFragment;
     private Handler mHandler;
@@ -69,8 +68,8 @@ public class AlarmRingingActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
-        mAlarm = AlarmList.get(this).getAlarm(mAlarmId);
+        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
+        mAlarm = AlarmList.get(this).getAlarm(alarmId);
 
         // Schedule the next repeating alarm if necessary
         if (!mAlarm.isOneShot()) {
@@ -84,7 +83,7 @@ public class AlarmRingingActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_fragment);
 
-        mAlarmRingingFragment = AlarmRingingFragment.newInstance(mAlarmId.toString());
+        mAlarmRingingFragment = AlarmRingingFragment.newInstance(mAlarm.getId().toString());
 
         // We do not want any animations when the ringing fragment is launched for the first time
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -137,12 +136,12 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     public void onRingingDismiss() {
         silenceAlarmRinging();
-        Fragment mimicFragment = MimicFactory.getMimicFragment(this, mAlarmId);
+        Fragment mimicFragment = MimicFactory.getMimicFragment(this, mAlarm.getId());
         if (mimicFragment != null) {
             showFragment(mimicFragment, MimicFactory.MIMIC_FRAGMENT_TAG);
         } else {
             cancelAlarmTimeout();
-            showFragment(AlarmNoMimicsFragment.newInstance(mAlarmId.toString()),
+            showFragment(AlarmNoMimicsFragment.newInstance(mAlarm.getId().toString()),
                     AlarmNoMimicsFragment.NO_MIMICS_FRAGMENT_TAG);
         }
     }
@@ -162,7 +161,11 @@ public class AlarmRingingActivity extends AppCompatActivity
         AlarmList.get(this).updateAlarm(mAlarm);
 
         // Show the snooze user interface
-        showFragment(new AlarmSnoozeFragment(), AlarmSnoozeFragment.SNOOZE_FRAGMENT_TAG);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        transaction.replace(R.id.fragment_container, new AlarmSnoozeFragment(),
+                AlarmSnoozeFragment.SNOOZE_FRAGMENT_TAG);
+        transaction.commit();
     }
 
     @Override
@@ -173,7 +176,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     public void onNoMimicDismiss(boolean launchSettings) {
         if (launchSettings) {
-            showFragment(AlarmSettingsFragment.newInstance(mAlarmId.toString()),
+            showFragment(AlarmSettingsFragment.newInstance(mAlarm.getId().toString()),
                     AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
         } else {
             finishActivity();

@@ -77,7 +77,11 @@ public class AlarmNotificationManager {
         builder.setLargeIcon(icon);
 
         builder.setContentTitle(context.getString(R.string.notification_alarm_ringing_content_title));
-        builder.setContentText(context.getString(R.string.alarm_ringing_default_text));
+        String title = AlarmList.get(context).getAlarm(alarmId).getTitle();
+        if (title == null || title.isEmpty()) {
+            title = context.getString(R.string.alarm_ringing_default_text);
+        }
+        builder.setContentText(title);
 
         Intent ringingIntent = new Intent(context, AlarmRingingActivity.class);
         ringingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
