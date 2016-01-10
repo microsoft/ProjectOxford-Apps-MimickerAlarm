@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.KeyUtil;
 import com.microsoft.projectoxford.emotion.EmotionServiceRestClient;
 import com.microsoft.projectoxford.emotion.contract.RecognizeResult;
 
@@ -38,7 +38,7 @@ public class MimicExpressYourselfFragment extends MimicWithCameraFragment {
 
         Resources resources = getResources();
 
-        String subscriptionKey = Util.getToken(getActivity(), "emotion");
+        String subscriptionKey = KeyUtil.getToken(getActivity(), "emotion");
         mEmotionServiceRestClient = new EmotionServiceRestClient(subscriptionKey);
 
         String[] emotions = resources.getStringArray(R.array.emotions);

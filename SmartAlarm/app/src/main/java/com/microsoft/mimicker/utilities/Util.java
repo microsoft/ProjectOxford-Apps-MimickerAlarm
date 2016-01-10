@@ -56,7 +56,7 @@ public class Util {
     }
 
     public static void registerCrashReport(Context context){
-        final String hockeyappToken = Util.getToken(context, "hockeyapp");
+        final String hockeyappToken = KeyUtil.getToken(context, "hockeyapp");
         if (!BuildConfig.DEBUG) {
             CrashManager.register(context, hockeyappToken, new CrashManagerListener() {
                 public boolean shouldAutoUploadCrashes() {

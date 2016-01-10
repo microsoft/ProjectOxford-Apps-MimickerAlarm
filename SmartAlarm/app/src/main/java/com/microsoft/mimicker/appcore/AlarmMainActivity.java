@@ -23,6 +23,7 @@ import com.microsoft.mimicker.settings.AlarmSettingsFragment;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.KeyUtil;
 
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
@@ -72,7 +73,7 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        final String hockeyappToken = Util.getToken(this, "hockeyapp");
+        final String hockeyappToken = KeyUtil.getToken(this, "hockeyapp");
         if (!BuildConfig.DEBUG)
             UpdateManager.register(this, hockeyappToken);
         Util.registerCrashReport(this);
@@ -106,7 +107,7 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     public void showFeedback(MenuItem item){
-        final String hockeyappToken = Util.getToken(this, "hockeyapp");
+        final String hockeyappToken = KeyUtil.getToken(this, "hockeyapp");
         FeedbackManager.register(this, hockeyappToken, null);
         FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
         FeedbackManager.showFeedbackActivity(this);
