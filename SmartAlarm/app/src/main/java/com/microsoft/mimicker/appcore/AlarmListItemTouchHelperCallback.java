@@ -72,12 +72,15 @@ public class AlarmListItemTouchHelperCallback extends ItemTouchHelper.Callback {
             }
 
             int drawWidth  = Math.min(x, maxDrawWidth);
+            // Cap the height of the drawable area to the selectable area - this improves the visual
+            // for the first taller item in the alarm list
+            int itemTop = itemView.getBottom() - resources.getDimensionPixelSize(R.dimen.alarm_list_item_height);
 
             if (dX > 0) {
                 // Handle swiping to the right
                 // Draw red background in area that we vacate up to maxDrawWidth
                 canvas.drawRect((float) itemView.getLeft(),
-                        (float) itemView.getTop(),
+                        (float) itemTop,
                         drawWidth,
                         (float) itemView.getBottom(),
                         paint);
@@ -87,7 +90,7 @@ public class AlarmListItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
                     Rect destRect = new Rect();
                     destRect.left = itemView.getLeft() + iconPadding;
-                    destRect.top = itemView.getTop() + (itemView.getBottom() - itemView.getTop() - icon.getHeight()) / 2;
+                    destRect.top = itemTop + (itemView.getBottom() - itemTop - icon.getHeight()) / 2;
                     int maxRight = destRect.left + icon.getWidth();
                     destRect.right = Math.min(x, maxRight);
                     destRect.bottom = destRect.top + icon.getHeight();
@@ -112,7 +115,7 @@ public class AlarmListItemTouchHelperCallback extends ItemTouchHelper.Callback {
                 // Handle swiping to the left
                 // Draw red background in area that we vacate  up to maxDrawWidth
                 canvas.drawRect((float) itemView.getRight() - drawWidth,
-                        (float) itemView.getTop(),
+                        (float) itemTop,
                         (float) itemView.getRight(),
                         (float) itemView.getBottom(), paint);
 
@@ -121,7 +124,7 @@ public class AlarmListItemTouchHelperCallback extends ItemTouchHelper.Callback {
                     int fromLeftX = itemView.getRight() - x;
                     Rect destRect = new Rect();
                     destRect.right = itemView.getRight() - iconPadding;
-                    destRect.top = itemView.getTop() + (itemView.getBottom() - itemView.getTop() - icon.getHeight()) / 2;
+                    destRect.top = itemTop + (itemView.getBottom() - itemTop - icon.getHeight()) / 2;
                     int maxFromLeft = destRect.right - icon.getWidth();
                     destRect.left = Math.max(fromLeftX, maxFromLeft);
                     destRect.bottom = destRect.top + icon.getHeight();

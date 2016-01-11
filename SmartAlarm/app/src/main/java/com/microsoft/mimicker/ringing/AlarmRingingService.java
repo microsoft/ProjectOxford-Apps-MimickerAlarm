@@ -1,48 +1,59 @@
 package com.microsoft.mimicker.ringing;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.appcore.AlarmApplication;
-import com.microsoft.mimicker.appcore.AlarmMainActivity;
-import com.microsoft.mimicker.utilities.AlarmUtils;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
+import com.microsoft.mimicker.utilities.SharedWakeLock;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 import java.util.UUID;
 
 public class AlarmRingingService extends Service {
 
-    public final String TAG = this.getClass().getSimpleName();
     public static final String ACTION_START_FOREGROUND =
             "com.microsoft.mimicker.ringing.AlarmRingingService.START_FOREGROUND";
-    public static final String ACTION_END_FOREGROUND =
-            "com.microsoft.mimicker.ringing.AlarmRingingService.END_FOREGROUND";
+    public static final String ACTION_STOP_FOREGROUND =
+            "com.microsoft.mimicker.ringing.AlarmRingingService.STOP_FOREGROUND";
     public static final String ACTION_DISPATCH_ALARM =
             "com.microsoft.mimicker.ringing.AlarmRingingService.DISPATCH_ALARM";
-
+    public static final String ACTION_TOGGLE_WAKELOCK =
+            "com.microsoft.mimicker.ringing.AlarmRingingService.TOGGLE_WAKELOCK";
     public static final String ALARM_ID = "alarm_id";
-    public static final String ALARM_TIME = "alarm_time";
-    private final static int NOTIFICATION_ID = 60653426;
+    private static final String ALARM_TIME = "alarm_time";
+    private static final String WAKELOCK_ENABLE = "wakelock_enable";
+    private static final String NOTIFICATION_TYPE = "notification_type";
+    public final String TAG = this.getClass().getSimpleName();
 
-
-    AlarmRingingDispatcher mDispatcher;
     private final IBinder mBinder = new LocalBinder();
+    AlarmRingingController mController;
 
-    public static void sendAlarmNotification(Context context, UUID alarmId, long alarmTime) {
+    public static void startForegroundService(Context context,
+                                              UUID alarmId,
+                                              long alarmTime,
+                                              String notificationType) {
         Intent serviceIntent = new Intent(AlarmRingingService.ACTION_START_FOREGROUND);
         serviceIntent.setClass(context, AlarmRingingService.class);
         serviceIntent.putExtra(ALARM_ID, alarmId);
         serviceIntent.putExtra(ALARM_TIME, alarmTime);
+        serviceIntent.putExtra(NOTIFICATION_TYPE, notificationType);
+        context.startService(serviceIntent);
+    }
+
+    public static void stopForegroundService(Context context) {
+        Intent serviceIntent = new Intent(AlarmRingingService.ACTION_STOP_FOREGROUND);
+        serviceIntent.setClass(context, AlarmRingingService.class);
+        context.startService(serviceIntent);
+    }
+
+    public static void toggleWakeLock(Context context, boolean wakelockEnable) {
+        Intent serviceIntent = new Intent(AlarmRingingService.ACTION_TOGGLE_WAKELOCK);
+        serviceIntent.setClass(context, AlarmRingingService.class);
+        serviceIntent.putExtra(WAKELOCK_ENABLE, wakelockEnable);
         context.startService(serviceIntent);
     }
 
@@ -50,11 +61,11 @@ public class AlarmRingingService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Util.registerCrashReport(this);
+        GeneralUtilities.registerCrashReport(this);
 
         Log.d(TAG, "Alarm service created!");
 
-        mDispatcher = new AlarmRingingDispatcher(getApplicationContext());
+        mController = AlarmRingingController.newInstance(getApplicationContext());
     }
 
     @Override
@@ -64,20 +75,21 @@ public class AlarmRingingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "Alarm service started!");
+        Log.d(TAG, "Alarm service started! - OnStartCommand()");
         if (intent != null) {
             if (ACTION_DISPATCH_ALARM.equals(intent.getAction())) {
                 Log.d(TAG, "Schedule ringing action!");
-                mDispatcher.register(intent);
+                mController.registerAlarm(intent);
                 AlarmWakeReceiver.completeWakefulIntent(intent);
             } else if (ACTION_START_FOREGROUND.equals(intent.getAction())) {
                 Log.d(TAG, "Show active notification!");
-                UUID alarmId = (UUID) intent.getSerializableExtra(ALARM_ID);
-                long alarmTime = intent.getLongExtra(ALARM_TIME, 0);
-                startForeground(NOTIFICATION_ID, buildNotification(alarmId, alarmTime));
-            } else if (ACTION_END_FOREGROUND.equals(intent.getAction())) {
+                enableForegroundService(intent);
+            } else if (ACTION_STOP_FOREGROUND.equals(intent.getAction())) {
                 Log.d(TAG, "Remove active notification");
-                stopForeground(true);
+                disableForegroundService();
+            } else if (ACTION_TOGGLE_WAKELOCK.equals(intent.getAction())) {
+                Log.d(TAG, "Toggle wakelock!");
+                toggleWakeLock(intent.getBooleanExtra(WAKELOCK_ENABLE, false));
             }
         }
         return START_STICKY;
@@ -89,35 +101,60 @@ public class AlarmRingingService extends Service {
         Log.d(TAG, "Alarm service destroyed!");
     }
 
-    public void reportAlarmRingingCompleted() {
-        Log.d(TAG, "Alarm ring completed!");
-        mDispatcher.workCompleted();
+    private void enableForegroundService(Intent intent) {
+        UUID alarmId = (UUID) intent.getSerializableExtra(ALARM_ID);
+        String notificationType = intent.getStringExtra(NOTIFICATION_TYPE);
+        if (notificationType.equalsIgnoreCase(AlarmNotificationManager.NOTIFICATION_NEXT_ALARM)) {
+            long alarmTime = intent.getLongExtra(ALARM_TIME, 0);
+            startForeground(AlarmNotificationManager.NOTIFICATION_ID,
+                    AlarmNotificationManager.createNextAlarmNotification(this, alarmId, alarmTime));
+        } else if (notificationType.equalsIgnoreCase(AlarmNotificationManager.NOTIFICATION_ALARM_RUNNING)) {
+            startForeground(AlarmNotificationManager.NOTIFICATION_ID,
+                    AlarmNotificationManager.createAlarmRunningNotification(this, alarmId));
+        }
+    }
+
+    private void disableForegroundService() {
+        stopForeground(true);
+        toggleWakeLock(false);
+    }
+
+    private void toggleWakeLock(boolean enableWakeLock) {
+        if (enableWakeLock) {
+            SharedWakeLock.get(this).acquirePartialWakeLock();
+        } else {
+            SharedWakeLock.get(this).releasePartialWakeLock();
+        }
+    }
+
+    public void reportAlarmUXCompleted() {
+        Log.d(TAG, "Alarm UX completed!");
+        mController.alarmRingingSessionCompleted();
+    }
+
+    public void reportAlarmUXDismissed() {
+        Log.d(TAG, "Alarm UX dismissed!");
+        mController.alarmRingingSessionDismissed();
+    }
+
+    public void requestAllowUXDismiss() {
+        Log.d(TAG, "Allow Dismiss UX requested!");
+        mController.requestAllowDismiss();
+    }
+
+    public void silenceAlarmRinging() {
+        Log.d(TAG, "Alarm silenced!");
+        mController.silenceAlarmRinging();
+    }
+
+    public void startAlarmRinging() {
+        Log.d(TAG, "Alarm restarted!");
+        mController.startAlarmRinging();
     }
 
     public class LocalBinder extends Binder {
         public AlarmRingingService getService() {
             return AlarmRingingService.this;
         }
-    }
-
-    private Notification buildNotification(UUID alarmId, long alarmTime) {
-        Context context = AlarmApplication.getAppContext();
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_alarm_on_white_18dp);
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_no_bg);
-        builder.setLargeIcon(icon);
-
-        String alarmDisplayString = AlarmUtils.getDateAndTimeAlarmDisplayString(context, alarmTime);
-        builder.setContentText("The next alarm will ring at");
-        builder.setContentTitle("Mimicker Alarm");
-        builder.setTicker("The next Mimicker alarm will ring at " + alarmDisplayString);
-        builder.setSubText(alarmDisplayString);
-
-        Intent startIntent = new Intent(context, AlarmMainActivity.class);
-        startIntent.putExtra(ALARM_ID, alarmId);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, (int)Math.abs(alarmId.getLeastSignificantBits()), startIntent, 0);
-        builder.setContentIntent(contentIntent);
-        return builder.build();
     }
 }

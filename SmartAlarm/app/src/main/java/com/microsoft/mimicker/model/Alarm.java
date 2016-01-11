@@ -1,9 +1,13 @@
 package com.microsoft.mimicker.model;
 
+import android.content.Context;
 import android.net.Uri;
 
+import com.microsoft.mimicker.R;
+import com.microsoft.mimicker.appcore.AlarmApplication;
+import com.microsoft.mimicker.scheduling.AlarmScheduler;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,6 +17,8 @@ import java.util.Calendar;
 import java.util.UUID;
 
 public class Alarm {
+    private static final int SNOOZE_DURATION_INTEGER = (5 * 60) * 1000;
+
     private UUID    mId;
     private String  mTitle;
     private int     mTimeHour;
@@ -25,6 +31,10 @@ public class Alarm {
     private boolean mColorCaptureEnabled;
     private boolean mExpressYourselfEnabled;
     private boolean mNew;
+    private boolean mSnoozed;
+    private int mSnoozeHour;
+    private int mSnoozeMinute;
+    private int mSnoozeSeconds;
 
     public Alarm () {
         this(UUID.randomUUID());
@@ -36,14 +46,13 @@ public class Alarm {
         mTimeHour = calendar.getTime().getHours();
         mTimeMinute = calendar.getTime().getMinutes();
         mRepeatingDays = new boolean[]{ false, false, false, false, false, false, false };
-        mAlarmTone = Util.defaultRingtone();
+        mAlarmTone = GeneralUtilities.defaultRingtone();
         mIsEnabled = true;
         mVibrate = true;
         mTongueTwisterEnabled = true;
         mColorCaptureEnabled = true;
         mExpressYourselfEnabled = true;
         mNew = false;
-
         mSnoozed = false;
         mSnoozeHour = 0;
         mSnoozeMinute = 0;
@@ -212,6 +221,38 @@ public class Alarm {
 
     public void setNew(boolean isNew) {
         mNew = isNew;
+    }
+
+    public boolean isSnoozed() {
+        return mSnoozed;
+    }
+
+    public void setSnoozed(boolean snoozed) {
+        mSnoozed = snoozed;
+    }
+
+    public int getSnoozeHour() {
+        return mSnoozeHour;
+    }
+
+    public void setSnoozeHour(int snoozeHour) {
+        mSnoozeHour = snoozeHour;
+    }
+
+    public int getSnoozeMinute() {
+        return mSnoozeMinute;
+    }
+
+    public void setSnoozeMinute(int snoozeMinute) {
+        mSnoozeMinute = snoozeMinute;
+    }
+
+    public int getSnoozeSeconds() {
+        return mSnoozeSeconds;
+    }
+
+    public void setSnoozeSeconds(int snoozeSeconds) {
+        mSnoozeSeconds = snoozeSeconds;
     }
 
     public boolean isOneShot() {

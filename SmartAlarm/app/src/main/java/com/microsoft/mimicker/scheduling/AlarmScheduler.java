@@ -19,13 +19,16 @@ public final class AlarmScheduler {
     private AlarmScheduler() {
     }
 
-    public static void scheduleAlarms(Context context) {
+    public static boolean scheduleAlarms(Context context) {
         List<Alarm> alarms =  AlarmList.get(context).getAlarms();
+        boolean alarmsScheduled = false;
         for (Alarm alarm : alarms) {
             if (alarm.isEnabled()) {
                 scheduleAlarm(context, alarm);
+                alarmsScheduled = true;
             }
         }
+        return alarmsScheduled;
     }
 
     public static void cancelAlarms(Context context) {
@@ -40,25 +43,31 @@ public final class AlarmScheduler {
     public static long scheduleAlarm(Context context, Alarm alarm) {
         PendingIntent pendingIntent = createPendingIntent(context, alarm);
         Calendar calenderNow = Calendar.getInstance();
-        long time = getTimeUntilAlarm(calenderNow, alarm);
+        long time = getAlarmTime(calenderNow, alarm, false);
         setAlarm(context, time, pendingIntent);
         return time;
     }
 
-    public static long getTimeUntilAlarm(Calendar calendarFrom, Alarm alarm) {
+    public static long getAlarmTime(Calendar calendarFrom, Alarm alarm, boolean includeSnoozed) {
         if (alarm.isOneShot()) {
-            return getTimeUntilOneShotAlarm(calendarFrom, alarm);
+            return getOneShotAlarmTime(calendarFrom, alarm, includeSnoozed);
         } else {
-            return getTimeUntilRepeatingAlarm(calendarFrom, alarm);
+            return getRepeatingAlarmTime(calendarFrom, alarm, includeSnoozed);
         }
     }
 
-    public static void snoozeAlarm(Context context, Alarm alarm, int snoozePeriod) {
+    public static long getAlarmTimeIncludeSnoozed(Calendar calendarFrom, Alarm alarm) {
+        return getAlarmTime(calendarFrom, alarm, true);
+    }
+
+    public static long snoozeAlarm(Context context, Alarm alarm, int snoozePeriod) {
+        PendingIntent pendingIntent = createPendingIntent(context, alarm);
         Calendar calendarAlarm = Calendar.getInstance();
         long now = calendarAlarm.getTimeInMillis();
         calendarAlarm.setTimeInMillis(now + snoozePeriod);
-        PendingIntent pendingIntent = createPendingIntent(context, alarm);
-        setAlarm(context, calendarAlarm.getTimeInMillis(), pendingIntent);
+        long snoozeTime = calendarAlarm.getTimeInMillis();
+        setAlarm(context, snoozeTime, pendingIntent);
+        return snoozeTime;
     }
 
     public static void cancelAlarm(Context context, Alarm alarm) {
@@ -67,20 +76,11 @@ public final class AlarmScheduler {
         alarmManager.cancel(pIntent);
     }
 
-    private static long getTimeUntilOneShotAlarm(Calendar calendarFrom, Alarm alarm) {
-        Calendar calendarAlarm = Calendar.getInstance();
-        calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
-        calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
-        calendarAlarm.set(Calendar.SECOND, 0);
+    private static long getOneShotAlarmTime(Calendar calendarFrom, Alarm alarm, boolean includeSnoozed) {
+        Calendar calendarAlarm = populateAlarmCalendar(alarm, includeSnoozed);
 
         final int nowHour = calendarFrom.get(Calendar.HOUR_OF_DAY);
         final int nowMinute = calendarFrom.get(Calendar.MINUTE);
-<<<<<<< Updated upstream
-
-        // if we cannot schedule today then set the alarm for tomorrow
-        if ((alarm.getTimeHour() < nowHour) ||
-            (alarm.getTimeHour() == nowHour && alarm.getTimeMinute() <= nowMinute)) {
-=======
         final int nowSeconds = calendarFrom.get(Calendar.SECOND);
 
         int alarmHour = includeSnoozed ? alarm.getSnoozeHour() : alarm.getTimeHour();
@@ -92,44 +92,32 @@ public final class AlarmScheduler {
             (alarmHour == nowHour && alarmMinute < nowMinute) ||
             (alarmHour == nowHour && alarmMinute == nowMinute &&
                     alarmSeconds <= nowSeconds)) {
->>>>>>> Stashed changes
             calendarAlarm.add(Calendar.DATE, 1);
         }
 
         return calendarAlarm.getTimeInMillis();
     }
 
-    private static long getTimeUntilRepeatingAlarm(Calendar calendarFrom, Alarm alarm) {
-        Calendar calendarAlarm = Calendar.getInstance();
-        calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
-        calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
-        calendarAlarm.set(Calendar.SECOND, 0);
-        boolean thisWeek = false;
+    private static long getRepeatingAlarmTime(Calendar calendarFrom, Alarm alarm, boolean includeSnoozed) {
+        Calendar calendarAlarm = populateAlarmCalendar(alarm, includeSnoozed);
 
+        boolean thisWeek = false;
         final int nowDay = calendarFrom.get(Calendar.DAY_OF_WEEK);
         final int nowHour = calendarFrom.get(Calendar.HOUR_OF_DAY);
         final int nowMinute = calendarFrom.get(Calendar.MINUTE);
-<<<<<<< Updated upstream
-=======
         final int nowSeconds = calendarFrom.get(Calendar.SECOND);
 
         int alarmHour = includeSnoozed ? alarm.getSnoozeHour() : alarm.getTimeHour();
         int alarmMinute = includeSnoozed ? alarm.getSnoozeMinute() : alarm.getTimeMinute();
         int alarmSeconds = includeSnoozed ? alarm.getSnoozeSeconds() : 0;
->>>>>>> Stashed changes
 
         // First check if it's later today or later in the week
         for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; ++dayOfWeek) {
             if (alarm.getRepeatingDay(dayOfWeek - 1) && dayOfWeek >= nowDay &&
-<<<<<<< Updated upstream
-                    !(dayOfWeek == nowDay && alarm.getTimeHour() < nowHour) &&
-                    !(dayOfWeek == nowDay && alarm.getTimeHour() == nowHour && alarm.getTimeMinute() <= nowMinute)) {
-=======
                     !(dayOfWeek == nowDay && alarmHour < nowHour) &&
                     !(dayOfWeek == nowDay && alarmHour == nowHour && alarmMinute < nowMinute) &&
                     !(dayOfWeek == nowDay && alarmHour == nowHour &&
                             alarmMinute == nowMinute && alarmSeconds <= nowSeconds)) {
->>>>>>> Stashed changes
                 // Only increment the calendar if the alarm isn't for later today
                 if (dayOfWeek > nowDay) {
                     calendarAlarm.add(Calendar.DATE, dayOfWeek - nowDay);
@@ -149,6 +137,22 @@ public final class AlarmScheduler {
         }
 
         return calendarAlarm.getTimeInMillis();
+    }
+
+    private static Calendar populateAlarmCalendar(Alarm alarm, boolean includeSnoozed) {
+        Calendar calendarAlarm = Calendar.getInstance();
+        if (includeSnoozed && alarm.isSnoozed()) {
+            calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getSnoozeHour());
+            calendarAlarm.set(Calendar.MINUTE, alarm.getSnoozeMinute());
+            calendarAlarm.set(Calendar.SECOND, alarm.getSnoozeSeconds());
+        } else {
+            calendarAlarm.set(Calendar.HOUR_OF_DAY, alarm.getTimeHour());
+            calendarAlarm.set(Calendar.MINUTE, alarm.getTimeMinute());
+            calendarAlarm.set(Calendar.SECOND, 0);
+        }
+        calendarAlarm.set(Calendar.MILLISECOND, 0);
+
+        return calendarAlarm;
     }
 
     private static PendingIntent createPendingIntent(Context context, Alarm alarm) {

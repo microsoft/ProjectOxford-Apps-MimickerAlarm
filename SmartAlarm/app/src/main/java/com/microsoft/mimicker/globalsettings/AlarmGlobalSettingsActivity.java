@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.preference.SwitchPreferenceCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -16,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.microsoft.mimicker.R;
+import com.microsoft.mimicker.appcore.DividerItemDecoration;
+import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
 
 import java.util.List;
 
@@ -54,13 +57,18 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
         private ListPreference mSnoozeDuration;
         private ListPreference mRingDuration;
         private VolumeSliderPreference mAlarmVolume;
+        private SwitchPreferenceCompat mEnableNotifications;
+        private SwitchPreferenceCompat mEnableReliability;
 
         @Override
         public void onCreatePreferences(Bundle bundle, String s) {
             addPreferencesFromResource(R.xml.pref_global);
-            mSnoozeDuration = (ListPreference)findPreference("KEY_SNOOZE_DURATION");
-            mRingDuration = (ListPreference)findPreference("KEY_RING_DURATION");
-            mAlarmVolume = (VolumeSliderPreference)findPreference("KEY_RING_VOLUME");
+            mSnoozeDuration = (ListPreference)findPreference(getString(R.string.pref_snooze_duration_key));
+            mRingDuration = (ListPreference)findPreference(getString(R.string.pref_ring_duration_key));
+            mAlarmVolume = (VolumeSliderPreference)findPreference(getString(R.string.pref_ring_volume_key));
+            mEnableNotifications = (SwitchPreferenceCompat)findPreference(getString(R.string.pref_enable_notifications_key));
+            mEnableReliability = (SwitchPreferenceCompat)findPreference(getString(R.string.pref_enable_reliability_key));
+            mEnableReliability.setEnabled(mEnableNotifications.isChecked());
             setDefaultSummaryValues();
         }
 
@@ -71,7 +79,10 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
             rootLayout.addView(appBarLayout, 0); // insert at top
             Toolbar bar = (Toolbar) appBarLayout.findViewById(R.id.settings_toolbar);
             ((AppCompatActivity) getActivity()).setSupportActionBar(bar);
-            return super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+            RecyclerView recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+            recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
+                    DividerItemDecoration.VERTICAL_LIST));
+            return recyclerView;
         }
 
         @Override
@@ -90,14 +101,27 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals("KEY_SNOOZE_DURATION")) {
+            if (key.equals(getString(R.string.pref_snooze_duration_key))) {
                 mSnoozeDuration.setSummary(mSnoozeDuration.getEntry());
                 PreferenceManager.getDefaultSharedPreferences(getActivity())
                         .edit()
-                        .putString("KEY_SNOOZE_DURATION_DISPLAY", mSnoozeDuration.getEntry().toString())
+                        .putString(getString(R.string.pref_snooze_duration_display_key), mSnoozeDuration.getEntry().toString())
                         .apply();
-            } else if (key.equals("KEY_RING_DURATION")) {
+            } else if (key.equals(getString(R.string.pref_ring_duration_key))) {
                 mRingDuration.setSummary(mRingDuration.getEntry());
+            } else if (key.equals(getString(R.string.pref_enable_notifications_key))) {
+                boolean notificationsEnabled = mEnableNotifications.isChecked();
+                // As the reliability setting is dependant on notifications, we enable or
+                // disable appropriately
+                mEnableReliability.setEnabled(notificationsEnabled);
+                if (notificationsEnabled) {
+                    AlarmNotificationManager.get(getContext()).handleNextAlarmNotificationStatus();
+                } else {
+                    AlarmNotificationManager.get(getContext()).disableNotifications();
+                }
+            } else if (key.equals(getString(R.string.pref_enable_reliability_key))) {
+                AlarmNotificationManager.get(getContext())
+                        .toggleWakeLock(mEnableReliability.isChecked());
             }
         }
 

@@ -20,10 +20,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.microsoft.mimicker.R;
+import com.microsoft.mimicker.appcore.DividerItemDecoration;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
-import com.microsoft.mimicker.scheduling.AlarmScheduler;
-import com.microsoft.mimicker.utilities.AlarmUtils;
+import com.microsoft.mimicker.utilities.DateTimeUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 
@@ -36,7 +36,6 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     private static final String PREFERENCE_DIALOG_FRAGMENT_CLASS = "android.support.v7.preference.PreferenceFragment.DIALOG";
 
     AlarmSettingsListener mCallback;
-    private UUID mAlarmId;
     private Alarm mAlarm;
     private TimePreference mTimePreference;
     private RepeatingDaysPreference mRepeatingDaysPreference;
@@ -83,6 +82,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         Bundle args = getArguments();
         UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
         mAlarm = AlarmList.get(getContext()).getAlarm(alarmId);
+
         String[] enabledMimics = args.getStringArray(ARGS_ENABLED_MIMICS);
 
         initializeTimePreference();
@@ -118,7 +118,12 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         }
         Logger.track(userAction);
 
-        return super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+        RecyclerView recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+        int timePreferenceOrder = mTimePreference.getOrder();
+        int buttonsPreferenceOrder = mButtonsPreference.getOrder();
+        int[] excludeDividerList = new int[] { timePreferenceOrder, buttonsPreferenceOrder };
+        recyclerView.addItemDecoration(new SettingsDividerItemDecoration(getContext(), excludeDividerList));
+        return recyclerView;
     }
 
     private void initializeTimePreference() {
@@ -239,17 +244,10 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
 
         populateUpdatedSettings();
 
-        if (mAlarm.isEnabled() && !mAlarm.isNew()) {
-            AlarmScheduler.cancelAlarm(getContext(), mAlarm);
-        } else {
-            mAlarm.setIsEnabled(true);
-        }
+        long alarmTime = mAlarm.schedule();
 
-        mAlarm.setNew(false);
-        AlarmList.get(getActivity()).updateAlarm(mAlarm);
-        long alarmTime = AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
         Toast.makeText(getActivity(),
-                AlarmUtils.getTimeUntilAlarmDisplayString(getActivity(), alarmTime),
+                DateTimeUtilities.getTimeUntilAlarmDisplayString(getActivity(), alarmTime),
                 Toast.LENGTH_LONG)
                 .show();
 
@@ -261,10 +259,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
 
-        if (mAlarm.isEnabled() && !mAlarm.isNew()) {
-            AlarmScheduler.cancelAlarm(getContext(), mAlarm);
-        }
-        AlarmList.get(getActivity()).deleteAlarm(mAlarm);
+        mAlarm.delete();
 
         mCallback.onSettingsDeleteOrNewCancel();
     }
