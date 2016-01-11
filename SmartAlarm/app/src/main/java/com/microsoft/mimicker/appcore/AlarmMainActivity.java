@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
@@ -22,7 +21,7 @@ import com.microsoft.mimicker.scheduling.AlarmScheduler;
 import com.microsoft.mimicker.settings.AlarmSettingsFragment;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
@@ -49,12 +48,11 @@ public class AlarmMainActivity extends AppCompatActivity
         mPreferences = getSharedPreferences(packageName, MODE_PRIVATE);
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        AlarmNotificationManager.get(this).handleAlarmNotificationStatus();
+        AlarmNotificationManager.get(this).handleNextAlarmNotificationStatus();
 
         UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
         if (alarmId != null) {
-            showFragment(AlarmSettingsFragment.newInstance(alarmId.toString()),
-                    AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+            showAlarmSettingsFragment(alarmId.toString());
         }
 
         Logger.init(this);
@@ -72,10 +70,10 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        final String hockeyappToken = Util.getToken(this, "hockeyapp");
+        final String hockeyappToken = GeneralUtilities.getToken(this, "hockeyapp");
         if (!BuildConfig.DEBUG)
             UpdateManager.register(this, hockeyappToken);
-        Util.registerCrashReport(this);
+        GeneralUtilities.registerCrashReport(this);
 
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
             if (!hasOnboardingStarted()) {
@@ -88,7 +86,10 @@ public class AlarmMainActivity extends AppCompatActivity
         else if (mPreferences.getBoolean(SHOULD_TOS, true)) {
             showToS();
         } else if (!areEditingSettings()) {
-            showAlarmList(false);
+            GeneralUtilities.showFragment(getSupportFragmentManager(),
+                    new AlarmListFragment(),
+                    AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
+            setTitle(R.string.alarm_list_title);
         }
     }
 
@@ -106,15 +107,22 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     public void showFeedback(MenuItem item){
-        final String hockeyappToken = Util.getToken(this, "hockeyapp");
+        final String hockeyappToken = GeneralUtilities.getToken(this, "hockeyapp");
         FeedbackManager.register(this, hockeyappToken, null);
         FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
         FeedbackManager.showFeedbackActivity(this);
     }
 
     public void showTutorial(MenuItem item){
-        showFragment(new OnboardingTutorialFragment(),
-                OnboardingTutorialFragment.ONBOARDING_FRAGMENT_TAG);
+        if (item != null) {
+            GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                    new OnboardingTutorialFragment(),
+                    OnboardingTutorialFragment.ONBOARDING_FRAGMENT_TAG);
+        } else {
+            GeneralUtilities.showFragment(getSupportFragmentManager(),
+                    new OnboardingTutorialFragment(),
+                    OnboardingTutorialFragment.ONBOARDING_FRAGMENT_TAG);
+        }
     }
 
     @Override
@@ -125,13 +133,19 @@ public class AlarmMainActivity extends AppCompatActivity
             showToS();
         }
         else {
-            showAlarmList(false);
+            GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                    new AlarmListFragment(),
+                    AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
+            setTitle(R.string.alarm_list_title);
         }
     }
 
     @Override
     public void onAccept() {
-        showAlarmList(false);
+        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                new AlarmListFragment(),
+                AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
+        setTitle(R.string.alarm_list_title);
     }
 
     @Override
@@ -163,17 +177,9 @@ public class AlarmMainActivity extends AppCompatActivity
 
     public void showToS() {
         mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
-        showFragment(new OnboardingToSFragment(), OnboardingToSFragment.TOS_FRAGMENT_TAG);
-    }
-
-    public void showAlarmList(boolean animateEntrance) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (animateEntrance) {
-            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-        }
-        transaction.replace(R.id.fragment_container, new AlarmListFragment());
-        transaction.commit();
-        setTitle(R.string.alarm_list_title);
+        GeneralUtilities.showFragment(getSupportFragmentManager(),
+                new OnboardingToSFragment(),
+                OnboardingToSFragment.TOS_FRAGMENT_TAG);
     }
 
     private boolean areEditingSettings() {
@@ -188,7 +194,10 @@ public class AlarmMainActivity extends AppCompatActivity
 
     @Override
     public void onSettingsSaveOrIgnoreChanges() {
-        showAlarmList(true);
+        GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                new AlarmListFragment(),
+                AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
+        setTitle(R.string.alarm_list_title);
         onAlarmChanged();
     }
 
@@ -209,21 +218,12 @@ public class AlarmMainActivity extends AppCompatActivity
 
     @Override
     public void onAlarmChanged() {
-        AlarmNotificationManager.get(this).handleAlarmNotificationStatus();
-    }
-
-    private void showFragment(Fragment fragment, String fragmentTag) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment, fragmentTag);
-        transaction.commit();
+        AlarmNotificationManager.get(this).handleNextAlarmNotificationStatus();
     }
 
     private void showAlarmSettingsFragment(String alarmId) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
-        transaction.replace(R.id.fragment_container,
+        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
                 AlarmSettingsFragment.newInstance(alarmId),
                 AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
-        transaction.commit();
     }
 }

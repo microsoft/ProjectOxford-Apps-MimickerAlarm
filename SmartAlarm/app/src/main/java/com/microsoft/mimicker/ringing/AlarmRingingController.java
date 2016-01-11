@@ -2,30 +2,27 @@ package com.microsoft.mimicker.ringing;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Vibrator;
 
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
 import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
 import com.microsoft.mimicker.scheduling.AlarmScheduler;
-import com.microsoft.mimicker.utilities.Logger;
 import com.microsoft.mimicker.utilities.SharedWakeLock;
 
 import java.util.UUID;
 
 public final class AlarmRingingController extends AlarmRingingSessionDispatcher {
-    private MediaPlayer mPlayer;
-    private Vibrator mVibrator;
     private Context mContext;
-    private boolean mVibrating;
+    private AlarmRingtonePlayer mRingtonePlayer;
+    private AlarmVibrator mVibrator;
     private Alarm mCurrentAlarm;
+    private boolean mAllowDismissRequested;
 
     public AlarmRingingController(Context context) {
         mContext = context;
+        mRingtonePlayer = new AlarmRingtonePlayer(mContext);
+        mVibrator = new AlarmVibrator(mContext);
     }
 
     public static AlarmRingingController newInstance(Context context) {
@@ -34,8 +31,8 @@ public final class AlarmRingingController extends AlarmRingingSessionDispatcher 
 
     @Override
     public void beforeDispatchFirstAlarmRingingSession() {
-        initializeMediaPlayer();
-        initializeVibrator();
+        mRingtonePlayer.initialize();
+        mVibrator.initialize();
         SharedWakeLock.get(mContext).acquireFullWakeLock();
     }
 
@@ -51,13 +48,12 @@ public final class AlarmRingingController extends AlarmRingingSessionDispatcher 
     @Override
     public void allAlarmRingingSessionsComplete() {
         // Cleanup the state now that we are done with all ringing sessions
-        mVibrator = null;
-        mPlayer.release();
-        mPlayer = null;
+        mVibrator.cleanup();
+        mRingtonePlayer.cleanup();
+
         SharedWakeLock.get(mContext).releaseFullWakeLock();
         // We should now update the notification to show the next alarm if appropriate
-        AlarmRingingService.stopForegroundService(mContext);
-        AlarmNotificationManager.get(mContext).handleAlarmNotificationStatus();
+        AlarmNotificationManager.get(mContext).handleNextAlarmNotificationStatus();
     }
 
     @Override
@@ -67,26 +63,38 @@ public final class AlarmRingingController extends AlarmRingingSessionDispatcher 
             mCurrentAlarm = AlarmList.get(mContext).getAlarm(alarmId);
             startAlarmRinging();
             launchRingingUserExperience(alarmId);
-            AlarmRingingService.startForegroundService(mContext, alarmId, 0,
-                    AlarmNotificationManager.NOTIFICATION_ALARM_RUNNING);
+            AlarmNotificationManager.get(mContext).handleAlarmRunningNotificationStatus(alarmId);
         }
     }
 
     public void silenceAlarmRinging() {
-        handleVibration(false);
-        handleAlarmSound(null);
+        mVibrator.stop();
+        mRingtonePlayer.stop();
     }
 
     public void startAlarmRinging() {
-        handleVibration(mCurrentAlarm.shouldVibrate());
-        handleAlarmSound(mCurrentAlarm.getAlarmTone());
+        if (mCurrentAlarm.shouldVibrate()) {
+            mVibrator.vibrate();
+        }
+        Uri ringtone = mCurrentAlarm.getAlarmTone();
+        if (ringtone != null) {
+            mRingtonePlayer.play(ringtone);
+        }
+    }
+
+    public void requestAllowDismiss() {
+        mAllowDismissRequested = true;
     }
 
     // alarmRingingSessionCompleted should always be called before this method.  If not, we should
     // restart the AlarmRingingActivity so that we can successfully finish the alarm session
     public void alarmRingingSessionDismissed() {
-        if (mCurrentAlarm != null) {
-            launchRingingUserExperience(mCurrentAlarm.getId());
+        if (mAllowDismissRequested) {
+            mAllowDismissRequested = false;
+        } else {
+            if (mCurrentAlarm != null) {
+                launchRingingUserExperience(mCurrentAlarm.getId());
+            }
         }
     }
 
@@ -96,83 +104,5 @@ public final class AlarmRingingController extends AlarmRingingSessionDispatcher 
                 Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         ringingIntent.putExtra(AlarmRingingService.ALARM_ID, alarmId);
         mContext.startActivity(ringingIntent);
-    }
-
-    private void initializeVibrator() {
-        mVibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
-    }
-
-    private void handleVibration(boolean shouldVibrate) {
-        if (shouldVibrate) {
-            if (!mVibrating) {
-                vibrateDevice();
-            }
-        } else {
-            if (mVibrating) {
-                cancelVibration();
-            }
-        }
-    }
-
-    private void vibrateDevice() {
-        // Start immediately
-        // Vibrate for 200 milliseconds
-        // Sleep for 500 milliseconds
-        long[] vibrationPattern = {0, 200, 500};
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            mVibrator.vibrate(vibrationPattern, 0,
-                    new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build());
-        } else {
-            mVibrator.vibrate(vibrationPattern, 0);
-        }
-        mVibrating = true;
-    }
-
-    private void cancelVibration() {
-        mVibrator.cancel();
-        mVibrating = false;
-    }
-
-    private void initializeMediaPlayer() {
-        try {
-            mPlayer = new MediaPlayer();
-            mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-            mPlayer.setLooping(true);
-        } catch (Exception e) {
-            Logger.trackException(e);
-        }
-    }
-
-    private void handleAlarmSound(Uri toneUri) {
-        if (toneUri != null) {
-            cancelAlarmSound();
-            playAlarmSound(toneUri);
-        } else {
-            cancelAlarmSound();
-        }
-    }
-
-    private void playAlarmSound(Uri toneUri) {
-        try {
-            if (mPlayer != null && !mPlayer.isPlaying()) {
-                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mp) {
-                        mp.start();
-                    }
-                });
-                mPlayer.setDataSource(mContext, toneUri);
-                mPlayer.prepareAsync();
-            }
-        } catch (Exception e) {
-            Logger.trackException(e);
-        }
-    }
-
-    private void cancelAlarmSound() {
-        if (mPlayer != null && mPlayer.isPlaying()) {
-            mPlayer.stop();
-            mPlayer.reset();
-        }
     }
 }

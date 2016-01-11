@@ -9,7 +9,7 @@ import android.support.v7.preference.Preference;
 import android.util.AttributeSet;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 public class RingtonePreference extends Preference {
     public static final int RINGTONE_PICKER_REQUEST = 1000;
@@ -49,7 +49,7 @@ public class RingtonePreference extends Preference {
         if (mRingtone == null) {
             setSummary(getContext().getString(R.string.pref_no_ringtone));
         }
-        else if (mRingtone.toString().compareToIgnoreCase(Util.defaultRingtone().toString()) == 0) {
+        else if (mRingtone.toString().compareToIgnoreCase(GeneralUtilities.defaultRingtone().toString()) == 0) {
             setSummary(getContext().getString(R.string.default_ringtone_name));
         }
         else {
@@ -76,7 +76,7 @@ public class RingtonePreference extends Preference {
     private void onPrepareRingtonePickerIntent(Intent ringtonePickerIntent) {
         ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, getRingtone());
         ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
-        ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, Util.defaultRingtone());
+        ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, GeneralUtilities.defaultRingtone());
         ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true);
         ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL);
         ringtonePickerIntent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getTitle());

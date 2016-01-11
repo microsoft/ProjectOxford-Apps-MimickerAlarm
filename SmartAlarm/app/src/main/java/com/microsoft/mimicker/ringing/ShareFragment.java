@@ -195,6 +195,8 @@ public class ShareFragment extends Fragment {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_SHARE);
         Logger.track(userAction);
 
+        mCallback.onRequestLaunchShareAction();
+
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         File file = new File(mShareableUri);
@@ -266,5 +268,6 @@ public class ShareFragment extends Fragment {
 
     public interface ShareResultListener {
         void onShareCompleted();
+        void onRequestLaunchShareAction();
     }
 }

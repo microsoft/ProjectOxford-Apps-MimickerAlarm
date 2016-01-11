@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.utilities.AlarmUtils;
+import com.microsoft.mimicker.utilities.DateTimeUtilities;
 
 public class RepeatingDaysPreference extends Preference {
 
@@ -27,7 +27,7 @@ public class RepeatingDaysPreference extends Preference {
         mDayViews = new DayView[7];
 
         //TODO How do we handle this better from a locale perspective i.e first day of week
-        String[] dayNames = AlarmUtils.getShortDayNames();
+        String[] dayNames = DateTimeUtilities.getShortDayNames();
         for(int i = 0; i < 7; i++) {
             DayView dayView = new DayView(getContext(), this);
             dayView.setText(dayNames[i]);
