@@ -43,6 +43,83 @@ public class Alarm {
         mColorCaptureEnabled = true;
         mExpressYourselfEnabled = true;
         mNew = false;
+
+        mSnoozed = false;
+        mSnoozeHour = 0;
+        mSnoozeMinute = 0;
+        mSnoozeSeconds = 0;
+    }
+
+    public long schedule() {
+        Context context = AlarmApplication.getAppContext();
+        if (isEnabled() && !isNew()) {
+            AlarmScheduler.cancelAlarm(context, this);
+        } else {
+            setIsEnabled(true);
+        }
+        // If someone edits alarm settings while in a snooze period we reset the snooze
+        setSnoozed(false);
+        setNew(false);
+        AlarmList.get(context).updateAlarm(this);
+        return AlarmScheduler.scheduleAlarm(context, this);
+    }
+
+    public void snooze() {
+        Context context = AlarmApplication.getAppContext();
+        // Schedule the snooze and update the alarm data with the details
+        long snoozeTime = AlarmScheduler.snoozeAlarm(context, this, getAlarmSnoozeDuration());
+        Calendar snoozeCalendar = Calendar.getInstance();
+        snoozeCalendar.setTimeInMillis(snoozeTime);
+        setSnoozeHour(snoozeCalendar.get(Calendar.HOUR_OF_DAY));
+        setSnoozeMinute(snoozeCalendar.get(Calendar.MINUTE));
+        setSnoozeSeconds(snoozeCalendar.get(Calendar.SECOND));
+        setSnoozed(true);
+        setIsEnabled(true);
+        AlarmList.get(context).updateAlarm(this);
+    }
+
+    public void delete() {
+        Context context = AlarmApplication.getAppContext();
+        if (isEnabled()) {
+            AlarmScheduler.cancelAlarm(context, this);
+        }
+        AlarmList.get(context).deleteAlarm(this);
+    }
+
+    public void cancel() {
+        Context context = AlarmApplication.getAppContext();
+        setIsEnabled(false);
+        // Reset the snooze state if we are cancelling the alarm
+        setSnoozed(false);
+        AlarmScheduler.cancelAlarm(context, this);
+        AlarmList.get(context).updateAlarm(this);
+    }
+
+    public void dismiss() {
+        Context context = AlarmApplication.getAppContext();
+        boolean updateAlarm = false;
+        // Schedule the next repeating alarm if necessary
+        if (!isOneShot()) {
+            AlarmScheduler.scheduleAlarm(context, this);
+        } else {
+            setIsEnabled(false);
+            updateAlarm = true;
+        }
+
+        if (isSnoozed()) {
+            setSnoozed(false);
+            updateAlarm = true;
+        }
+
+        if (updateAlarm) {
+            AlarmList.get(context).updateAlarm(this);
+        }
+    }
+
+    private int getAlarmSnoozeDuration() {
+        return GeneralUtilities.getDurationSetting(R.string.pref_snooze_duration_key,
+                R.string.pref_default_snooze_duration_value,
+                SNOOZE_DURATION_INTEGER);
     }
 
     public String getTitle() {

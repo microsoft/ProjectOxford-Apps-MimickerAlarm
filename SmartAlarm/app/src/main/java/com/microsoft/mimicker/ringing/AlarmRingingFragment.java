@@ -42,7 +42,22 @@ public class AlarmRingingFragment extends Fragment {
     private MediaPlayer mPlayer;
     private Vibrator mVibrator;
     private ImageView mAlarmRingingClock;
+<<<<<<< Updated upstream
     private UUID mAlarmId;
+=======
+    private ImageView mLeftArrowImage;
+    private ImageView mRightArrowImage;
+
+    private ObjectAnimator mClockAnimation;
+    private AnimationDrawable mLeftArrowAnimation;
+    private AnimationDrawable mRightArrowAnimation;
+    // A zone value to tell us If the current dragged clock is on the left of the clock, right of the clock, or near the middle of view.
+    private DragZone mDragZone;
+    // The threshold of gap to decide if the drag of the clock should cause
+    // us to hide left arrow or right arrow
+    private float mDragThreshold;
+
+>>>>>>> Stashed changes
     private boolean mShowClockOnDragEnd;
     private ObjectAnimator mAnimateClock;
     private Alarm mAlarm;
@@ -61,8 +76,8 @@ public class AlarmRingingFragment extends Fragment {
 
         Logger.init(getActivity());
         Bundle args = getArguments();
-        mAlarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
-        mAlarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
+        UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
+        mAlarm = AlarmList.get(getContext()).getAlarm(alarmId);
 
         View view = inflater.inflate(R.layout.fragment_alarm_ringing, container, false);
 
@@ -152,14 +167,16 @@ public class AlarmRingingFragment extends Fragment {
     private void dismissAlarm() {
         mShowClockOnDragEnd = false;
 
+<<<<<<< Updated upstream
         if (mAlarm.isOneShot()) {
             mAlarm.setIsEnabled(false);
             AlarmList.get(getContext()).updateAlarm(mAlarm);
         }
 
+=======
+>>>>>>> Stashed changes
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
-        Alarm alarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
-        userAction.putJSON(alarm.toJSON());
+        userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
 
         mCallback.onRingingDismiss();

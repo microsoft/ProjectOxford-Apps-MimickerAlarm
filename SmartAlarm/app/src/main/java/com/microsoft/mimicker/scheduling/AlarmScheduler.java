@@ -75,10 +75,24 @@ public final class AlarmScheduler {
 
         final int nowHour = calendarFrom.get(Calendar.HOUR_OF_DAY);
         final int nowMinute = calendarFrom.get(Calendar.MINUTE);
+<<<<<<< Updated upstream
 
         // if we cannot schedule today then set the alarm for tomorrow
         if ((alarm.getTimeHour() < nowHour) ||
             (alarm.getTimeHour() == nowHour && alarm.getTimeMinute() <= nowMinute)) {
+=======
+        final int nowSeconds = calendarFrom.get(Calendar.SECOND);
+
+        int alarmHour = includeSnoozed ? alarm.getSnoozeHour() : alarm.getTimeHour();
+        int alarmMinute = includeSnoozed ? alarm.getSnoozeMinute() : alarm.getTimeMinute();
+        int alarmSeconds = includeSnoozed ? alarm.getSnoozeSeconds() : 0;
+
+        // if we cannot schedule today then set the alarm for tomorrow
+        if ((alarmHour < nowHour) ||
+            (alarmHour == nowHour && alarmMinute < nowMinute) ||
+            (alarmHour == nowHour && alarmMinute == nowMinute &&
+                    alarmSeconds <= nowSeconds)) {
+>>>>>>> Stashed changes
             calendarAlarm.add(Calendar.DATE, 1);
         }
 
@@ -95,12 +109,27 @@ public final class AlarmScheduler {
         final int nowDay = calendarFrom.get(Calendar.DAY_OF_WEEK);
         final int nowHour = calendarFrom.get(Calendar.HOUR_OF_DAY);
         final int nowMinute = calendarFrom.get(Calendar.MINUTE);
+<<<<<<< Updated upstream
+=======
+        final int nowSeconds = calendarFrom.get(Calendar.SECOND);
+
+        int alarmHour = includeSnoozed ? alarm.getSnoozeHour() : alarm.getTimeHour();
+        int alarmMinute = includeSnoozed ? alarm.getSnoozeMinute() : alarm.getTimeMinute();
+        int alarmSeconds = includeSnoozed ? alarm.getSnoozeSeconds() : 0;
+>>>>>>> Stashed changes
 
         // First check if it's later today or later in the week
         for (int dayOfWeek = Calendar.SUNDAY; dayOfWeek <= Calendar.SATURDAY; ++dayOfWeek) {
             if (alarm.getRepeatingDay(dayOfWeek - 1) && dayOfWeek >= nowDay &&
+<<<<<<< Updated upstream
                     !(dayOfWeek == nowDay && alarm.getTimeHour() < nowHour) &&
                     !(dayOfWeek == nowDay && alarm.getTimeHour() == nowHour && alarm.getTimeMinute() <= nowMinute)) {
+=======
+                    !(dayOfWeek == nowDay && alarmHour < nowHour) &&
+                    !(dayOfWeek == nowDay && alarmHour == nowHour && alarmMinute < nowMinute) &&
+                    !(dayOfWeek == nowDay && alarmHour == nowHour &&
+                            alarmMinute == nowMinute && alarmSeconds <= nowSeconds)) {
+>>>>>>> Stashed changes
                 // Only increment the calendar if the alarm isn't for later today
                 if (dayOfWeek > nowDay) {
                     calendarAlarm.add(Calendar.DATE, dayOfWeek - nowDay);

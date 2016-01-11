@@ -34,8 +34,8 @@ public class AlarmRingingActivity extends AppCompatActivity
         AlarmNoMimicsFragment.NoMimicResultListener,
         AlarmSettingsFragment.AlarmSettingsListener {
 
-    private static final String DEFAULT_DURATION_STRING = "60000";
-    private static final int DEFAULT_DURATION_INTEGER = 60 * 1000;
+    private static final int ALARM_DURATION_INTEGER = (2 * 60 * 60) * 1000;
+
     public final String TAG = this.getClass().getSimpleName();
     private UUID mAlarmId;
     private Alarm mAlarm;
@@ -74,11 +74,6 @@ public class AlarmRingingActivity extends AppCompatActivity
         mAlarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
         mAlarm = AlarmList.get(this).getAlarm(mAlarmId);
 
-        // Schedule the next repeating alarm if necessary
-        if (!mAlarm.isOneShot()) {
-            AlarmScheduler.scheduleAlarm(this, mAlarm);
-        }
-
         Log.d(TAG, "Creating activity!");
 
         // This call must be made before setContentView to avoid the view being refreshed
@@ -109,6 +104,7 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     @Override
     public void onMimicSuccess(String shareable) {
+        mAlarm.dismiss();
         cancelAlarmTimeout();
         mIsGameRunning = false;
         if (shareable != null && shareable.length() > 0) {
@@ -140,6 +136,7 @@ public class AlarmRingingActivity extends AppCompatActivity
             mIsGameRunning = true;
             showFragment(gameFragment);
         } else {
+            mAlarm.dismiss();
             cancelAlarmTimeout();
             showFragment(AlarmNoMimicsFragment.newInstance(mAlarmId.toString()));
         }
@@ -179,6 +176,11 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     public void onSettingsDeleteOrNewCancel() {
         finishActivity();
+    }
+
+    @Override
+    public void onShowMimicsSettings(String alarmId, String[] enabledMimics) {
+
     }
 
     @Override

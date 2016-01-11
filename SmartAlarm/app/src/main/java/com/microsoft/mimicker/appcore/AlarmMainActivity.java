@@ -20,6 +20,10 @@ import com.microsoft.mimicker.onboarding.OnboardingTutorialFragment;
 import com.microsoft.mimicker.ringing.AlarmRingingService;
 import com.microsoft.mimicker.scheduling.AlarmScheduler;
 import com.microsoft.mimicker.settings.AlarmSettingsFragment;
+
+import com.microsoft.mimicker.settings.MimicsSettingsFragment;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
+
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 import com.microsoft.mimicker.utilities.Util;
@@ -39,7 +43,8 @@ public class AlarmMainActivity extends AppCompatActivity
         implements AlarmListFragment.AlarmListListener,
         OnboardingTutorialFragment.OnOnboardingTutorialListener,
         OnboardingToSFragment.OnOnboardingToSListener,
-        AlarmSettingsFragment.AlarmSettingsListener {
+        AlarmSettingsFragment.AlarmSettingsListener,
+        MimicsSettingsFragment.MimicsSettingsListener {
 
     public final static String SHOULD_ONBOARD = "onboarding";
     public final static String SHOULD_TOS = "show-tos";
@@ -128,11 +133,15 @@ public class AlarmMainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (mEditingAlarm) {
-            AlarmSettingsFragment fragment = ((AlarmSettingsFragment)getSupportFragmentManager()
-                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG));
-            if (fragment != null) {
-                fragment.onCancel();
+        if (areEditingSettings()) {
+            if (areEditingMimicSettings()) {
+                ((MimicsSettingsFragment) getSupportFragmentManager()
+                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG))
+                        .onBack();
+            } else {
+                ((AlarmSettingsFragment) getSupportFragmentManager()
+                        .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
+                        .onCancel();
             }
         } else {
             super.onBackPressed();
@@ -157,7 +166,21 @@ public class AlarmMainActivity extends AppCompatActivity
 
     public void showToS() {
         mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
-        showFragment(new OnboardingToSFragment());
+        GeneralUtilities.showFragment(getSupportFragmentManager(),
+                new OnboardingToSFragment(),
+                OnboardingToSFragment.TOS_FRAGMENT_TAG);
+    }
+
+    private boolean areEditingSettings() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null) ||
+                (getSupportFragmentManager()
+                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
+    }
+
+    private boolean areEditingMimicSettings() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
     }
 
     public void showAlarmList(boolean animateEntrance) {
@@ -173,6 +196,13 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onShowMimicsSettings(String alarmId, String[] enabledMimics) {
+        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                MimicsSettingsFragment.newInstance(alarmId, enabledMimics),
+                MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
+    }
+
+    @Override
     public void onSettingsSaveOrIgnoreChanges() {
         showAlarmList(true);
         mEditingAlarm = false;
@@ -185,6 +215,13 @@ public class AlarmMainActivity extends AppCompatActivity
         transaction.replace(R.id.fragment_container, new AlarmListFragment());
         transaction.commit();
         setTitle(R.string.alarm_list_title);
+    }
+
+    @Override
+    public void onMimicsSettingsDismiss(String alarmId, String[] enabledMimics) {
+        GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                AlarmSettingsFragment.newInstance(alarmId, enabledMimics),
+                AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
     }
 
     @Override
