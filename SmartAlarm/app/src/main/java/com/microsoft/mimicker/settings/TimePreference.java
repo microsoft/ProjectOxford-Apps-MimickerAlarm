@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.utilities.AlarmUtils;
+import com.microsoft.mimicker.utilities.DateTimeUtilities;
 
 public class TimePreference extends DialogPreference {
 
@@ -43,7 +43,7 @@ public class TimePreference extends DialogPreference {
     }
 
     private void setTimeLabel() {
-        mTimeLabel.setText(AlarmUtils.getUserTimeString(getContext(), mHour, mMinute));
+        mTimeLabel.setText(DateTimeUtilities.getUserTimeString(getContext(), mHour, mMinute));
     }
 
     public boolean hasChanged() {

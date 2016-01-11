@@ -4,14 +4,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import com.microsoft.mimicker.R;
@@ -20,11 +17,8 @@ import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
 import com.microsoft.mimicker.scheduling.AlarmScheduler;
 import com.microsoft.mimicker.settings.AlarmSettingsFragment;
-import com.microsoft.mimicker.utilities.AlarmUtils;
-import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
-import java.util.Calendar;
 import java.util.UUID;
 
 public class AlarmRingingActivity extends AppCompatActivity
@@ -35,7 +29,7 @@ public class AlarmRingingActivity extends AppCompatActivity
         AlarmNoMimicsFragment.NoMimicResultListener,
         AlarmSettingsFragment.AlarmSettingsListener {
 
-    private static final int DEFAULT_DURATION_INTEGER = (10 * 60) * 1000;
+    private static final int ALARM_DURATION_INTEGER = (120 * 60) * 1000;
     public final String TAG = this.getClass().getSimpleName();
     private Alarm mAlarm;
     private Fragment mAlarmRingingFragment;
@@ -79,17 +73,16 @@ public class AlarmRingingActivity extends AppCompatActivity
         Log.d(TAG, "Creating activity!");
 
         // This call must be made before setContentView to avoid the view being refreshed
-        AlarmUtils.setLockScreenFlags(getWindow());
+        GeneralUtilities.setLockScreenFlags(getWindow());
 
         setContentView(R.layout.activity_fragment);
 
         mAlarmRingingFragment = AlarmRingingFragment.newInstance(mAlarm.getId().toString());
 
         // We do not want any animations when the ringing fragment is launched for the first time
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, mAlarmRingingFragment,
+        GeneralUtilities.showFragment(getSupportFragmentManager(),
+                mAlarmRingingFragment,
                 AlarmRingingFragment.RINGING_FRAGMENT_TAG);
-        transaction.commit();
 
         mAlarmCancelTask = new Runnable() {
             @Override
@@ -113,7 +106,9 @@ public class AlarmRingingActivity extends AppCompatActivity
     public void onMimicSuccess(String shareable) {
         cancelAlarmTimeout();
         if (shareable != null && shareable.length() > 0) {
-            showFragment(ShareFragment.newInstance(shareable), ShareFragment.SHARE_FRAGMENT_TAG);
+            GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                    ShareFragment.newInstance(shareable),
+                    ShareFragment.SHARE_FRAGMENT_TAG);
         } else {
             finishActivity();
         }
@@ -134,38 +129,34 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
+    public void onRequestLaunchShareAction() {
+        notifyControllerAllowDismiss();
+    }
+
+    @Override
     public void onRingingDismiss() {
-        silenceAlarmRinging();
+        notifyControllerSilenceAlarmRinging();
         Fragment mimicFragment = MimicFactory.getMimicFragment(this, mAlarm.getId());
         if (mimicFragment != null) {
-            showFragment(mimicFragment, MimicFactory.MIMIC_FRAGMENT_TAG);
+            GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                    mimicFragment, MimicFactory.MIMIC_FRAGMENT_TAG);
         } else {
             cancelAlarmTimeout();
-            showFragment(AlarmNoMimicsFragment.newInstance(mAlarm.getId().toString()),
+            GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                    AlarmNoMimicsFragment.newInstance(mAlarm.getId().toString()),
                     AlarmNoMimicsFragment.NO_MIMICS_FRAGMENT_TAG);
         }
     }
 
     @Override
     public void onRingingSnooze() {
-        silenceAlarmRinging();
+        notifyControllerSilenceAlarmRinging();
         cancelAlarmTimeout();
-
-        // Schedule the snooze and update the alarm data with the details
-        long snoozeTime = AlarmScheduler.snoozeAlarm(this, mAlarm, getAlarmSnoozeDuration());
-        Calendar snoozeCalendar = Calendar.getInstance();
-        snoozeCalendar.setTimeInMillis(snoozeTime);
-        mAlarm.setSnoozeHour(snoozeCalendar.get(Calendar.HOUR_OF_DAY));
-        mAlarm.setSnoozeMinute(snoozeCalendar.get(Calendar.MINUTE));
-        mAlarm.setSnoozed(true);
-        AlarmList.get(this).updateAlarm(mAlarm);
-
+        mAlarm.snooze();
         // Show the snooze user interface
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-        transaction.replace(R.id.fragment_container, new AlarmSnoozeFragment(),
+        GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                new AlarmSnoozeFragment(),
                 AlarmSnoozeFragment.SNOOZE_FRAGMENT_TAG);
-        transaction.commit();
     }
 
     @Override
@@ -176,7 +167,8 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     public void onNoMimicDismiss(boolean launchSettings) {
         if (launchSettings) {
-            showFragment(AlarmSettingsFragment.newInstance(mAlarm.getId().toString()),
+            GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                    AlarmSettingsFragment.newInstance(mAlarm.getId().toString()),
                     AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
         } else {
             finishActivity();
@@ -199,14 +191,14 @@ public class AlarmRingingActivity extends AppCompatActivity
 
         Log.d(TAG, "Entered onResume!");
 
-        Util.registerCrashReport(this);
+        GeneralUtilities.registerCrashReport(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "Entered onPause!");
-        reportRingingDismissed();
+        notifyControllerRingingDismissed();
     }
 
     @Override
@@ -231,24 +223,15 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     private void finishActivity() {
         // We only want to report that ringing completed as a result of correct user action
-        reportRingingCompleted();
+        notifyControllerRingingCompleted();
         finish();
     }
 
-    private void showFragment(Fragment fragment, String fragmentTag) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
-        transaction.replace(R.id.fragment_container, fragment, fragmentTag);
-        transaction.commit();
-    }
-
     private void transitionBackToRingingScreen() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-        transaction.replace(R.id.fragment_container, mAlarmRingingFragment,
+        GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                mAlarmRingingFragment,
                 AlarmRingingFragment.RINGING_FRAGMENT_TAG);
-        transaction.commit();
-        startAlarmRinging();
+        notifyControllerStartAlarmRinging();
     }
 
     private boolean isAlarmRinging() {
@@ -267,27 +250,9 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     private int getAlarmRingingDuration() {
-        return getDurationSetting(getString(R.string.pref_ring_duration_key),
-                R.string.pref_default_ring_duration_value);
-    }
-
-    private int getAlarmSnoozeDuration() {
-        return getDurationSetting(getString(R.string.pref_snooze_duration_key),
-                R.string.pref_default_snooze_duration_value);
-    }
-
-    private int getDurationSetting(String setting, int defaultSettingStringResId) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String durationPreference = preferences.getString(setting, getString(defaultSettingStringResId));
-
-        int alarmRingingDuration = DEFAULT_DURATION_INTEGER;
-        try {
-            alarmRingingDuration = Integer.parseInt(durationPreference);
-        } catch (NumberFormatException e) {
-            Logger.trackException(e);
-        }
-
-        return alarmRingingDuration;
+        return GeneralUtilities.getDurationSetting(R.string.pref_ring_duration_key,
+                R.string.pref_default_ring_duration_value,
+                ALARM_DURATION_INTEGER);
     }
 
     private void bindRingingService() {
@@ -308,27 +273,33 @@ public class AlarmRingingActivity extends AppCompatActivity
         }
     }
 
-    private void reportRingingCompleted() {
+    private void notifyControllerRingingCompleted() {
         if (mRingingService != null) {
             mRingingService.reportAlarmUXCompleted();
         }
     }
 
-    private void silenceAlarmRinging() {
+    private void notifyControllerSilenceAlarmRinging() {
         if (mRingingService != null) {
             mRingingService.silenceAlarmRinging();
         }
     }
 
-    private void startAlarmRinging() {
+    private void notifyControllerStartAlarmRinging() {
         if (mRingingService != null) {
             mRingingService.startAlarmRinging();
         }
     }
 
-    private void reportRingingDismissed() {
+    private void notifyControllerRingingDismissed() {
         if (mRingingService != null) {
             mRingingService.reportAlarmUXDismissed();
+        }
+    }
+
+    private void notifyControllerAllowDismiss() {
+        if (mRingingService != null) {
+            mRingingService.requestAllowUXDismiss();
         }
     }
 

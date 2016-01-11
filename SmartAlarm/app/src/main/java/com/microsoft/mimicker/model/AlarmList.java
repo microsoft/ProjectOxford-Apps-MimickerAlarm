@@ -55,6 +55,7 @@ public class AlarmList {
         values.put(AlarmTable.Columns.SNOOZED, alarm.isSnoozed() ? 1 : 0);
         values.put(AlarmTable.Columns.SNOOZED_HOUR, alarm.getSnoozeHour());
         values.put(AlarmTable.Columns.SNOOZED_MINUTE, alarm.getSnoozeMinute());
+        values.put(AlarmTable.Columns.SNOOZED_SECONDS, alarm.getSnoozeSeconds());
 
         return values;
     }

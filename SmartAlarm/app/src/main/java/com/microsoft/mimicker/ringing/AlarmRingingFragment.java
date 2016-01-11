@@ -23,10 +23,10 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
-import com.microsoft.mimicker.utilities.AlarmUtils;
+import com.microsoft.mimicker.utilities.DateTimeUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 import java.util.UUID;
 
@@ -82,11 +82,11 @@ public class AlarmRingingFragment extends Fragment {
 
         if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
             TextView timeField = (TextView) view.findViewById(R.id.alarm_ringing_time);
-            timeField.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
+            timeField.setText(DateTimeUtilities.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
         }
 
         TextView dateField = (TextView) view.findViewById(R.id.alarm_ringing_date);
-        dateField.setText(AlarmUtils.getFullDateStringForNow());
+        dateField.setText(DateTimeUtilities.getFullDateStringForNow());
 
         String name = mAlarm.getTitle();
         if (name == null || name.isEmpty()) {
@@ -274,7 +274,7 @@ public class AlarmRingingFragment extends Fragment {
         mLeftArrowAnimation.start();
         mRightArrowAnimation.start();
 
-        Util.registerCrashReport(getActivity());
+        GeneralUtilities.registerCrashReport(getActivity());
     }
 
     @Override

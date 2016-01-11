@@ -32,6 +32,7 @@ public class AlarmCursorWrapper extends CursorWrapper {
         boolean isSnoozed = (getInt(getColumnIndex(AlarmTable.Columns.SNOOZED)) != 0);
         int snoozedHour = getInt(getColumnIndex(AlarmTable.Columns.SNOOZED_HOUR));
         int snoozedMinute = getInt(getColumnIndex(AlarmTable.Columns.SNOOZED_MINUTE));
+        int snoozedSeconds = getInt(getColumnIndex(AlarmTable.Columns.SNOOZED_SECONDS));
 
         Alarm alarm = new Alarm(UUID.fromString(uuidString));
         alarm.setTitle(title);
@@ -50,6 +51,7 @@ public class AlarmCursorWrapper extends CursorWrapper {
         alarm.setSnoozed(isSnoozed);
         alarm.setSnoozeHour(snoozedHour);
         alarm.setSnoozeMinute(snoozedMinute);
+        alarm.setSnoozeSeconds(snoozedSeconds);
 
         return alarm;
     }

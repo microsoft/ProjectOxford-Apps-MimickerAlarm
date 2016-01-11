@@ -20,6 +20,7 @@ public class AlarmDbSchema {
             public static final String SNOOZED = "snoozed";
             public static final String SNOOZED_HOUR = "snoozed_hour";
             public static final String SNOOZED_MINUTE = "snoozed_minute";
+            public static final String SNOOZED_SECONDS = "snoozed_seconds";
         }
     }
 }

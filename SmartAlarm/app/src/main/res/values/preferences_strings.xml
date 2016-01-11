@@ -58,7 +58,7 @@
 
     <string name="pref_title_enable_notifications">Show Notifications</string>
     <string name="pref_title_enable_reliability">Improve Alarm Reliability</string>
-    <string name="pref_title_enable_reliability_description">Alarms will ring more reliably, but at the cost of battery life</string>
+    <string name="pref_title_enable_reliability_description">Alarms should ring more reliably, but at the cost of battery life</string>
 
     <!-- Alarm settings -->
 

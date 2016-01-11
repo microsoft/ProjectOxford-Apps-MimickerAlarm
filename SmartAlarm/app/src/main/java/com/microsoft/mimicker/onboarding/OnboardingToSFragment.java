@@ -14,7 +14,7 @@ import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.appcore.AlarmMainActivity;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 public class OnboardingToSFragment extends Fragment {
     public static final String TOS_FRAGMENT_TAG = "tos_fragment";
@@ -68,7 +68,7 @@ public class OnboardingToSFragment extends Fragment {
             }
         });
 
-        Util.enableLinks((TextView) mRootToSView.findViewById(R.id.onboarding_tos_text));
+        GeneralUtilities.enableLinks((TextView) mRootToSView.findViewById(R.id.onboarding_tos_text));
         return mRootToSView;
     }
 

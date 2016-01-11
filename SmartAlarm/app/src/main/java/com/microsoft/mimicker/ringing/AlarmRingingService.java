@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
 import com.microsoft.mimicker.utilities.SharedWakeLock;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 import java.util.UUID;
 
@@ -61,7 +61,7 @@ public class AlarmRingingService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Util.registerCrashReport(this);
+        GeneralUtilities.registerCrashReport(this);
 
         Log.d(TAG, "Alarm service created!");
 
@@ -101,26 +101,6 @@ public class AlarmRingingService extends Service {
         Log.d(TAG, "Alarm service destroyed!");
     }
 
-    public void reportAlarmUXCompleted() {
-        Log.d(TAG, "Alarm UX completed!");
-        mController.alarmRingingSessionCompleted();
-    }
-
-    public void reportAlarmUXDismissed() {
-        Log.d(TAG, "Alarm UX dismissed!");
-        mController.alarmRingingSessionDismissed();
-    }
-
-    public void silenceAlarmRinging() {
-        Log.d(TAG, "Alarm silenced!");
-        mController.silenceAlarmRinging();
-    }
-
-    public void startAlarmRinging() {
-        Log.d(TAG, "Alarm restarted!");
-        mController.startAlarmRinging();
-    }
-
     private void enableForegroundService(Intent intent) {
         UUID alarmId = (UUID) intent.getSerializableExtra(ALARM_ID);
         String notificationType = intent.getStringExtra(NOTIFICATION_TYPE);
@@ -145,6 +125,31 @@ public class AlarmRingingService extends Service {
         } else {
             SharedWakeLock.get(this).releasePartialWakeLock();
         }
+    }
+
+    public void reportAlarmUXCompleted() {
+        Log.d(TAG, "Alarm UX completed!");
+        mController.alarmRingingSessionCompleted();
+    }
+
+    public void reportAlarmUXDismissed() {
+        Log.d(TAG, "Alarm UX dismissed!");
+        mController.alarmRingingSessionDismissed();
+    }
+
+    public void requestAllowUXDismiss() {
+        Log.d(TAG, "Allow Dismiss UX requested!");
+        mController.requestAllowDismiss();
+    }
+
+    public void silenceAlarmRinging() {
+        Log.d(TAG, "Alarm silenced!");
+        mController.silenceAlarmRinging();
+    }
+
+    public void startAlarmRinging() {
+        Log.d(TAG, "Alarm restarted!");
+        mController.startAlarmRinging();
     }
 
     public class LocalBinder extends Binder {

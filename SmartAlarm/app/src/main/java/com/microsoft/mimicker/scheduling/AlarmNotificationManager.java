@@ -17,7 +17,7 @@ import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
 import com.microsoft.mimicker.ringing.AlarmRingingActivity;
 import com.microsoft.mimicker.ringing.AlarmRingingService;
-import com.microsoft.mimicker.utilities.AlarmUtils;
+import com.microsoft.mimicker.utilities.DateTimeUtilities;
 
 import java.util.Calendar;
 import java.util.List;
@@ -59,7 +59,7 @@ public class AlarmNotificationManager {
         builder.setLargeIcon(icon);
 
         builder.setContentTitle(context.getString(R.string.notification_next_alarm_content_title));
-        builder.setContentText(AlarmUtils.getDayAndTimeAlarmDisplayString(context, alarmTime));
+        builder.setContentText(DateTimeUtilities.getDayAndTimeAlarmDisplayString(context, alarmTime));
 
         Intent startIntent = new Intent(context, AlarmMainActivity.class);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -93,7 +93,7 @@ public class AlarmNotificationManager {
         return builder.build();
     }
 
-    public void handleAlarmNotificationStatus() {
+    public void handleNextAlarmNotificationStatus() {
         // Check if notifications are enabled
         if (!shouldEnableNotifications()) return;
 
@@ -103,7 +103,7 @@ public class AlarmNotificationManager {
         SortedMap<Long, UUID> alarmValues = new TreeMap<>();
         for (Alarm alarm : alarms) {
             if (alarm.isEnabled()) {
-                alarmValues.put(AlarmScheduler.getTimeUntilAlarmIncludeSnoozed(now, alarm), alarm.getId());
+                alarmValues.put(AlarmScheduler.getAlarmTimeIncludeSnoozed(now, alarm), alarm.getId());
             }
         }
 
@@ -123,6 +123,18 @@ public class AlarmNotificationManager {
         } else {
             disableNotifications();
         }
+    }
+
+    public void handleAlarmRunningNotificationStatus(UUID alarmId) {
+        // Check if notifications are enabled
+        if (!shouldEnableNotifications()) return;
+
+        updateStateWithAlarmDetails(alarmId, 0, false);
+        AlarmRingingService.startForegroundService(mContext,
+                alarmId,
+                0,
+                NOTIFICATION_ALARM_RUNNING);
+
     }
 
     public void disableNotifications() {
