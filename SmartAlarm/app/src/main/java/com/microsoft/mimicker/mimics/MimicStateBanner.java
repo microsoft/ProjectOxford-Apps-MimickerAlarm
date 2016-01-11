@@ -14,6 +14,7 @@ public class MimicStateBanner extends TextView {
     private AnimatorSet mEnterLeftAnimation;
     private int mWidth;
     private int mSuccessColor, mFailureColor;
+
     public MimicStateBanner(Context context) {
         this(context, null);
     }
@@ -75,6 +76,12 @@ public class MimicStateBanner extends TextView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         mWidth = MeasureSpec.getSize(widthMeasureSpec);
+    }
+
+    // This is required for animation
+    public void setXPercentage(float value){
+        value /= 100f;
+        setX((mWidth > 0) ? (value * mWidth) : 0);
     }
 
     public interface Command {
