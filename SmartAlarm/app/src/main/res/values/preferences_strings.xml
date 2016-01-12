@@ -93,9 +93,11 @@
     <string name="pref_mimic_express_yourself_label">Express yourself</string>
     <string name="pref_mimic_tongue_twister_label">Tongue twister</string>
 
-    <string name="pref_mimic_color_capture_summary">Not available in grey</string>
-    <string name="pref_mimic_express_yourself_summary">Do or do not, there is no try</string>
-    <string name="pref_mimic_tongue_twister_summary">Having fun twisting tongues</string>
+    <string name="pref_mimic_color_capture_summary">Match the color by snapping a pic</string>
+    <string name="pref_mimic_express_yourself_summary">Mimic the emotion by taking a selfie</string>
+    <string name="pref_mimic_tongue_twister_summary">Repeat the phrase by speaking out loud</string>
+
+    <string name="pref_mimic_not_supported">Your phone does not support this game</string>
 
     <string name="pref_title_new">Add alarm</string>
     <string name="pref_title_edit">Edit alarm</string>

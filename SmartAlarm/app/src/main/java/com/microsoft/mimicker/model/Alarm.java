@@ -50,8 +50,8 @@ public class Alarm {
         mIsEnabled = true;
         mVibrate = true;
         mTongueTwisterEnabled = true;
-        mColorCaptureEnabled = true;
-        mExpressYourselfEnabled = true;
+        mColorCaptureEnabled = GeneralUtilities.deviceHasRearFacingCamera();
+        mExpressYourselfEnabled = GeneralUtilities.deviceHasFrontFacingCamera();
         mNew = false;
         mSnoozed = false;
         mSnoozeHour = 0;

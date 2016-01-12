@@ -2,6 +2,7 @@ package com.microsoft.mimicker.utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -128,5 +129,28 @@ public class GeneralUtilities {
         }
 
         return duration;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static boolean deviceHasFrontFacingCamera() {
+        return hasDeviceCameraWithDirection(Camera.CameraInfo.CAMERA_FACING_FRONT);
+    }
+
+    @SuppressWarnings("deprecation")
+    public static boolean deviceHasRearFacingCamera() {
+        return hasDeviceCameraWithDirection(Camera.CameraInfo.CAMERA_FACING_BACK);
+    }
+
+    @SuppressWarnings("deprecation")
+    private static boolean hasDeviceCameraWithDirection(int cameraDirection) {
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
+
+            Camera.getCameraInfo(i, cameraInfo);
+            if (cameraInfo.facing == cameraDirection) {
+                return true;
+            }
+        }
+        return false;
     }
 }

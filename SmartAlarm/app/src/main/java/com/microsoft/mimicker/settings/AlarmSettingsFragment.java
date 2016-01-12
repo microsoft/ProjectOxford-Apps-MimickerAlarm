@@ -20,13 +20,13 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.appcore.DividerItemDecoration;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
 import com.microsoft.mimicker.utilities.DateTimeUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class AlarmSettingsFragment extends PreferenceFragmentCompat {
@@ -53,11 +53,11 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         return fragment;
     }
 
-    public static AlarmSettingsFragment newInstance(String alarmId, String[] enabledMimics) {
+    public static AlarmSettingsFragment newInstance(String alarmId, ArrayList<String> enabledMimics) {
         AlarmSettingsFragment fragment = new AlarmSettingsFragment();
         Bundle bundle = new Bundle(1);
         bundle.putString(ARGS_ALARM_ID, alarmId);
-        bundle.putStringArray(ARGS_ENABLED_MIMICS, enabledMimics);
+        bundle.putStringArrayList(ARGS_ENABLED_MIMICS, enabledMimics);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -83,7 +83,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
         mAlarm = AlarmList.get(getContext()).getAlarm(alarmId);
 
-        String[] enabledMimics = args.getStringArray(ARGS_ENABLED_MIMICS);
+        ArrayList<String> enabledMimics = args.getStringArrayList(ARGS_ENABLED_MIMICS);
 
         initializeTimePreference();
         initializeRepeatingDaysPreference();
@@ -145,12 +145,9 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         mNamePreference.setAlarmName(mAlarm.getTitle());
     }
 
-    private void initializeMimicsPreference(String[] enabledValues) {
+    private void initializeMimicsPreference(ArrayList<String> enabledValues) {
         mMimicsPreference = (MimicsPreference) findPreference(getString(R.string.pref_mimics_key));
-        mMimicsPreference.setTongueTwisterEnabled(mAlarm.isTongueTwisterEnabled());
-        mMimicsPreference.setColorCaptureEnabled(mAlarm.isColorCaptureEnabled());
-        mMimicsPreference.setExpressYourselfEnabled(mAlarm.isExpressYourselfEnabled());
-        mMimicsPreference.setInitialValues();
+        mMimicsPreference.setInitialValues(mAlarm);
         if (enabledValues == null) {
             mMimicsPreference.setInitialSummary();
         } else {
@@ -285,7 +282,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         updateTimeSetting();
         updateRepeatingDaysSetting();
         updateNameSetting();
-        updateGamesSetting();
+        updateMimicsSetting();
         updateRingtoneSetting();
         updateVibrateSetting();
     }
@@ -302,7 +299,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    private void updateGamesSetting() {
+    private void updateMimicsSetting() {
         if (mMimicsPreference.hasChanged()) {
             mAlarm.setTongueTwisterEnabled(mMimicsPreference.isTongueTwisterEnabled());
             mAlarm.setColorCaptureEnabled(mMimicsPreference.isColorCaptureEnabled());
@@ -341,7 +338,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     }
 
     public interface AlarmSettingsListener {
-        void onShowMimicsSettings(String alarmId, String[] enabledValues);
+        void onShowMimicsSettings(String alarmId, ArrayList<String> enabledValues);
         void onSettingsSaveOrIgnoreChanges();
         void onSettingsDeleteOrNewCancel();
     }

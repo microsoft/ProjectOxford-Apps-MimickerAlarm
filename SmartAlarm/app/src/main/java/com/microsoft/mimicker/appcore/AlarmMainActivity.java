@@ -29,6 +29,7 @@ import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class AlarmMainActivity extends AppCompatActivity
@@ -209,13 +210,6 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onShowMimicsSettings(String alarmId, String[] enabledMimics) {
-        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
-                MimicsSettingsFragment.newInstance(alarmId, enabledMimics),
-                MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
-    }
-
-    @Override
     public void onSettingsSaveOrIgnoreChanges() {
         GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
                 new AlarmListFragment(),
@@ -235,10 +229,17 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMimicsSettingsDismiss(String alarmId, String[] enabledMimics) {
+    public void onMimicsSettingsDismiss(String alarmId, ArrayList<String> enabledMimics) {
         GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
                 AlarmSettingsFragment.newInstance(alarmId, enabledMimics),
                 AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+    }
+
+    @Override
+    public void onShowMimicsSettings(String alarmId, ArrayList<String> enabledMimics) {
+        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                MimicsSettingsFragment.newInstance(alarmId, enabledMimics),
+                MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
     }
 
     @Override

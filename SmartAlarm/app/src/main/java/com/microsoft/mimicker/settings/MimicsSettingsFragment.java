@@ -4,7 +4,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.CheckBoxPreference;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -14,8 +17,10 @@ import android.widget.LinearLayout;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.appcore.DividerItemDecoration;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 import com.microsoft.mimicker.utilities.Logger;
 
+import java.util.ArrayList;
 
 public class MimicsSettingsFragment extends PreferenceFragmentCompat {
     public static final String MIMICS_SETTINGS_FRAGMENT_TAG = "mimics_settings_fragment";
@@ -24,11 +29,11 @@ public class MimicsSettingsFragment extends PreferenceFragmentCompat {
     MimicsSettingsListener mCallback;
     private String mAlarmId;
 
-    public static MimicsSettingsFragment newInstance(String alarmId, String[] enabledMimics) {
+    public static MimicsSettingsFragment newInstance(String alarmId, ArrayList<String> enabledMimics) {
         MimicsSettingsFragment fragment = new MimicsSettingsFragment();
         Bundle bundle = new Bundle(1);
         bundle.putString(ARGS_ALARM_ID, alarmId);
-        bundle.putStringArray(ARGS_ENABLED_MIMICS, enabledMimics);
+        bundle.putStringArrayList(ARGS_ENABLED_MIMICS, enabledMimics);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -49,14 +54,14 @@ public class MimicsSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle bundle, final String s) {
         addPreferencesFromResource(R.xml.pref_mimics);
+        setDefaultEnabledState();
 
         Bundle args = getArguments();
         mAlarmId = args.getString(ARGS_ALARM_ID);
-        String[] enabledMimics = args.getStringArray(ARGS_ENABLED_MIMICS);
-        for (String mimic : enabledMimics) {
-
+        ArrayList<String> enabledMimics = args.getStringArrayList(ARGS_ENABLED_MIMICS);
+        for (String mimicId : enabledMimics) {
+            ((CheckBoxPreference)findPreference(mimicId)).setChecked(true);
         }
-
     }
 
     @Override
@@ -88,12 +93,38 @@ public class MimicsSettingsFragment extends PreferenceFragmentCompat {
         mCallback.onMimicsSettingsDismiss(mAlarmId, getEnabledMimics());
     }
 
-    private String[] getEnabledMimics() {
-        return null;
+    private void setDefaultEnabledState() {
+        PreferenceScreen preferenceScreen = getPreferenceManager().getPreferenceScreen();
+        for (int i = 0; i < preferenceScreen.getPreferenceCount(); i++) {
+            ((CheckBoxPreference)preferenceScreen.getPreference(i)).setChecked(false);
+        }
+
+        if (!GeneralUtilities.deviceHasFrontFacingCamera()) {
+            Preference preference = findPreference(getString(R.string.pref_mimic_express_yourself_id));
+            preference.setEnabled(false);
+            preference.setSummary(R.string.pref_mimic_not_supported);
+        }
+        if (!GeneralUtilities.deviceHasRearFacingCamera()) {
+            Preference preference = findPreference(getString(R.string.pref_mimic_color_capture_id));
+            preference.setEnabled(false);
+            preference.setSummary(R.string.pref_mimic_not_supported);
+        }
+    }
+
+    private ArrayList<String> getEnabledMimics() {
+        ArrayList<String> enabledMimics = new ArrayList<>();
+        PreferenceScreen preferenceScreen = getPreferenceManager().getPreferenceScreen();
+        for (int i = 0; i < preferenceScreen.getPreferenceCount(); i++) {
+            CheckBoxPreference preference = (CheckBoxPreference)preferenceScreen.getPreference(i);
+            if (preference.isChecked()) {
+                enabledMimics.add(preference.getKey());
+            }
+        }
+        return enabledMimics;
     }
 
     public interface MimicsSettingsListener {
-        void onMimicsSettingsDismiss(String alarmId, String[] enabledMimics);
+        void onMimicsSettingsDismiss(String alarmId, ArrayList<String> enabledMimics);
     }
 }
 
