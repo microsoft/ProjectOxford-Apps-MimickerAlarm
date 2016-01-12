@@ -17,8 +17,11 @@ import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
 import com.microsoft.mimicker.scheduling.AlarmScheduler;
 import com.microsoft.mimicker.settings.AlarmSettingsFragment;
+import com.microsoft.mimicker.settings.MimicsPreference;
+import com.microsoft.mimicker.settings.MimicsSettingsFragment;
 import com.microsoft.mimicker.utilities.GeneralUtilities;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class AlarmRingingActivity extends AppCompatActivity
@@ -27,9 +30,11 @@ public class AlarmRingingActivity extends AppCompatActivity
         AlarmRingingFragment.RingingResultListener,
         AlarmSnoozeFragment.SnoozeResultListener,
         AlarmNoMimicsFragment.NoMimicResultListener,
-        AlarmSettingsFragment.AlarmSettingsListener {
+        AlarmSettingsFragment.AlarmSettingsListener,
+        MimicsSettingsFragment.MimicsSettingsListener {
 
-    private static final int ALARM_DURATION_INTEGER = (120 * 60) * 1000;
+
+    private static final int ALARM_DURATION_INTEGER = (2 * 60 * 60) * 1000;
     public final String TAG = this.getClass().getSimpleName();
     private Alarm mAlarm;
     private Fragment mAlarmRingingFragment;
@@ -62,13 +67,8 @@ public class AlarmRingingActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
+        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ARGS_ALARM_ID);
         mAlarm = AlarmList.get(this).getAlarm(alarmId);
-
-        // Schedule the next repeating alarm if necessary
-        if (!mAlarm.isOneShot()) {
-            AlarmScheduler.scheduleAlarm(this, mAlarm);
-        }
 
         Log.d(TAG, "Creating activity!");
 
@@ -104,6 +104,7 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     @Override
     public void onMimicSuccess(String shareable) {
+        mAlarm.onDismiss();
         cancelAlarmTimeout();
         if (shareable != null && shareable.length() > 0) {
             GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
@@ -141,6 +142,7 @@ public class AlarmRingingActivity extends AppCompatActivity
             GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
                     mimicFragment, MimicFactory.MIMIC_FRAGMENT_TAG);
         } else {
+            mAlarm.onDismiss();
             cancelAlarmTimeout();
             GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
                     AlarmNoMimicsFragment.newInstance(mAlarm.getId().toString()),
@@ -168,8 +170,9 @@ public class AlarmRingingActivity extends AppCompatActivity
     public void onNoMimicDismiss(boolean launchSettings) {
         if (launchSettings) {
             GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
-                    AlarmSettingsFragment.newInstance(mAlarm.getId().toString()),
-                    AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+                    MimicsSettingsFragment.newInstance(mAlarm.getId().toString(),
+                            MimicsPreference.getEnabledMimics(this, mAlarm)),
+                    MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
         } else {
             finishActivity();
         }
@@ -183,6 +186,20 @@ public class AlarmRingingActivity extends AppCompatActivity
     @Override
     public void onSettingsDeleteOrNewCancel() {
         finishActivity();
+    }
+
+    @Override
+    public void onMimicsSettingsDismiss(String alarmId, ArrayList<String> enabledMimics) {
+        GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                AlarmSettingsFragment.newInstance(mAlarm.getId().toString(), enabledMimics),
+                AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+    }
+
+    @Override
+    public void onShowMimicsSettings(String alarmId, ArrayList<String> enabledMimics) {
+        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                MimicsSettingsFragment.newInstance(mAlarm.getId().toString(), enabledMimics),
+                MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
     }
 
     @Override
@@ -213,9 +230,15 @@ public class AlarmRingingActivity extends AppCompatActivity
         if (isGameRunning()) {
             transitionBackToRingingScreen();
         } else if (areEditingSettings()) {
-            ((AlarmSettingsFragment) getSupportFragmentManager()
-                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
-                    .onCancel();
+            if (areEditingMimicSettings()) {
+                ((MimicsSettingsFragment) getSupportFragmentManager()
+                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG))
+                        .onBack();
+            } else {
+                ((AlarmSettingsFragment) getSupportFragmentManager()
+                        .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
+                        .onCancel();
+            }
         } else if (!isAlarmRinging()) {
             finishActivity();
         }
@@ -246,7 +269,14 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     private boolean areEditingSettings() {
         return (getSupportFragmentManager()
-                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null);
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null) ||
+                (getSupportFragmentManager()
+                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
+    }
+
+    private boolean areEditingMimicSettings() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
     }
 
     private int getAlarmRingingDuration() {

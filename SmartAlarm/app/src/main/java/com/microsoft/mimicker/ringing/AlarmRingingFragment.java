@@ -57,7 +57,6 @@ public class AlarmRingingFragment extends Fragment {
     // us to hide left arrow or right arrow
     private float mDragThreshold;
 
-    private UUID mAlarmId;
     private boolean mShowClockOnDragEnd;
     private Alarm mAlarm;
 
@@ -75,8 +74,8 @@ public class AlarmRingingFragment extends Fragment {
 
         Logger.init(getActivity());
         Bundle args = getArguments();
-        mAlarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
-        mAlarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
+        UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
+        mAlarm = AlarmList.get(getContext()).getAlarm(alarmId);
 
         View view = inflater.inflate(R.layout.fragment_alarm_ringing, container, false);
 
@@ -224,24 +223,8 @@ public class AlarmRingingFragment extends Fragment {
     private void dismissAlarm() {
         mShowClockOnDragEnd = false;
 
-        boolean updateAlarm = false;
-        if (mAlarm.isSnoozed()) {
-            mAlarm.setSnoozed(false);
-            updateAlarm = true;
-        }
-
-        if (mAlarm.isOneShot()) {
-            mAlarm.setIsEnabled(false);
-            updateAlarm = true;
-        }
-
-        if (updateAlarm) {
-            AlarmList.get(getContext()).updateAlarm(mAlarm);
-        }
-
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ALARM_DISMISS);
-        Alarm alarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
-        userAction.putJSON(alarm.toJSON());
+        userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
 
         mCallback.onRingingDismiss();

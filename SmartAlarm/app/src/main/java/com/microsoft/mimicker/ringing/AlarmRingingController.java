@@ -59,7 +59,7 @@ public final class AlarmRingingController extends AlarmRingingSessionDispatcher 
     @Override
     public void dispatchAlarmRingingSession(Intent intent) {
         if (intent != null) {
-            UUID alarmId = (UUID) intent.getExtras().getSerializable(AlarmScheduler.ALARM_ID);
+            UUID alarmId = (UUID) intent.getExtras().getSerializable(AlarmScheduler.ARGS_ALARM_ID);
             mCurrentAlarm = AlarmList.get(mContext).getAlarm(alarmId);
             startAlarmRinging();
             launchRingingUserExperience(alarmId);

@@ -50,8 +50,8 @@ public class Alarm {
         mIsEnabled = true;
         mVibrate = true;
         mTongueTwisterEnabled = true;
-        mColorCaptureEnabled = true;
-        mExpressYourselfEnabled = true;
+        mColorCaptureEnabled = GeneralUtilities.deviceHasRearFacingCamera();
+        mExpressYourselfEnabled = GeneralUtilities.deviceHasFrontFacingCamera();
         mNew = false;
         mSnoozed = false;
         mSnoozeHour = 0;
@@ -83,6 +83,7 @@ public class Alarm {
         setSnoozeMinute(snoozeCalendar.get(Calendar.MINUTE));
         setSnoozeSeconds(snoozeCalendar.get(Calendar.SECOND));
         setSnoozed(true);
+        setIsEnabled(true);
         AlarmList.get(context).updateAlarm(this);
     }
 
@@ -101,6 +102,27 @@ public class Alarm {
         setSnoozed(false);
         AlarmScheduler.cancelAlarm(context, this);
         AlarmList.get(context).updateAlarm(this);
+    }
+
+    public void onDismiss() {
+        Context context = AlarmApplication.getAppContext();
+        boolean updateAlarm = false;
+        // Schedule the next repeating alarm if necessary
+        if (!isOneShot()) {
+            AlarmScheduler.scheduleAlarm(context, this);
+        } else {
+            setIsEnabled(false);
+            updateAlarm = true;
+        }
+
+        if (isSnoozed()) {
+            setSnoozed(false);
+            updateAlarm = true;
+        }
+
+        if (updateAlarm) {
+            AlarmList.get(context).updateAlarm(this);
+        }
     }
 
     private int getAlarmSnoozeDuration() {

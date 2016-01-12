@@ -50,7 +50,7 @@ public class AlarmListItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
             View itemView = viewHolder.itemView;
             Resources resources = AlarmApplication.getAppContext().getResources();
-            Bitmap icon = BitmapFactory.decodeResource(resources, R.drawable.ic_delete_white_36dp);
+            Bitmap icon = BitmapFactory.decodeResource(resources, R.drawable.delete_trash_can);
             int iconPadding = resources.getDimensionPixelOffset(R.dimen.alarm_list_delete_icon_padding);
             int maxDrawWidth = (iconPadding * 2) + icon.getWidth();
 

@@ -19,6 +19,7 @@ import com.microsoft.mimicker.onboarding.OnboardingTutorialFragment;
 import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
 import com.microsoft.mimicker.scheduling.AlarmScheduler;
 import com.microsoft.mimicker.settings.AlarmSettingsFragment;
+import com.microsoft.mimicker.settings.MimicsSettingsFragment;
 import com.microsoft.mimicker.utilities.GeneralUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
@@ -28,13 +29,15 @@ import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class AlarmMainActivity extends AppCompatActivity
         implements AlarmListFragment.AlarmListListener,
         OnboardingTutorialFragment.OnOnboardingTutorialListener,
         OnboardingToSFragment.OnOnboardingToSListener,
-        AlarmSettingsFragment.AlarmSettingsListener {
+        AlarmSettingsFragment.AlarmSettingsListener,
+        MimicsSettingsFragment.MimicsSettingsListener {
 
     public final static String SHOULD_ONBOARD = "onboarding";
     public final static String SHOULD_TOS = "show-tos";
@@ -51,7 +54,7 @@ public class AlarmMainActivity extends AppCompatActivity
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         AlarmNotificationManager.get(this).handleNextAlarmNotificationStatus();
 
-        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
+        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ARGS_ALARM_ID);
         if (alarmId != null) {
             showAlarmSettingsFragment(alarmId.toString());
         }
@@ -62,7 +65,7 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        UUID alarmId = (UUID) intent.getSerializableExtra(AlarmScheduler.ALARM_ID);
+        UUID alarmId = (UUID) intent.getSerializableExtra(AlarmScheduler.ARGS_ALARM_ID);
         if (alarmId != null) {
             showAlarmSettingsFragment(alarmId.toString());
         }
@@ -152,9 +155,15 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         if (areEditingSettings()) {
-            ((AlarmSettingsFragment) getSupportFragmentManager()
-                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
-                    .onCancel();
+            if (areEditingMimicSettings()) {
+                ((MimicsSettingsFragment) getSupportFragmentManager()
+                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG))
+                        .onBack();
+            } else {
+                ((AlarmSettingsFragment) getSupportFragmentManager()
+                        .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
+                        .onCancel();
+            }
         } else {
             super.onBackPressed();
         }
@@ -185,7 +194,14 @@ public class AlarmMainActivity extends AppCompatActivity
 
     private boolean areEditingSettings() {
         return (getSupportFragmentManager()
-                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null);
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null) ||
+                (getSupportFragmentManager()
+                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
+    }
+
+    private boolean areEditingMimicSettings() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
     }
 
     private boolean hasOnboardingStarted() {
@@ -210,6 +226,20 @@ public class AlarmMainActivity extends AppCompatActivity
         transaction.commit();
         setTitle(R.string.alarm_list_title);
         onAlarmChanged();
+    }
+
+    @Override
+    public void onMimicsSettingsDismiss(String alarmId, ArrayList<String> enabledMimics) {
+        GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                AlarmSettingsFragment.newInstance(alarmId, enabledMimics),
+                AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+    }
+
+    @Override
+    public void onShowMimicsSettings(String alarmId, ArrayList<String> enabledMimics) {
+        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                MimicsSettingsFragment.newInstance(alarmId, enabledMimics),
+                MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
     }
 
     @Override

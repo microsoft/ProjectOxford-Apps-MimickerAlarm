@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.Loggable;
@@ -57,6 +56,7 @@ public class ShareFragment extends Fragment {
     private Handler mHandler;
     private Runnable mSharingFragmentDismissTask;
     private Runnable mToastAutoDismiss;
+    private int mSharingFragmentDismissTaskDelay = SHARING_FRAGMENT_STAY_DURATION;
 
     public static ShareFragment newInstance(String shareableUri) {
         ShareFragment fragment = new ShareFragment();
@@ -149,8 +149,7 @@ public class ShareFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Reset the timer to wait sharing to complete
-                mHandler.removeCallbacks(mSharingFragmentDismissTask);
-                mHandler.postDelayed(mSharingFragmentDismissTask, SHARING_FRAGMENT_SHARE_STAY_DURATION);
+                updateDismissTaskWithDelayDuration(SHARING_FRAGMENT_SHARE_STAY_DURATION);
                 share();
             }
         });
@@ -159,8 +158,7 @@ public class ShareFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Reset the timer to wait downloading to complete
-                mHandler.removeCallbacks(mSharingFragmentDismissTask);
-                mHandler.postDelayed(mSharingFragmentDismissTask, SHARING_FRAGMENT_SAVE_STAY_DURATION);
+                updateDismissTaskWithDelayDuration(SHARING_FRAGMENT_SAVE_STAY_DURATION);
                 download();
             }
         });
@@ -177,7 +175,6 @@ public class ShareFragment extends Fragment {
         };
 
         mHandler = new Handler();
-        mHandler.postDelayed(mSharingFragmentDismissTask, SHARING_FRAGMENT_STAY_DURATION);
 
         Logger.init(getActivity());
         return view;
@@ -196,12 +193,19 @@ public class ShareFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        mHandler.removeCallbacks(mSharingFragmentDismissTask);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         if (mShareableUri != null && mShareableUri.length() > 0) {
             Uri shareableUri = Uri.parse(mShareableUri);
             mShareableImage.setImageURI(shareableUri);
         }
+        mHandler.postDelayed(mSharingFragmentDismissTask, mSharingFragmentDismissTaskDelay);
     }
 
     @Override
@@ -220,9 +224,7 @@ public class ShareFragment extends Fragment {
                 }
             }).start();
         }
-        if (mToastAutoDismiss != null) {
-            mHandler.removeCallbacks(mToastAutoDismiss);
-        }
+        mHandler.removeCallbacks(mToastAutoDismiss);
     }
 
     public void share() {
@@ -324,5 +326,11 @@ public class ShareFragment extends Fragment {
             }
         };
         handler.postDelayed(mToastAutoDismiss, TOAST_IN_FRAGMENT_DELAY);
+    }
+
+    private void updateDismissTaskWithDelayDuration(int delayDuration) {
+        mHandler.removeCallbacks(mSharingFragmentDismissTask);
+        mSharingFragmentDismissTaskDelay = delayDuration;
+        mHandler.postDelayed(mSharingFragmentDismissTask, mSharingFragmentDismissTaskDelay);
     }
 }

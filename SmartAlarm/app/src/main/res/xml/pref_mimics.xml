@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="@string/pref_mimic_color_capture_id"
+        android:title="@string/pref_mimic_color_capture_label"
+        android:summary="@string/pref_mimic_color_capture_summary"
+        android:defaultValue="true"/>
+
+    <CheckBoxPreference
+        android:key="@string/pref_mimic_express_yourself_id"
+        android:title="@string/pref_mimic_express_yourself_label"
+        android:summary="@string/pref_mimic_express_yourself_summary"
+        android:defaultValue="true"/>
+
+    <CheckBoxPreference
+        android:key="@string/pref_mimic_tongue_twister_id"
+        android:title="@string/pref_mimic_tongue_twister_label"
+        android:summary="@string/pref_mimic_tongue_twister_summary"
+        android:defaultValue="true"/>
+
+</PreferenceScreen>
