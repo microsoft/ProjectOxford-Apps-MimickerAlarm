@@ -155,10 +155,12 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
 
     protected void gameFailure(boolean allowRetry) {
         if (allowRetry) {
+            mTimer.pause();
             String failureMessage = getString(R.string.mimic_failure_message);
             mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
                 @Override
                 public void execute() {
+                    mTimer.resume();
                     mCaptureButton.readyAudio();
                 }
             });
