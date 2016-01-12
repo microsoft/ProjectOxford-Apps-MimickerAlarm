@@ -67,7 +67,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
+        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ARGS_ALARM_ID);
         mAlarm = AlarmList.get(this).getAlarm(alarmId);
 
         Log.d(TAG, "Creating activity!");

@@ -54,7 +54,7 @@ public class AlarmMainActivity extends AppCompatActivity
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         AlarmNotificationManager.get(this).handleNextAlarmNotificationStatus();
 
-        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ALARM_ID);
+        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ARGS_ALARM_ID);
         if (alarmId != null) {
             showAlarmSettingsFragment(alarmId.toString());
         }
@@ -65,7 +65,7 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        UUID alarmId = (UUID) intent.getSerializableExtra(AlarmScheduler.ALARM_ID);
+        UUID alarmId = (UUID) intent.getSerializableExtra(AlarmScheduler.ARGS_ALARM_ID);
         if (alarmId != null) {
             showAlarmSettingsFragment(alarmId.toString());
         }
