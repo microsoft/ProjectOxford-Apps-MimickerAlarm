@@ -74,9 +74,9 @@
     <string name="pref_no_repeating">Does not repeat</string>
 
     <string-array name="pref_mimic_labels">
-        <item>Color capture</item>
-        <item>Express yourself</item>
-        <item>Tongue twister</item>
+        <item>@string/pref_mimic_color_capture_label</item>
+        <item>@string/pref_mimic_express_yourself_label</item>
+        <item>@string/pref_mimic_tongue_twister_label</item>
     </string-array>
 
     <string name="pref_mimic_tongue_twister_id">tongue_twister</string>

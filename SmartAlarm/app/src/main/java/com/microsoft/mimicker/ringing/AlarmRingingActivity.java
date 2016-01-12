@@ -104,7 +104,7 @@ public class AlarmRingingActivity extends AppCompatActivity
 
     @Override
     public void onMimicSuccess(String shareable) {
-        mAlarm.dismiss();
+        mAlarm.onDismiss();
         cancelAlarmTimeout();
         if (shareable != null && shareable.length() > 0) {
             GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
@@ -142,7 +142,7 @@ public class AlarmRingingActivity extends AppCompatActivity
             GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
                     mimicFragment, MimicFactory.MIMIC_FRAGMENT_TAG);
         } else {
-            mAlarm.dismiss();
+            mAlarm.onDismiss();
             cancelAlarmTimeout();
             GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
                     AlarmNoMimicsFragment.newInstance(mAlarm.getId().toString()),

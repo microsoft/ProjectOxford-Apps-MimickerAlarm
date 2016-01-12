@@ -104,7 +104,7 @@ public class Alarm {
         AlarmList.get(context).updateAlarm(this);
     }
 
-    public void dismiss() {
+    public void onDismiss() {
         Context context = AlarmApplication.getAppContext();
         boolean updateAlarm = false;
         // Schedule the next repeating alarm if necessary

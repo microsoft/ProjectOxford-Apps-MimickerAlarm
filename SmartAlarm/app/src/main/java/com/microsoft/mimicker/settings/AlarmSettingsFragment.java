@@ -82,7 +82,6 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         Bundle args = getArguments();
         UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
         mAlarm = AlarmList.get(getContext()).getAlarm(alarmId);
-
         ArrayList<String> enabledMimics = args.getStringArrayList(ARGS_ENABLED_MIMICS);
 
         initializeTimePreference();
