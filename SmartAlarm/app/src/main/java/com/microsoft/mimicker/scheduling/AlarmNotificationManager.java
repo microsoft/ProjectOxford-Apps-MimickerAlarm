@@ -54,7 +54,7 @@ public class AlarmNotificationManager {
 
     public static Notification createNextAlarmNotification(Context context, UUID alarmId, long alarmTime) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_alarm_on_white_18dp);
+        builder.setSmallIcon(R.drawable.alarm_clock_notification);
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_no_bg);
         builder.setLargeIcon(icon);
 
@@ -72,7 +72,7 @@ public class AlarmNotificationManager {
 
     public static Notification createAlarmRunningNotification(Context context, UUID alarmId) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_alarm_on_white_18dp);
+        builder.setSmallIcon(R.drawable.alarm_clock_notification);
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_no_bg);
         builder.setLargeIcon(icon);
 
