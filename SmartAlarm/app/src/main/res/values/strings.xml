@@ -8,7 +8,6 @@
     <string name="title_activity_alarm_settings">Settings</string>
     <string name="empty_alarm_list_text">You don\'t have any alarms set!\nUse the button to add alarms</string>
     <string name="title_activity_learn_more">Learn more</string>
-    <string name="alarm_ringing_default_text">Wakey Wakey</string>
     <string name="alarm_list_weekend">Weekend</string>
     <string name="alarm_list_weekdays">Weekdays</string>
     <string name="alarm_list_every_day">Every day</string>
@@ -29,7 +28,7 @@
     <string name="mimic_failure_message">That does not look quite right</string>
     <string name="mimic_success_message">You did it!</string>
     <string name="mimic_emotion_failure">You look too %s, try again</string>
-    <string name="mimic_emotion_failure_not_enough">You don't look %s enough, try again</string>
+    <string name="mimic_emotion_failure_not_enough">You don\'t look %s enough, try again</string>
     <string name="mimic_twister_perfect_message">Perfect!</string>
 
     <string name="onboarding_tutorial_title_1">Set your alarm</string>

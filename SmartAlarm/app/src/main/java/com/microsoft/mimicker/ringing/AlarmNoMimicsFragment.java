@@ -44,10 +44,6 @@ public class AlarmNoMimicsFragment extends Fragment {
         TextView alarmTitle = (TextView) view.findViewById(R.id.alarm_no_mimics_label);
 
         String name = alarm.getTitle();
-        if (name == null || name.isEmpty()) {
-            name = getString(R.string.alarm_ringing_default_text);
-        }
-
         alarmTitle.setText(name);
 
         view.findViewById(R.id.alarm_no_mimics_tap_to_add).setOnClickListener(new View.OnClickListener() {

@@ -132,7 +132,7 @@ public class Alarm {
     }
 
     public String getTitle() {
-        return mTitle;
+        return mTitle == null ? "" : mTitle;
     }
 
     public void setTitle(String title) {

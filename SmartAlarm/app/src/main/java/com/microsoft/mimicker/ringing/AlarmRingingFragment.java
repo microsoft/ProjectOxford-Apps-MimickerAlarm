@@ -88,9 +88,6 @@ public class AlarmRingingFragment extends Fragment {
         dateField.setText(DateTimeUtilities.getFullDateStringForNow());
 
         String name = mAlarm.getTitle();
-        if (name == null || name.isEmpty()) {
-            name = getString(R.string.alarm_ringing_default_text);
-        }
         TextView titleField = (TextView) view.findViewById(R.id.alarm_ringing_title);
         titleField.setText(name);
 
