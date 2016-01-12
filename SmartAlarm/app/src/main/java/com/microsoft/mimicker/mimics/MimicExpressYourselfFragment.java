@@ -106,7 +106,12 @@ public class MimicExpressYourselfFragment extends MimicWithCameraFragment {
                     Resources resources = getResources();
                     int adjectiveId = resources.getIdentifier("emotion_" + dominantEmotion, "string", getActivity().getPackageName());
                     String adjective = resources.getString(adjectiveId);
-                    gameResult.message = String.format(resources.getString(R.string.mimic_emotion_failure), adjective);
+                    if (dominantEmotion.equalsIgnoreCase(mEmotion)) {
+                        gameResult.message = String.format(resources.getString(R.string.mimic_emotion_failure_not_enough), adjective);
+                    }
+                    else {
+                        gameResult.message = String.format(resources.getString(R.string.mimic_emotion_failure), adjective);
+                    }
                 }
             }
         }
@@ -128,5 +133,3 @@ public class MimicExpressYourselfFragment extends MimicWithCameraFragment {
         super.gameFailure(gameResult, allowRetry);
     }
 }
-
-

@@ -29,6 +29,7 @@
     <string name="mimic_failure_message">That does not look quite right</string>
     <string name="mimic_success_message">You did it!</string>
     <string name="mimic_emotion_failure">You look too %s, try again</string>
+    <string name="mimic_emotion_failure_not_enough">You don't look %s enough, try again</string>
     <string name="mimic_twister_perfect_message">Perfect!</string>
 
     <string name="onboarding_tutorial_title_1">Set your alarm</string>
