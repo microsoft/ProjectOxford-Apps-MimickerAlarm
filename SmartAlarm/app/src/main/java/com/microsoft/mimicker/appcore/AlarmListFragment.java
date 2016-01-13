@@ -77,6 +77,7 @@ public class AlarmListFragment extends Fragment implements
 
         Toolbar toolbar = (Toolbar) view
                 .findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.alarm_list_title);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
         AlarmFloatingActionButton fab = (AlarmFloatingActionButton) view.findViewById(R.id.fab);

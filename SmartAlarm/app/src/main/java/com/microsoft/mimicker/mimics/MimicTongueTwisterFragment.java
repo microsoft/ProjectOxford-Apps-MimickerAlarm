@@ -20,7 +20,7 @@ import com.microsoft.mimicker.mimics.MimicFactory.MimicResultListener;
 import com.microsoft.mimicker.ringing.ShareFragment;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.KeyUtil;
+import com.microsoft.mimicker.utilities.KeyUtilities;
 import com.microsoft.projectoxford.speechrecognition.Confidence;
 import com.microsoft.projectoxford.speechrecognition.ISpeechRecognitionServerEvents;
 import com.microsoft.projectoxford.speechrecognition.MicrophoneRecognitionClient;
@@ -244,7 +244,7 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
         try {
             //TODO: localize
             String language = "en-us";
-            String subscriptionKey = KeyUtil.getToken(getActivity(), "speech");
+            String subscriptionKey = KeyUtilities.getToken(getActivity(), "speech");
             if (mMicClient == null) {
                 mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(getActivity(), mRecognitionMode, language, this, subscriptionKey);
             }

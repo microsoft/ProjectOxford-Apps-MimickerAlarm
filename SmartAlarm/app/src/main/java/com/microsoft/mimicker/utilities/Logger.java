@@ -30,7 +30,7 @@ public class Logger {
             String android_id = Secure.getString(caller.getContentResolver(), Secure.ANDROID_ID);
             try {
 
-                sMixpanelToken = KeyUtil.getToken(caller, "mixpanel");
+                sMixpanelToken = KeyUtilities.getToken(caller, "mixpanel");
 
                 sStarted = true;
 

@@ -3,6 +3,7 @@ package com.microsoft.mimicker.settings;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
@@ -24,15 +25,12 @@ import java.util.ArrayList;
 
 public class MimicsSettingsFragment extends PreferenceFragmentCompat {
     public static final String MIMICS_SETTINGS_FRAGMENT_TAG = "mimics_settings_fragment";
-    private static final String ARGS_ALARM_ID = "alarm_id";
     private static final String ARGS_ENABLED_MIMICS = "enabled_mimics";
     MimicsSettingsListener mCallback;
-    private String mAlarmId;
 
-    public static MimicsSettingsFragment newInstance(String alarmId, ArrayList<String> enabledMimics) {
+    public static MimicsSettingsFragment newInstance(ArrayList<String> enabledMimics) {
         MimicsSettingsFragment fragment = new MimicsSettingsFragment();
         Bundle bundle = new Bundle(1);
-        bundle.putString(ARGS_ALARM_ID, alarmId);
         bundle.putStringArrayList(ARGS_ENABLED_MIMICS, enabledMimics);
         fragment.setArguments(bundle);
         return fragment;
@@ -52,12 +50,20 @@ public class MimicsSettingsFragment extends PreferenceFragmentCompat {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        // We need to pass the enabled Mimics to the Alarm Settings
+        if (launchedFromAlarmSettings()) {
+            onBack();
+        }
+    }
+
+    @Override
     public void onCreatePreferences(Bundle bundle, final String s) {
         addPreferencesFromResource(R.xml.pref_mimics);
         setDefaultEnabledState();
 
         Bundle args = getArguments();
-        mAlarmId = args.getString(ARGS_ALARM_ID);
         ArrayList<String> enabledMimics = args.getStringArrayList(ARGS_ENABLED_MIMICS);
         for (String mimicId : enabledMimics) {
             ((CheckBoxPreference)findPreference(mimicId)).setChecked(true);
@@ -78,7 +84,13 @@ public class MimicsSettingsFragment extends PreferenceFragmentCompat {
         bar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBack();
+                // If Alarm settings is already in the backstack just pop, otherwise callback
+                if (launchedFromAlarmSettings()) {
+                    getFragmentManager().popBackStack();
+                } else {
+                    onBack();
+                }
+
             }
         });
         bar.setTitle(R.string.pref_title_mimics);
@@ -90,7 +102,7 @@ public class MimicsSettingsFragment extends PreferenceFragmentCompat {
     }
 
     public void onBack() {
-        mCallback.onMimicsSettingsDismiss(mAlarmId, getEnabledMimics());
+        mCallback.onMimicsSettingsDismiss(getEnabledMimics());
     }
 
     private void setDefaultEnabledState() {
@@ -123,8 +135,13 @@ public class MimicsSettingsFragment extends PreferenceFragmentCompat {
         return enabledMimics;
     }
 
+    private boolean launchedFromAlarmSettings() {
+        return (getFragmentManager()
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null);
+    }
+
     public interface MimicsSettingsListener {
-        void onMimicsSettingsDismiss(String alarmId, ArrayList<String> enabledMimics);
+        void onMimicsSettingsDismiss(ArrayList<String> enabledMimics);
     }
 }
 

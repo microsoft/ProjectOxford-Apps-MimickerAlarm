@@ -107,12 +107,14 @@ public class Alarm {
     public void onDismiss() {
         Context context = AlarmApplication.getAppContext();
         boolean updateAlarm = false;
-        // Schedule the next repeating alarm if necessary
-        if (!isOneShot()) {
-            AlarmScheduler.scheduleAlarm(context, this);
-        } else {
+        if (isOneShot()) {
+            // We disable a oneshot alarm after it has been dismissed
             setIsEnabled(false);
             updateAlarm = true;
+
+        } else {
+            // Schedule the next repeating alarm if necessary
+            AlarmScheduler.scheduleAlarm(context, this);
         }
 
         if (isSnoozed()) {

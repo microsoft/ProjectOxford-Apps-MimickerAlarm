@@ -84,6 +84,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         mAlarm = AlarmList.get(getContext()).getAlarm(alarmId);
         ArrayList<String> enabledMimics = args.getStringArrayList(ARGS_ENABLED_MIMICS);
 
+        // Initialize the preferences from the alarm object before populating the settings list
         initializeTimePreference();
         initializeRepeatingDaysPreference();
         initializeNamePreference();
@@ -96,7 +97,8 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public RecyclerView onCreateRecyclerView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         LinearLayout rootLayout = (LinearLayout) parent.getParent();
-        AppBarLayout appBarLayout = (AppBarLayout) LayoutInflater.from(getContext()).inflate(R.layout.settings_toolbar, rootLayout, false);
+        AppBarLayout appBarLayout = (AppBarLayout) LayoutInflater.from(getContext())
+                .inflate(R.layout.settings_toolbar, rootLayout, false);
         rootLayout.addView(appBarLayout, 0); // insert at top
         Toolbar bar = (Toolbar) appBarLayout.findViewById(R.id.settings_toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(bar);
@@ -122,7 +124,12 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         int buttonsPreferenceOrder = mButtonsPreference.getOrder();
         int[] excludeDividerList = new int[] { timePreferenceOrder, buttonsPreferenceOrder };
         recyclerView.addItemDecoration(new SettingsDividerItemDecoration(getContext(), excludeDividerList));
+
         return recyclerView;
+    }
+
+    public void updateMimicsPreference(ArrayList<String> enabledMimics) {
+        mMimicsPreference.setMimicValuesAndSummary(enabledMimics);
     }
 
     private void initializeTimePreference() {
@@ -155,8 +162,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         mMimicsPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                mCallback.onShowMimicsSettings(mAlarm.getId().toString(),
-                        mMimicsPreference.getEnabledMimicValues());
+                mCallback.onShowMimicsSettings(mMimicsPreference.getEnabledMimicValues());
                 return true;
             }
         });
@@ -337,7 +343,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     }
 
     public interface AlarmSettingsListener {
-        void onShowMimicsSettings(String alarmId, ArrayList<String> enabledValues);
+        void onShowMimicsSettings(ArrayList<String> enabledMimics);
         void onSettingsSaveOrIgnoreChanges();
         void onSettingsDeleteOrNewCancel();
     }

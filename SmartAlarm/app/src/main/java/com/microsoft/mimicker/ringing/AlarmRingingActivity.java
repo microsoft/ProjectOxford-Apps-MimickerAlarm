@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -170,7 +171,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     public void onNoMimicDismiss(boolean launchSettings) {
         if (launchSettings) {
             GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
-                    MimicsSettingsFragment.newInstance(mAlarm.getId().toString(),
+                    MimicsSettingsFragment.newInstance(
                             MimicsPreference.getEnabledMimics(this, mAlarm)),
                     MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
         } else {
@@ -189,17 +190,29 @@ public class AlarmRingingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMimicsSettingsDismiss(String alarmId, ArrayList<String> enabledMimics) {
-        GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
-                AlarmSettingsFragment.newInstance(mAlarm.getId().toString(), enabledMimics),
-                AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+    public void onMimicsSettingsDismiss(ArrayList<String> enabledMimics) {
+        // If Mimics settings was launched from Alarm settings just update Alarm settings,
+        // otherwise we need to launch Alarm settings
+        AlarmSettingsFragment settingsFragment = (AlarmSettingsFragment)getSupportFragmentManager()
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+        if (settingsFragment != null){
+            settingsFragment.updateMimicsPreference(enabledMimics);
+        } else {
+            GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                    AlarmSettingsFragment.newInstance(mAlarm.getId().toString(), enabledMimics),
+                    AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+        }
     }
 
     @Override
-    public void onShowMimicsSettings(String alarmId, ArrayList<String> enabledMimics) {
-        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
-                MimicsSettingsFragment.newInstance(mAlarm.getId().toString(), enabledMimics),
+    public void onShowMimicsSettings(ArrayList<String> enabledMimics) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
+                R.anim.slide_in_left, R.anim.slide_out_right);
+        transaction.replace(R.id.fragment_container, MimicsSettingsFragment.newInstance(enabledMimics),
                 MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -230,14 +243,18 @@ public class AlarmRingingActivity extends AppCompatActivity
         if (isGameRunning()) {
             transitionBackToRingingScreen();
         } else if (areEditingSettings()) {
-            if (areEditingMimicSettings()) {
+            if (areEditingAlarmSettings()) {
+                ((AlarmSettingsFragment) getSupportFragmentManager()
+                        .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
+                        .onCancel();
+            } else if (areEditingMimicSettings()) {
                 ((MimicsSettingsFragment) getSupportFragmentManager()
                         .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG))
                         .onBack();
             } else {
-                ((AlarmSettingsFragment) getSupportFragmentManager()
-                        .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
-                        .onCancel();
+                // This implies we are in the Mimics settings and we were launched from Alarm
+                // settings.  In this case we just pop the stack.
+                super.onBackPressed();
             }
         } else if (!isAlarmRinging()) {
             finishActivity();
@@ -274,9 +291,18 @@ public class AlarmRingingActivity extends AppCompatActivity
                         .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
     }
 
+    private boolean areEditingAlarmSettings() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null) &&
+                (getSupportFragmentManager()
+                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) == null);
+    }
+
     private boolean areEditingMimicSettings() {
         return (getSupportFragmentManager()
-                .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
+                .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null) &&
+                (getSupportFragmentManager()
+                        .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) == null);
     }
 
     private int getAlarmRingingDuration() {

@@ -23,7 +23,7 @@ import com.microsoft.mimicker.settings.MimicsSettingsFragment;
 import com.microsoft.mimicker.utilities.GeneralUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.KeyUtil;
+import com.microsoft.mimicker.utilities.KeyUtilities;
 
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
@@ -74,7 +74,7 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        final String hockeyappToken = KeyUtil.getToken(this, "hockeyapp");
+        final String hockeyappToken = KeyUtilities.getToken(this, "hockeyapp");
         if (!BuildConfig.DEBUG)
             UpdateManager.register(this, hockeyappToken);
         GeneralUtilities.registerCrashReport(this);
@@ -93,7 +93,6 @@ public class AlarmMainActivity extends AppCompatActivity
             GeneralUtilities.showFragment(getSupportFragmentManager(),
                     new AlarmListFragment(),
                     AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
-            setTitle(R.string.alarm_list_title);
         }
     }
 
@@ -111,7 +110,7 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     public void showFeedback(MenuItem item){
-        final String hockeyappToken = KeyUtil.getToken(this, "hockeyapp");
+        final String hockeyappToken = KeyUtilities.getToken(this, "hockeyapp");
         FeedbackManager.register(this, hockeyappToken, null);
         FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
         FeedbackManager.showFeedbackActivity(this);
@@ -140,7 +139,6 @@ public class AlarmMainActivity extends AppCompatActivity
             GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
                     new AlarmListFragment(),
                     AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
-            setTitle(R.string.alarm_list_title);
         }
     }
 
@@ -149,21 +147,14 @@ public class AlarmMainActivity extends AppCompatActivity
         GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
                 new AlarmListFragment(),
                 AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
-        setTitle(R.string.alarm_list_title);
     }
 
     @Override
     public void onBackPressed() {
-        if (areEditingSettings()) {
-            if (areEditingMimicSettings()) {
-                ((MimicsSettingsFragment) getSupportFragmentManager()
-                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG))
-                        .onBack();
-            } else {
-                ((AlarmSettingsFragment) getSupportFragmentManager()
-                        .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
-                        .onCancel();
-            }
+        if (areEditingAlarmSettings()) {
+            ((AlarmSettingsFragment) getSupportFragmentManager()
+                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
+                    .onCancel();
         } else {
             super.onBackPressed();
         }
@@ -192,16 +183,18 @@ public class AlarmMainActivity extends AppCompatActivity
                 OnboardingToSFragment.TOS_FRAGMENT_TAG);
     }
 
+    private boolean areEditingAlarmSettings() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null) &&
+                (getSupportFragmentManager()
+                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) == null);
+    }
+
     private boolean areEditingSettings() {
         return (getSupportFragmentManager()
                 .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null) ||
                 (getSupportFragmentManager()
                         .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
-    }
-
-    private boolean areEditingMimicSettings() {
-        return (getSupportFragmentManager()
-                .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
     }
 
     private boolean hasOnboardingStarted() {
@@ -214,7 +207,6 @@ public class AlarmMainActivity extends AppCompatActivity
         GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
                 new AlarmListFragment(),
                 AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
-        setTitle(R.string.alarm_list_title);
         onAlarmChanged();
     }
 
@@ -224,22 +216,27 @@ public class AlarmMainActivity extends AppCompatActivity
         transaction.setCustomAnimations(android.R.anim.fade_in, R.anim.slide_down);
         transaction.replace(R.id.fragment_container, new AlarmListFragment());
         transaction.commit();
-        setTitle(R.string.alarm_list_title);
         onAlarmChanged();
     }
 
     @Override
-    public void onMimicsSettingsDismiss(String alarmId, ArrayList<String> enabledMimics) {
-        GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
-                AlarmSettingsFragment.newInstance(alarmId, enabledMimics),
-                AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+    public void onMimicsSettingsDismiss(ArrayList<String> enabledMimics) {
+        AlarmSettingsFragment settingsFragment = (AlarmSettingsFragment)getSupportFragmentManager()
+                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+        if (settingsFragment != null){
+            settingsFragment.updateMimicsPreference(enabledMimics);
+        }
     }
 
     @Override
-    public void onShowMimicsSettings(String alarmId, ArrayList<String> enabledMimics) {
-        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
-                MimicsSettingsFragment.newInstance(alarmId, enabledMimics),
+    public void onShowMimicsSettings(ArrayList<String> enabledMimics) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
+                R.anim.slide_in_left, R.anim.slide_out_right);
+        transaction.replace(R.id.fragment_container, MimicsSettingsFragment.newInstance(enabledMimics),
                 MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override

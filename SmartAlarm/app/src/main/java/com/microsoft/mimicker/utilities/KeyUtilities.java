@@ -5,7 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-public class KeyUtil {
+public class KeyUtilities {
     public static String getToken(Context caller, String resource) {
         String token = null;
         try {

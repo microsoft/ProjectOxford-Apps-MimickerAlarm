@@ -49,7 +49,7 @@ public class GeneralUtilities {
     }
 
     public static void registerCrashReport(Context context){
-        final String hockeyappToken = KeyUtil.getToken(context, "hockeyapp");
+        final String hockeyappToken = KeyUtilities.getToken(context, "hockeyapp");
         if (!BuildConfig.DEBUG) {
             CrashManager.register(context, hockeyappToken, new CrashManagerListener() {
                 public boolean shouldAutoUploadCrashes() {
