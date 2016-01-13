@@ -3,7 +3,6 @@ package com.microsoft.mimicker.settings;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
@@ -20,6 +19,7 @@ import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.appcore.DividerItemDecoration;
 import com.microsoft.mimicker.utilities.GeneralUtilities;
 import com.microsoft.mimicker.utilities.Logger;
+import com.microsoft.mimicker.utilities.SettingsUtilities;
 
 import java.util.ArrayList;
 
@@ -52,7 +52,8 @@ public class MimicsSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onPause() {
         super.onPause();
-        // We need to pass the enabled Mimics to the Alarm Settings
+        // We need to pass the enabled Mimics to the Alarm Settings if we are dismissed
+        // using the back button with Alarm Settings already on the backstack
         if (launchedFromAlarmSettings()) {
             onBack();
         }
@@ -136,8 +137,7 @@ public class MimicsSettingsFragment extends PreferenceFragmentCompat {
     }
 
     private boolean launchedFromAlarmSettings() {
-        return (getFragmentManager()
-                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null);
+        return (SettingsUtilities.getAlarmSettingsFragment(getFragmentManager()) != null);
     }
 
     public interface MimicsSettingsListener {

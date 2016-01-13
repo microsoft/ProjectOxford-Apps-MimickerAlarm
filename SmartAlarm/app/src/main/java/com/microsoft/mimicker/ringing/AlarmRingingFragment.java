@@ -116,6 +116,14 @@ public class AlarmRingingFragment extends Fragment {
             }
         });
 
+        // Dismiss ringing if someone presses the dismiss button directly
+        dismissButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismissAlarm();
+            }
+        });
+
         ImageView snoozeButton = (ImageView) view.findViewById(R.id.alarm_ringing_snooze);
         snoozeButton.setOnDragListener(new View.OnDragListener() {
             @Override
@@ -128,6 +136,14 @@ public class AlarmRingingFragment extends Fragment {
                         break;
                 }
                 return true;
+            }
+        });
+
+        // Snooze ringing if someone presses the snooze button directly
+        snoozeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCallback.onRingingSnooze();
             }
         });
 

@@ -24,6 +24,7 @@ import com.microsoft.mimicker.utilities.GeneralUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 import com.microsoft.mimicker.utilities.KeyUtilities;
+import com.microsoft.mimicker.utilities.SettingsUtilities;
 
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
@@ -89,7 +90,7 @@ public class AlarmMainActivity extends AppCompatActivity
         }
         else if (mPreferences.getBoolean(SHOULD_TOS, true)) {
             showToS();
-        } else if (!areEditingSettings()) {
+        } else if (!SettingsUtilities.areEditingSettings(getSupportFragmentManager())) {
             GeneralUtilities.showFragment(getSupportFragmentManager(),
                     new AlarmListFragment(),
                     AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
@@ -151,10 +152,8 @@ public class AlarmMainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (areEditingAlarmSettings()) {
-            ((AlarmSettingsFragment) getSupportFragmentManager()
-                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG))
-                    .onCancel();
+        if (SettingsUtilities.areEditingAlarmSettingsExclusive(getSupportFragmentManager())) {
+            SettingsUtilities.getAlarmSettingsFragment(getSupportFragmentManager()).onCancel();
         } else {
             super.onBackPressed();
         }
@@ -183,20 +182,6 @@ public class AlarmMainActivity extends AppCompatActivity
                 OnboardingToSFragment.TOS_FRAGMENT_TAG);
     }
 
-    private boolean areEditingAlarmSettings() {
-        return (getSupportFragmentManager()
-                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null) &&
-                (getSupportFragmentManager()
-                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) == null);
-    }
-
-    private boolean areEditingSettings() {
-        return (getSupportFragmentManager()
-                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG) != null) ||
-                (getSupportFragmentManager()
-                        .findFragmentByTag(MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG) != null);
-    }
-
     private boolean hasOnboardingStarted() {
         return (getSupportFragmentManager()
                 .findFragmentByTag(OnboardingTutorialFragment.ONBOARDING_FRAGMENT_TAG) != null);
@@ -221,8 +206,8 @@ public class AlarmMainActivity extends AppCompatActivity
 
     @Override
     public void onMimicsSettingsDismiss(ArrayList<String> enabledMimics) {
-        AlarmSettingsFragment settingsFragment = (AlarmSettingsFragment)getSupportFragmentManager()
-                .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+        AlarmSettingsFragment settingsFragment = SettingsUtilities.
+                getAlarmSettingsFragment(getSupportFragmentManager());
         if (settingsFragment != null){
             settingsFragment.updateMimicsPreference(enabledMimics);
         }
@@ -230,13 +215,7 @@ public class AlarmMainActivity extends AppCompatActivity
 
     @Override
     public void onShowMimicsSettings(ArrayList<String> enabledMimics) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
-                R.anim.slide_in_left, R.anim.slide_out_right);
-        transaction.replace(R.id.fragment_container, MimicsSettingsFragment.newInstance(enabledMimics),
-                MimicsSettingsFragment.MIMICS_SETTINGS_FRAGMENT_TAG);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        SettingsUtilities.transitionFromAlarmToMimicsSettings(getSupportFragmentManager(), enabledMimics);
     }
 
     @Override
@@ -250,8 +229,6 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     private void showAlarmSettingsFragment(String alarmId) {
-        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
-                AlarmSettingsFragment.newInstance(alarmId),
-                AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
+        SettingsUtilities.transitionFromAlarmListToSettings(getSupportFragmentManager(), alarmId);
     }
 }
