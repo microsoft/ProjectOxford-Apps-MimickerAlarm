@@ -103,22 +103,6 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
         instructionTextView.setText(mQuestion);
     }
 
-    protected void gameSuccess(double difference) {
-        mTimer.stop();
-        mSuccessMessage = getString(R.string.mimic_success_message);
-        if (difference <= DIFFERENCE_PERFECT_THRESHOLD) {
-            mSuccessMessage = getString(R.string.mimic_twister_perfect_message);
-        }
-
-        createSharableBitmap();
-        mStateBanner.success(mSuccessMessage, new MimicStateBanner.Command() {
-            @Override
-            public void execute() {
-                mCallback.onMimicSuccess(mSharableUri.getPath());
-            }
-        });
-    }
-
     //
     // Create bitmap for sharing
     //
@@ -153,7 +137,31 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
         mSharableUri = ShareFragment.saveShareableBitmap(getActivity(), sharableBitmap, title);
     }
 
+    protected void gameSuccess(double difference) {
+        if (getActivity() == null) {
+            return;
+        }
+
+        mTimer.stop();
+        mSuccessMessage = getString(R.string.mimic_success_message);
+        if (difference <= DIFFERENCE_PERFECT_THRESHOLD) {
+            mSuccessMessage = getString(R.string.mimic_twister_perfect_message);
+        }
+
+        createSharableBitmap();
+        mStateBanner.success(mSuccessMessage, new MimicStateBanner.Command() {
+            @Override
+            public void execute() {
+                mCallback.onMimicSuccess(mSharableUri.getPath());
+            }
+        });
+    }
+
     protected void gameFailure(boolean allowRetry) {
+        if (getActivity() == null) {
+            return;
+        }
+
         if (allowRetry) {
             mTimer.pause();
             String failureMessage = getString(R.string.mimic_failure_message);
@@ -166,6 +174,7 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
             });
         }
         else {
+            mCaptureButton.setClickable(false);
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER_TIMEOUT);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
             Logger.track(userAction);
@@ -193,7 +202,6 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
         if (mRecognitionMode == SpeechRecognitionMode.ShortPhrase
                 || isFinalDictationMessage) {
             mMicClient.endMicAndRecognition();
-            mCaptureButton.readyAudio();
             for (RecognizedPhrase res : response.Results) {
                 Log.d(LOGTAG, String.valueOf(res.Confidence));
                 Log.d(LOGTAG, String.valueOf(res.DisplayText));
@@ -227,7 +235,6 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
     public void onAudioEvent(boolean recording) {
         if (!recording) {
             mMicClient.endMicAndRecognition();
-            mCaptureButton.readyAudio();
         }
     }
 
@@ -257,7 +264,6 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
                     mCaptureButton.waiting();
                 } else {
                     mMicClient.endMicAndRecognition();
-                    mCaptureButton.readyAudio();
                 }
             }
         });
