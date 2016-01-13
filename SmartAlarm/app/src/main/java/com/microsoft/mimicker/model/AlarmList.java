@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class AlarmList {
-    private static AlarmList sAlarmList;
     private static final String ORDER_BY = AlarmTable.Columns.HOUR + ", " +
                                             AlarmTable.Columns.MINUTE;
-
+    private static AlarmList sAlarmList;
     private Context mContext;
     private SQLiteDatabase mDatabase;
 
@@ -53,6 +52,10 @@ public class AlarmList {
         values.put(AlarmTable.Columns.COLOR_CAPTURE, alarm.isColorCaptureEnabled());
         values.put(AlarmTable.Columns.EXPRESS_YOURSELF, alarm.isExpressYourselfEnabled());
         values.put(AlarmTable.Columns.NEW, alarm.isNew() ? 1 : 0);
+        values.put(AlarmTable.Columns.SNOOZED, alarm.isSnoozed() ? 1 : 0);
+        values.put(AlarmTable.Columns.SNOOZED_HOUR, alarm.getSnoozeHour());
+        values.put(AlarmTable.Columns.SNOOZED_MINUTE, alarm.getSnoozeMinute());
+        values.put(AlarmTable.Columns.SNOOZED_SECONDS, alarm.getSnoozeSeconds());
 
         return values;
     }

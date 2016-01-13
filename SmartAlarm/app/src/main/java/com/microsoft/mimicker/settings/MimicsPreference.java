@@ -2,91 +2,90 @@ package com.microsoft.mimicker.settings;
 
 import android.content.Context;
 import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 
 import com.microsoft.mimicker.R;
+import com.microsoft.mimicker.model.Alarm;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
-public class MimicsPreference extends MultiSelectListPreferenceWithSummary {
+public class MimicsPreference extends Preference {
+    private String[] mMimicLabels;
+    private String[] mMimicValues;
+    ArrayList<String> mInitialValues;
+    ArrayList<String> mEnabledValues;
 
-    private boolean mTongueTwisterEnabled;
-    private boolean mColorCaptureEnabled;
-    private boolean mExpressYourselfEnabled;
-    private boolean mChanged;
+    public static ArrayList<String> getEnabledMimics(Context context, Alarm alarm) {
+        ArrayList<String> enabledMimics = new ArrayList<>();
+        if (alarm.isColorCaptureEnabled()) {
+            enabledMimics.add(context.getString(R.string.pref_mimic_color_capture_id));
+        }
+        if (alarm.isExpressYourselfEnabled()) {
+            enabledMimics.add(context.getString(R.string.pref_mimic_express_yourself_id));
+        }
+        if (alarm.isTongueTwisterEnabled()) {
+            enabledMimics.add(context.getString(R.string.pref_mimic_tongue_twister_id));
+        }
+        return enabledMimics;
+    }
 
     public MimicsPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     public boolean hasChanged() {
-        return mChanged;
-    }
-
-    public void setChanged(boolean changed) {
-        mChanged = changed;
-    }
-
-    @Override
-    public void onBindViewHolder(PreferenceViewHolder holder) {
-        super.onBindViewHolder(holder);
-        setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
-                @SuppressWarnings("unchecked")
-                Set<String> selectedGames = (Set<String>) o;
-                setGamePreferences(selectedGames);
-                setChanged(true);
-                return true;
-            }
-        });
+        return !mInitialValues.equals(mEnabledValues);
     }
 
     public boolean isTongueTwisterEnabled() {
-        return mTongueTwisterEnabled;
-    }
-
-    public void setTongueTwisterEnabled(boolean tongueTwisterEnabled) {
-        mTongueTwisterEnabled = tongueTwisterEnabled;
+        return mEnabledValues.contains(getContext().getString(R.string.pref_mimic_tongue_twister_id));
     }
 
     public boolean isColorCaptureEnabled() {
-        return mColorCaptureEnabled;
-    }
-
-    public void setColorCaptureEnabled(boolean colorCaptureEnabled) {
-        mColorCaptureEnabled = colorCaptureEnabled;
+        return mEnabledValues.contains(getContext().getString(R.string.pref_mimic_color_capture_id));
     }
 
     public boolean isExpressYourselfEnabled() {
-        return mExpressYourselfEnabled;
+        return mEnabledValues.contains(getContext().getString(R.string.pref_mimic_express_yourself_id));
     }
 
-    public void setExpressYourselfEnabled(boolean expressYourselfEnabled) {
-        mExpressYourselfEnabled = expressYourselfEnabled;
+    public void setMimicValuesAndSummary(ArrayList<String> enabledMimics) {
+        mEnabledValues = enabledMimics;
+        setSummaryValues(mEnabledValues);
     }
 
-    public void setInitialValues() {
-        Set<String> values = new HashSet<>();
-        if (isTongueTwisterEnabled()) {
-            values.add(getContext().getString(R.string.pref_mimic_tongue_twister_id));
-        }
-        if (isColorCaptureEnabled()) {
-            values.add(getContext().getString(R.string.pref_mimic_color_capture_id));
-        }
-        if (isExpressYourselfEnabled()) {
-            values.add(getContext().getString(R.string.pref_mimic_express_yourself_id));
-        }
-        setValues(values);
-        setSummaryValues(values, R.string.pref_no_mimics);
+    public void setInitialValues(Alarm alarm) {
+        mMimicValues = getContext().getResources().getStringArray(R.array.pref_mimic_values);
+        mMimicLabels = getContext().getResources().getStringArray(R.array.pref_mimic_labels);
+        mEnabledValues = getEnabledMimics(getContext(), alarm);
+
+        // Save the initial state so we can check for changes later
+        mInitialValues = new ArrayList<>(mEnabledValues);
     }
 
-    private void setGamePreferences(Set<String> values) {
-        setTongueTwisterEnabled(values.contains(getContext().getString(R.string.pref_mimic_tongue_twister_id)));
-        setColorCaptureEnabled(values.contains(getContext().getString(R.string.pref_mimic_color_capture_id)));
-        setExpressYourselfEnabled(values.contains(getContext().getString(R.string.pref_mimic_express_yourself_id)));
-        setSummaryValues(values, R.string.pref_no_mimics);
+    public void setInitialSummary() {
+        setSummaryValues(mInitialValues);
+    }
+
+    public ArrayList<String> getEnabledMimicValues() {
+        return mEnabledValues;
+    }
+
+    private void setSummaryValues(ArrayList<String> values) {
+        String summaryString = "";
+        for (int i = 0; i < mMimicValues.length; i++) {
+            if (values.contains(mMimicValues[i])) {
+                String displayString = mMimicLabels[i];
+                if (summaryString.isEmpty()) {
+                    summaryString = displayString;
+                } else {
+                    summaryString += ", " + displayString;
+                }
+            }
+        }
+        if (summaryString.isEmpty()) {
+            summaryString = getContext().getString(R.string.pref_no_mimics);
+        }
+        setSummary(summaryString);
     }
 }

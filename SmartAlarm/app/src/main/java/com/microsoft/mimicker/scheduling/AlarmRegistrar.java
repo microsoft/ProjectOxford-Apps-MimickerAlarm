@@ -9,7 +9,7 @@ public class AlarmRegistrar extends BroadcastReceiver {
     private static void refreshAlarms(Context context) {
         AlarmScheduler.cancelAlarms(context);
         if (AlarmScheduler.scheduleAlarms(context)) {
-            AlarmNotificationManager.get(context).handleAlarmNotificationStatus();
+            AlarmNotificationManager.get(context).handleNextAlarmNotificationStatus();
         }
     }
 

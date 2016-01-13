@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 
 public class OnboardingTutorialFragment extends Fragment {
+    public static final String ONBOARDING_FRAGMENT_TAG = "onboarding_fragment";
     private static final int WELCOME_MSG_DURATION = 1500;
     private static final int WELCOME_MSG_CROSSFADE_DURATION = 1000;
     OnOnboardingTutorialListener mCallback;

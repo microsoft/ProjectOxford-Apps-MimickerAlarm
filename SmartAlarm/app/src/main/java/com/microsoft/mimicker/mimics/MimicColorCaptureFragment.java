@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.KeyUtilities;
 import com.microsoft.projectoxford.vision.VisionServiceRestClient;
 import com.microsoft.projectoxford.vision.contract.AnalyzeResult;
 
@@ -38,7 +38,7 @@ public class MimicColorCaptureFragment extends MimicWithCameraFragment {
 
         Resources resources = getResources();
 
-        String subscriptionKey = Util.getToken(getActivity(), "vision");
+        String subscriptionKey = KeyUtilities.getToken(getActivity(), "vision");
         mVisionServiceRestClient = new VisionServiceRestClient(subscriptionKey);
 
         String[] questions = resources.getStringArray(R.array.vision_color_questions);

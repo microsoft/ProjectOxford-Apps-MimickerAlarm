@@ -17,6 +17,10 @@ public class AlarmDbSchema {
             public static final String COLOR_CAPTURE = "color_collector";  // TODO: Clean this up before publish
             public static final String EXPRESS_YOURSELF = "express_yourself";
             public static final String NEW = "new";
+            public static final String SNOOZED = "snoozed";
+            public static final String SNOOZED_HOUR = "snoozed_hour";
+            public static final String SNOOZED_MINUTE = "snoozed_minute";
+            public static final String SNOOZED_SECONDS = "snoozed_seconds";
         }
     }
 }

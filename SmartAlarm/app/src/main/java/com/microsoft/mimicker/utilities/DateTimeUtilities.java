@@ -2,14 +2,11 @@ package com.microsoft.mimicker.utilities;
 
 import android.content.Context;
 import android.text.format.DateUtils;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.ibm.icu.text.SimpleDateFormat;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.text.MessageFormat;
 import com.microsoft.mimicker.R;
-
 
 import java.text.Format;
 import java.util.Arrays;
@@ -18,12 +15,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public final class AlarmUtils {
+public final class DateTimeUtilities {
 
     // As per http://icu-project.org/apiref/icu4j/com/ibm/icu/text/SimpleDateFormat.html, we
     // need the format 'EEEEEE' to get a short weekday name
     private final static String TWO_CHARACTER_SHORT_DAY_PATTERN = "EEEEEE";
-    private AlarmUtils() {}
+    private DateTimeUtilities() {}
 
     public static String getUserTimeString(Context context, int hour, int minute) {
         Format formatter = android.text.format.DateFormat.getTimeFormat(context);
@@ -67,9 +64,11 @@ public final class AlarmUtils {
     }
 
     public static String getDayPeriodSummaryString(Context context, int[] daysOfWeek) {
-        int[] weekdays = { Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY };
+        int[] weekdays = { Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY,
+                Calendar.FRIDAY };
         int[] weekend = { Calendar.SUNDAY, Calendar.SATURDAY };
-        int[] everyday = { Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY };
+        int[] everyday = { Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY,
+                Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY };
         if (Arrays.equals(daysOfWeek, weekend)) {
             return context.getString(R.string.alarm_list_weekend);
         } else if (Arrays.equals(daysOfWeek, weekdays)) {
@@ -129,23 +128,8 @@ public final class AlarmUtils {
         return new MessageFormat(context.getString(resourceIdForDisplayString)).format(args);
     }
 
-    public static String getDateAndTimeAlarmDisplayString(Context context, long timeUntilAlarm) {
-        return DateUtils.formatDateTime(context, timeUntilAlarm,
-                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME |
+    public static String getDayAndTimeAlarmDisplayString(Context context, long timeUntilAlarm) {
+        return DateUtils.formatDateTime(context, timeUntilAlarm, DateUtils.FORMAT_SHOW_TIME |
                 DateUtils.FORMAT_SHOW_WEEKDAY);
-    }
-
-    public static void setLockScreenFlags(Window window) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-    }
-
-    public static void clearLockScreenFlags(Window window) {
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
     }
 }

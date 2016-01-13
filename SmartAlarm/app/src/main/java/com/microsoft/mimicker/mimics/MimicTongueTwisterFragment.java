@@ -2,6 +2,9 @@ package com.microsoft.mimicker.mimics;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,13 +12,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.mimics.MimicFactory.MimicResultListener;
+import com.microsoft.mimicker.ringing.ShareFragment;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.KeyUtilities;
 import com.microsoft.projectoxford.speechrecognition.Confidence;
 import com.microsoft.projectoxford.speechrecognition.ISpeechRecognitionServerEvents;
 import com.microsoft.projectoxford.speechrecognition.MicrophoneRecognitionClient;
@@ -41,6 +46,8 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
     private CountDownTimerView mTimer;
     private MimicStateBanner mStateBanner;
     private TextView mTextResponse;
+    private String mSuccessMessage;
+    private Uri mSharableUri;
 
     @Nullable
     @Override
@@ -96,30 +103,78 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
         instructionTextView.setText(mQuestion);
     }
 
+    //
+    // Create bitmap for sharing
+    //
+    private void createSharableBitmap() {
+        Bitmap sharableBitmap = Bitmap.createBitmap(getView().getWidth(), getView().getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(sharableBitmap);
+        canvas.drawColor(getResources().getColor(R.color.white));
+
+        // Load the view for the sharable. This will be drawn to the bitmap
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.fragment_sharable_tongue_twister, null);
+
+        TextView textView = (TextView)layout.findViewById(R.id.twister_sharable_tongue_twister);
+        textView.setText(mQuestion);
+
+        textView = (TextView)layout.findViewById(R.id.twister_sharable_i_said);
+        textView.setText(mUnderstoodText);
+
+        textView = (TextView)layout.findViewById(R.id.mimic_twister_share_success);
+        textView.setText(mSuccessMessage);
+
+        // Perform the layout using the dimension of the bitmap
+        int widthSpec = View.MeasureSpec.makeMeasureSpec(canvas.getWidth(), View.MeasureSpec.EXACTLY);
+        int heightSpec = View.MeasureSpec.makeMeasureSpec(canvas.getHeight(), View.MeasureSpec.EXACTLY);
+        layout.measure(widthSpec, heightSpec);
+        layout.layout(0, 0, layout.getMeasuredWidth(), layout.getMeasuredHeight());
+
+        // Draw the generated view to canvas
+        layout.draw(canvas);
+
+        String title = getString(R.string.app_short_name) + ": " + getString(R.string.mimic_twister_name);
+        mSharableUri = ShareFragment.saveShareableBitmap(getActivity(), sharableBitmap, title);
+    }
+
     protected void gameSuccess(double difference) {
-        mTimer.stop();
-        String successMessage = getString(R.string.mimic_success_message);
-        if (difference <= DIFFERENCE_PERFECT_THRESHOLD) {
-            successMessage = getString(R.string.mimic_twister_perfect_message);
+        if (getActivity() == null) {
+            return;
         }
-        mStateBanner.success(successMessage, new MimicStateBanner.Command() {
+
+        mTimer.stop();
+        mSuccessMessage = getString(R.string.mimic_success_message);
+        if (difference <= DIFFERENCE_PERFECT_THRESHOLD) {
+            mSuccessMessage = getString(R.string.mimic_twister_perfect_message);
+        }
+
+        createSharableBitmap();
+        mStateBanner.success(mSuccessMessage, new MimicStateBanner.Command() {
             @Override
             public void execute() {
-                mCallback.onMimicSuccess(null);
+                mCallback.onMimicSuccess(mSharableUri.getPath());
             }
         });
     }
+
     protected void gameFailure(boolean allowRetry) {
+        if (getActivity() == null) {
+            return;
+        }
+
         if (allowRetry) {
+            mTimer.pause();
             String failureMessage = getString(R.string.mimic_failure_message);
             mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
                 @Override
                 public void execute() {
+                    mTimer.resume();
                     mCaptureButton.readyAudio();
                 }
             });
         }
         else {
+            mCaptureButton.setClickable(false);
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER_TIMEOUT);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
             Logger.track(userAction);
@@ -147,7 +202,6 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
         if (mRecognitionMode == SpeechRecognitionMode.ShortPhrase
                 || isFinalDictationMessage) {
             mMicClient.endMicAndRecognition();
-            mCaptureButton.readyAudio();
             for (RecognizedPhrase res : response.Results) {
                 Log.d(LOGTAG, String.valueOf(res.Confidence));
                 Log.d(LOGTAG, String.valueOf(res.DisplayText));
@@ -181,7 +235,6 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
     public void onAudioEvent(boolean recording) {
         if (!recording) {
             mMicClient.endMicAndRecognition();
-            mCaptureButton.readyAudio();
         }
     }
 
@@ -191,7 +244,7 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
         try {
             //TODO: localize
             String language = "en-us";
-            String subscriptionKey = Util.getToken(getActivity(), "speech");
+            String subscriptionKey = KeyUtilities.getToken(getActivity(), "speech");
             if (mMicClient == null) {
                 mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(getActivity(), mRecognitionMode, language, this, subscriptionKey);
             }
@@ -211,7 +264,6 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
                     mCaptureButton.waiting();
                 } else {
                     mMicClient.endMicAndRecognition();
-                    mCaptureButton.readyAudio();
                 }
             }
         });

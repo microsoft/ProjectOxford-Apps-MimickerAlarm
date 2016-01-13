@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 public class LearnMoreActivity extends AppCompatActivity {
     @Override
@@ -23,7 +23,7 @@ public class LearnMoreActivity extends AppCompatActivity {
         LinearLayout linksHolder = (LinearLayout) findViewById(R.id.learn_more_links);
         for( int i = 0; i < linksHolder.getChildCount(); i++ ) {
             TextView child = (TextView) linksHolder.getChildAt(i);
-            Util.enableLinks(child);
+            GeneralUtilities.enableLinks(child);
         }
 
         Logger.init(this);

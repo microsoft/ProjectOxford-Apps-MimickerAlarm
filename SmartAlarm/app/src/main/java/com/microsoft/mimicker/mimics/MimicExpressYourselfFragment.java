@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.KeyUtilities;
 import com.microsoft.projectoxford.emotion.EmotionServiceRestClient;
 import com.microsoft.projectoxford.emotion.contract.RecognizeResult;
 
@@ -38,7 +38,7 @@ public class MimicExpressYourselfFragment extends MimicWithCameraFragment {
 
         Resources resources = getResources();
 
-        String subscriptionKey = Util.getToken(getActivity(), "emotion");
+        String subscriptionKey = KeyUtilities.getToken(getActivity(), "emotion");
         mEmotionServiceRestClient = new EmotionServiceRestClient(subscriptionKey);
 
         String[] emotions = resources.getStringArray(R.array.emotions);
@@ -106,7 +106,12 @@ public class MimicExpressYourselfFragment extends MimicWithCameraFragment {
                     Resources resources = getResources();
                     int adjectiveId = resources.getIdentifier("emotion_" + dominantEmotion, "string", getActivity().getPackageName());
                     String adjective = resources.getString(adjectiveId);
-                    gameResult.message = String.format(resources.getString(R.string.mimic_emotion_failure), adjective);
+                    if (dominantEmotion.equalsIgnoreCase(mEmotion)) {
+                        gameResult.message = String.format(resources.getString(R.string.mimic_emotion_failure_not_enough), adjective);
+                    }
+                    else {
+                        gameResult.message = String.format(resources.getString(R.string.mimic_emotion_failure), adjective);
+                    }
                 }
             }
         }
@@ -128,5 +133,3 @@ public class MimicExpressYourselfFragment extends MimicWithCameraFragment {
         super.gameFailure(gameResult, allowRetry);
     }
 }
-
-

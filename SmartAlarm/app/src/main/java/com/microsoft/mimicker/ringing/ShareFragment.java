@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -20,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.Loggable;
@@ -36,12 +36,27 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ShareFragment extends Fragment {
+    public static final String SHARE_FRAGMENT_TAG = "share_fragment";
     public static final String SHAREABLE_URI = "shareable-uri";
     private final static int SHARE_REQUEST_CODE = 2;
     private final static String MIMICKER_FILE_PREFIX = "Mimicker_";
-    ShareResultListener mCallback;
+    // The time to auto-dismiss share screen if there is no user interaction
+    private static final int SHARING_FRAGMENT_STAY_DURATION = 60 * 1000;    // 1 minute
+    // The time to auto-dismiss share screen after pressing save button
+    private static final int SHARING_FRAGMENT_SAVE_STAY_DURATION = 60 * 1000;   // 1 minute
+    // The time to auto-dismiss share screen after pressing share button
+    private static final int SHARING_FRAGMENT_SHARE_STAY_DURATION = 300 * 1000; // 5 minutes
+    // Delay to dismiss the toast message
+    private static final long TOAST_IN_FRAGMENT_DELAY = 1500;    // 1.5 seconds
+
+    private ShareResultListener mCallback;
     private String mShareableUri;
     private ImageView mShareableImage;
+
+    private Handler mHandler;
+    private Runnable mSharingFragmentDismissTask;
+    private Runnable mToastAutoDismiss;
+    private int mSharingFragmentDismissTaskDelay = SHARING_FRAGMENT_STAY_DURATION;
 
     public static ShareFragment newInstance(String shareableUri) {
         ShareFragment fragment = new ShareFragment();
@@ -133,6 +148,8 @@ public class ShareFragment extends Fragment {
         view.findViewById(R.id.share_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Reset the timer to wait sharing to complete
+                updateDismissTaskWithDelayDuration(SHARING_FRAGMENT_SHARE_STAY_DURATION);
                 share();
             }
         });
@@ -140,12 +157,24 @@ public class ShareFragment extends Fragment {
         view.findViewById(R.id.download_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Reset the timer to wait downloading to complete
+                updateDismissTaskWithDelayDuration(SHARING_FRAGMENT_SAVE_STAY_DURATION);
                 download();
             }
         });
 
         Bundle args = getArguments();
         mShareableUri = args.getString(SHAREABLE_URI);
+
+        // Set up timer to dismiss the sharing fragment if there is no user interaction with the buttons
+        mSharingFragmentDismissTask = new Runnable() {
+            @Override
+            public void run() {
+                finishShare();
+            }
+        };
+
+        mHandler = new Handler();
 
         Logger.init(getActivity());
         return view;
@@ -164,12 +193,19 @@ public class ShareFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        mHandler.removeCallbacks(mSharingFragmentDismissTask);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         if (mShareableUri != null && mShareableUri.length() > 0) {
             Uri shareableUri = Uri.parse(mShareableUri);
             mShareableImage.setImageURI(shareableUri);
         }
+        mHandler.postDelayed(mSharingFragmentDismissTask, mSharingFragmentDismissTaskDelay);
     }
 
     @Override
@@ -188,14 +224,18 @@ public class ShareFragment extends Fragment {
                 }
             }).start();
         }
+        mHandler.removeCallbacks(mToastAutoDismiss);
     }
 
     public void share() {
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_SHARE);
         Logger.track(userAction);
 
+        mCallback.onRequestLaunchShareAction();
+
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         File file = new File(mShareableUri);
         Uri uri = Uri.fromFile(file);
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
@@ -221,7 +261,7 @@ public class ShareFragment extends Fragment {
         try {
             copyFile(sourceFile, targetFile);
         } catch (IOException ex) {
-            Toast.makeText(getActivity(), R.string.share_download_failure, Toast.LENGTH_SHORT).show();
+            showToastInFragment(R.string.share_download_failure);
             Logger.trackException(ex);
             return;
         }
@@ -233,7 +273,7 @@ public class ShareFragment extends Fragment {
         values.put(MediaStore.MediaColumns.DATA, targetFile.getPath());
         getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-        Toast.makeText(getActivity(), R.string.share_download_success, Toast.LENGTH_SHORT).show();
+        showToastInFragment(R.string.share_download_success);
     }
 
     public void copyFile(File sourceFile, File targetFile) throws IOException {
@@ -260,10 +300,38 @@ public class ShareFragment extends Fragment {
     }
 
     public void finishShare() {
+        mHandler.removeCallbacks(mSharingFragmentDismissTask);
         mCallback.onShareCompleted();
     }
 
     public interface ShareResultListener {
         void onShareCompleted();
+        void onRequestLaunchShareAction();
+    }
+
+    // Display the home-made toast message with the specified string resource ID
+    //
+    // We create our own toast message, instead of using android.widget.toast, because
+    // system toast won't work in lock screen.
+    private void showToastInFragment(int resourceId) {
+        String message = getResources().getString(resourceId);
+        final TextView textView = (TextView)getView().findViewById(R.id.share_toast_message);
+        textView.setText(message);
+        textView.setVisibility(View.VISIBLE);
+
+        Handler handler = new Handler();
+        mToastAutoDismiss = new Runnable() {
+            @Override
+            public void run() {
+                textView.setVisibility(View.INVISIBLE);
+            }
+        };
+        handler.postDelayed(mToastAutoDismiss, TOAST_IN_FRAGMENT_DELAY);
+    }
+
+    private void updateDismissTaskWithDelayDuration(int delayDuration) {
+        mHandler.removeCallbacks(mSharingFragmentDismissTask);
+        mSharingFragmentDismissTaskDelay = delayDuration;
+        mHandler.postDelayed(mSharingFragmentDismissTask, mSharingFragmentDismissTaskDelay);
     }
 }

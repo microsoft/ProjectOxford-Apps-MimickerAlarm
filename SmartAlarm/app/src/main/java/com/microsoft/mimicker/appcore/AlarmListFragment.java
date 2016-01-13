@@ -27,8 +27,7 @@ import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.globalsettings.AlarmGlobalSettingsActivity;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
-import com.microsoft.mimicker.scheduling.AlarmScheduler;
-import com.microsoft.mimicker.utilities.AlarmUtils;
+import com.microsoft.mimicker.utilities.DateTimeUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 
@@ -43,15 +42,14 @@ import java.util.List;
 public class AlarmListFragment extends Fragment implements
     AlarmFloatingActionButton.OnVisibilityChangedListener {
 
+    public static final String ALARM_LIST_FRAGMENT_TAG = "alarm_list_fragment";
+
     private RecyclerView mAlarmRecyclerView;
     private RelativeLayout mEmptyView;
     private AlarmAdapter mAdapter;
     private CollapsingToolbarLayout mCollapsingLayout;
     private AppBarLayout mAppBarLayout;
-    private Toolbar mToolbar;
-    private AlarmFloatingActionButton mFab;
     private AlarmListListener mCallbacks;
-    private List<Alarm> mAlarms;
     private boolean mShowAddButtonInToolbar;
 
     @Override
@@ -74,21 +72,22 @@ public class AlarmListFragment extends Fragment implements
 
         mAlarmRecyclerView = (RecyclerView) view
                 .findViewById(R.id.alarm_recycler_view);
-        mAlarmRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+        mAlarmRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
+                DividerItemDecoration.VERTICAL_LIST));
 
-        mToolbar = (Toolbar) view
+        Toolbar toolbar = (Toolbar) view
                 .findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(mToolbar);
+        toolbar.setTitle(R.string.alarm_list_title);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
-        mFab = (AlarmFloatingActionButton) view.findViewById(R.id.fab);
-
-        mFab.setOnClickListener(new View.OnClickListener() {
+        AlarmFloatingActionButton fab = (AlarmFloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addAlarm();
             }
         });
-        mFab.setVisibilityListener(this);
+        fab.setVisibilityListener(this);
 
         mEmptyView = (RelativeLayout) view.findViewById(R.id.empty_view);
 
@@ -154,17 +153,17 @@ public class AlarmListFragment extends Fragment implements
 
     public void updateUI() {
         AlarmList alarmList = AlarmList.get(getActivity());
-        mAlarms = alarmList.getAlarms();
+        List<Alarm> alarms = alarmList.getAlarms();
 
         if (mAdapter == null) {
-            mAdapter = new AlarmAdapter(mAlarms);
+            mAdapter = new AlarmAdapter(alarms);
             mAlarmRecyclerView.setAdapter(mAdapter);
         } else {
-            mAdapter.setAlarms(mAlarms);
+            mAdapter.setAlarms(alarms);
             mAdapter.notifyDataSetChanged();
         }
 
-        if (mAlarms.isEmpty()) {
+        if (alarms.isEmpty()) {
             mAlarmRecyclerView.setVisibility(View.GONE);
             mEmptyView.setVisibility(View.VISIBLE);
             enableCollapsingBehaviour(false);
@@ -227,16 +226,14 @@ public class AlarmListFragment extends Fragment implements
             mAlarmEnabled.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mAlarm.setIsEnabled(mAlarmEnabled.isChecked());
-                    AlarmList.get(getActivity()).updateAlarm(mAlarm);
-                    if (mAlarm.isEnabled()) {
-                        long alarmTime = AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
+                    if (mAlarmEnabled.isChecked()) {
+                        long alarmTime = mAlarm.schedule();
                         Toast.makeText(getActivity(),
-                                AlarmUtils.getTimeUntilAlarmDisplayString(getActivity(), alarmTime),
+                                DateTimeUtilities.getTimeUntilAlarmDisplayString(getActivity(), alarmTime),
                                 Toast.LENGTH_LONG)
                                 .show();
                     } else {
-                        AlarmScheduler.cancelAlarm(getContext(), mAlarm);
+                        mAlarm.cancel();
                     }
                     mCallbacks.onAlarmChanged();
                 }
@@ -254,7 +251,7 @@ public class AlarmListFragment extends Fragment implements
                 mTitleTextView.setText(title);
             }
 
-            mTimeTextView.setText(AlarmUtils.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
+            mTimeTextView.setText(DateTimeUtilities.getUserTimeString(getContext(), mAlarm.getTimeHour(), mAlarm.getTimeMinute()));
             mAlarmEnabled.setChecked(mAlarm.isEnabled());
         }
 
@@ -295,7 +292,7 @@ public class AlarmListFragment extends Fragment implements
             }
             Integer[] daysWrapper = days.toArray(new Integer[days.size()]);
             int[] daysOfWeek =  ArrayUtils.toPrimitive(daysWrapper);
-            return AlarmUtils.getDayPeriodSummaryString(getContext(), daysOfWeek);
+            return DateTimeUtilities.getDayPeriodSummaryString(getContext(), daysOfWeek);
         }
     }
 
@@ -341,10 +338,7 @@ public class AlarmListFragment extends Fragment implements
             userAction.putJSON(alarm.toJSON());
             Logger.track(userAction);
 
-            if (alarm.isEnabled()) {
-                AlarmScheduler.cancelAlarm(getContext(), alarm);
-            }
-            AlarmList.get(getActivity()).deleteAlarm(alarm);
+            alarm.delete();
 
             notifyItemRemoved(position);
 

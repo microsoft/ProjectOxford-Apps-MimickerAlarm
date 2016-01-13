@@ -14,8 +14,6 @@
         android:title="@string/pref_title_name"/>
 
     <com.microsoft.mimicker.settings.MimicsPreference
-        android:entries="@array/pref_mimic_labels"
-        android:entryValues="@array/pref_mimic_values"
         android:key="@string/pref_mimics_key"
         android:title="@string/pref_title_mimics"/>
 

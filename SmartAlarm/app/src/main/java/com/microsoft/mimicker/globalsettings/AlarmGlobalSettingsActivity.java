@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.ringing.AlarmRingingService;
+import com.microsoft.mimicker.appcore.DividerItemDecoration;
 import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
 
 import java.util.List;
@@ -79,7 +79,10 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
             rootLayout.addView(appBarLayout, 0); // insert at top
             Toolbar bar = (Toolbar) appBarLayout.findViewById(R.id.settings_toolbar);
             ((AppCompatActivity) getActivity()).setSupportActionBar(bar);
-            return super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+            RecyclerView recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+            recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
+                    DividerItemDecoration.VERTICAL_LIST));
+            return recyclerView;
         }
 
         @Override
@@ -112,7 +115,7 @@ public class AlarmGlobalSettingsActivity extends AppCompatActivity {
                 // disable appropriately
                 mEnableReliability.setEnabled(notificationsEnabled);
                 if (notificationsEnabled) {
-                    AlarmNotificationManager.get(getContext()).handleAlarmNotificationStatus();
+                    AlarmNotificationManager.get(getContext()).handleNextAlarmNotificationStatus();
                 } else {
                     AlarmNotificationManager.get(getContext()).disableNotifications();
                 }
