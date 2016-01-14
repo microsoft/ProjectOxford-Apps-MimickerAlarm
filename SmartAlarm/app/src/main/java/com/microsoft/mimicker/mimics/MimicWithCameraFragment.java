@@ -4,6 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.mimics.MimicFactory.MimicResultListener;
@@ -29,11 +34,17 @@ abstract class MimicWithCameraFragment extends Fragment
     private static final int TIMEOUT_MILLISECONDS = 30000;
     // Max width for sending to Project Oxford, reduce latency
     private static final int MAX_WIDTH = 500;
+    private static final int LIGHT_THRESHOLD = 50;
+
     protected static int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     MimicResultListener mCallback;
     private CameraPreview   mCameraPreview;
     private MimicCoordinator mCoordinator;
     private Uri mSharableUri;
+    private SensorManager mSensorManager;
+    private Sensor mLightSensor;
+    private SensorEventListener mLightSensorListener;
+    private Toast mTooDarkToast;
 
     private Point mSize;
     private CameraPreview.ImageCallback onCaptureCallback = new CameraPreview.ImageCallback() {
@@ -81,6 +92,27 @@ abstract class MimicWithCameraFragment extends Fragment
         mCoordinator.registerProgressButton(progressButton, MimicButtonBehavior.CAMERA);
         mCoordinator.registerMimic(this);
 
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        if (mSensorManager != null) {
+            mLightSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        }
+        mLightSensorListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if (event.values[0] < LIGHT_THRESHOLD) {
+                    mTooDarkToast.show();
+                }
+                else {
+                    mTooDarkToast.cancel();
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+        };
+        // This toast is only shown when there is not enough light
+        mTooDarkToast = Toast.makeText(getActivity(), getString(R.string.mimic_camera_too_dark), Toast.LENGTH_SHORT);
+
         return view;
     }
 
@@ -99,6 +131,11 @@ abstract class MimicWithCameraFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
+
+        if (mSensorManager != null && mLightSensorListener != null) {
+            mSensorManager.registerListener(mLightSensorListener, mLightSensor, SensorManager.SENSOR_DELAY_UI);
+        }
+
         mCoordinator.start();
     }
 
@@ -106,6 +143,11 @@ abstract class MimicWithCameraFragment extends Fragment
     public void onStop() {
         super.onStop();
         mCoordinator.stop();
+
+        mTooDarkToast.cancel();
+        if (mSensorManager != null && mLightSensorListener != null) {
+            mSensorManager.unregisterListener(mLightSensorListener);
+        }
     }
 
     @Override
