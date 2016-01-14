@@ -23,6 +23,16 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Implements the logic and UI of the Express yourself game
+ *
+ * on start, choose a random emotion (defined in emotion_questions.xml)
+ * after capturing an image from the front camera, send it to Project Oxford Emotion API which
+ * return a list of detected faces and list of emotions and their probabilities.
+ *
+ * The game predefined an acceptance rating for each emotion. If the returned emotion has a probability
+ * higher than that acceptance rating then the game passes.
+ */
 public class MimicExpressYourselfFragment extends MimicWithCameraFragment {
     private double mEmotionAcceptance = 0.5;
     private EmotionServiceRestClient mEmotionServiceRestClient;

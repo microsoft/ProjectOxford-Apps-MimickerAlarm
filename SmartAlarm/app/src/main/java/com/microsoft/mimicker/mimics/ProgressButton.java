@@ -14,6 +14,15 @@ import android.widget.ImageView;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * Simple UI class that implements a button with states
+ *
+ * The states are :
+ * capture image,
+ * capture audio,
+ * stop capturing audio,
+ * processing
+ **/
 public class ProgressButton extends ImageView {
     private static final int PRESSED_ANIMATION_DURATION = 200;
     private static final float sPressedAnimationSize = 1.2f;
@@ -60,6 +69,7 @@ public class ProgressButton extends ImageView {
         this(context, null);
     }
 
+    // These setters and getters are required by animator
     public float getRadius() {
         return mRadius;
     }

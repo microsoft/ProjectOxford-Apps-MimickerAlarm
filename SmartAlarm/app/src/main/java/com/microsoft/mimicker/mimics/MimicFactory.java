@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+/**
+ * simple class that spawns a random mimic game while respect that mimics enabled in settings
+ *
+ * if no internet access is detected, spawns the NoNetwork mimic.
+ */
 public final class MimicFactory {
 
     public static final String MIMIC_FRAGMENT_TAG = "mimic_fragment";

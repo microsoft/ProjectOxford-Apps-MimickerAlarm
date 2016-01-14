@@ -26,6 +26,11 @@ import com.microsoft.mimicker.mimics.MimicFactory.MimicResultListener;
 import com.microsoft.mimicker.ringing.ShareFragment;
 import com.microsoft.mimicker.utilities.Logger;
 
+/**
+ * Base class for all camera based mimic games
+ * it provides a capture button, countdown timer, game state banner, and a preview surface
+ * Classes that inherits from this will only have to override the verify function.
+ **/
 @SuppressWarnings("deprecation")
 abstract class MimicWithCameraFragment extends Fragment
     implements IMimicImplementation {

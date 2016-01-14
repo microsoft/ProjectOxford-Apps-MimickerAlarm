@@ -10,6 +10,16 @@ import android.view.View;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * A simple class to draw a countdown timer
+ *
+ * Public methods:
+ * init (call this before anything else, passing a time and command to execute when time out),
+ * start,
+ * pause,
+ * resume,
+ * stop
+ */
 public class CountDownTimerView extends View {
     private final static int sInterval = 100;
     private long mTotalTime = 0;

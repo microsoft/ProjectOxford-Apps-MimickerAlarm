@@ -10,6 +10,13 @@ import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * UI class to draw the top banner in Mimics to display the state of the game (failure, success,
+ * timeout)
+ *
+ * animation is defined in game_success_animator.xml
+ *
+ */
 public class MimicStateBanner extends TextView {
     private AnimatorSet mEnterLeftAnimation;
     private int mWidth;

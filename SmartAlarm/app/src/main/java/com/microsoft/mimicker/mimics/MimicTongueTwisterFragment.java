@@ -32,6 +32,24 @@ import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionServiceFac
 
 import java.util.Random;
 
+/**
+ * Implements the UI and logic of the Tongue Twister mimic game
+ *
+ * on start randomly selects one of the tongue twisters
+ * when the user presses the record button, uses the speech SDK binaries to capture and send audio
+ * to the Project Oxford speech API.
+ *
+ * There are two types of results returned. Partial and Final.
+ * Final result is returned by Project Oxford API. It contains the most likely Speech->Text transcription
+ * of the provided audio. It is used here to compute the final correctness
+ *
+ * Partial results are continuously returned by native code. It is fast but the quality is not as good
+ * as the final result. It is used here to continuously provide feedback to the user
+ *
+ *
+ * The correctness is computed by a simple Levenshtein distance calculation between the question
+ * tongue twister and the final result returned by Project Oxford.
+ */
 public class MimicTongueTwisterFragment extends Fragment
         implements ISpeechRecognitionServerEvents,
         IMimicImplementation {
