@@ -73,4 +73,5 @@
 
     <string name="notification_next_alarm_content_title">Next Mimicker alarm</string>
     <string name="notification_alarm_ringing_content_title">Mimicker alarm is ringing</string>
+    <string name="mimic_camera_too_dark">It\'s really dark here</string>
 </resources>
