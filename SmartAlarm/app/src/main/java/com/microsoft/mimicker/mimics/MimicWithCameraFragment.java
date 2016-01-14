@@ -73,6 +73,7 @@ abstract class MimicWithCameraFragment extends Fragment {
         });
 
         mCaptureButton = (ProgressButton) view.findViewById(R.id.capture_button);
+        mCaptureButton.setReadyState(ProgressButton.State.ReadyCamera);
         mCaptureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,7 +82,7 @@ abstract class MimicWithCameraFragment extends Fragment {
                 mCameraPreview.onCapture(onCaptureCallback);
             }
         });
-        mCaptureButton.readyCamera();
+        mCaptureButton.setReady();
 
         mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
         mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
@@ -155,7 +156,7 @@ abstract class MimicWithCameraFragment extends Fragment {
     protected void gameFailure(GameResult gameResult, boolean allowRetry) {
         if (allowRetry) {
             mCameraPreview.start();
-            mCaptureButton.readyCamera();
+            mCaptureButton.setReady();
             String failureMessage = getString(R.string.mimic_failure_message);
             if (gameResult != null && gameResult.message != null) {
                 failureMessage = gameResult.message;

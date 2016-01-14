@@ -90,6 +90,10 @@ public class CountDownTimerView extends View {
         }
     }
 
+    public boolean hasExpired() {
+        return (mMillisUntilFinished == 0);
+    }
+
     private void createNewTimer(long millisUntilFinished) {
         mTimer = new CountDownTimer(millisUntilFinished, sInterval) {
             @Override

@@ -32,7 +32,9 @@ import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionServiceFac
 
 import java.util.Random;
 
-public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecognitionServerEvents {
+public class MimicTongueTwisterFragment extends Fragment
+        implements ISpeechRecognitionServerEvents,
+        IMimicImplementation {
     private final static int TIMEOUT_MILLISECONDS = 15000;
     private final static float DIFFERENCE_SUCCESS_THRESHOLD = 0.3f;
     private final static float DIFFERENCE_PERFECT_THRESHOLD = 0.1f;
@@ -42,27 +44,31 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
     private SpeechRecognitionMode mRecognitionMode;
     private String mUnderstoodText = null;
     private String mQuestion = null;
-    private ProgressButton mCaptureButton;
-    private CountDownTimerView mTimer;
-    private MimicStateBanner mStateBanner;
     private TextView mTextResponse;
     private String mSuccessMessage;
     private Uri mSharableUri;
+    private MimicCoordinator mCoordinator;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tongue_twister_mimic, container, false);
-        mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
-        mStateBanner = (MimicStateBanner) view.findViewById(R.id.mimic_state);
-        mTextResponse = (TextView) view.findViewById(R.id.understood_text);
+        ProgressButton progressButton = (ProgressButton) view.findViewById(R.id.capture_button);
+        progressButton.setReadyState(ProgressButton.State.ReadyAudio);
 
-        generateQuestion(view);
+        mCoordinator = new MimicCoordinator();
+        mCoordinator.registerCountDownTimer(
+                (CountDownTimerView) view.findViewById(R.id.countdown_timer), TIMEOUT_MILLISECONDS);
+        mCoordinator.registerStateBanner((MimicStateBanner) view.findViewById(R.id.mimic_state));
+        mCoordinator.registerProgressButton(progressButton);
+        mCoordinator.registerMimic(this);
+
         initialize(view);
 
         Logger.init(getContext());
         Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER);
         Logger.track(userAction);
+
         return view;
     }
 
@@ -79,19 +85,148 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        mTimer.start();
+    public void onStart() {
+        super.onStart();
+        mCoordinator.start();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mCoordinator.stop();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Logger.flush();
+    }
+
+    @Override
+    public void onPartialResponseReceived(String s) {
+        Log.d(LOGTAG, s);
+        mTextResponse.setText(s);
+    }
+
+    @Override
+    public void onFinalResponseReceived(RecognitionResult response) {
+        if (!mCoordinator.hasStopped()) {
+            boolean isFinalDictationMessage = mRecognitionMode == SpeechRecognitionMode.LongDictation &&
+                    (response.RecognitionStatus == RecognitionStatus.EndOfDictation ||
+                            response.RecognitionStatus == RecognitionStatus.DictationEndSilenceTimeout);
+            if (mRecognitionMode == SpeechRecognitionMode.ShortPhrase
+                    || isFinalDictationMessage) {
+                mMicClient.endMicAndRecognition();
+                for (RecognizedPhrase res : response.Results) {
+                    Log.d(LOGTAG, String.valueOf(res.Confidence));
+                    Log.d(LOGTAG, String.valueOf(res.DisplayText));
+
+                    if(res.Confidence == Confidence.Normal) {
+                        mUnderstoodText = res.DisplayText;
+                    }
+                    else if(res.Confidence == Confidence.High) {
+                        mUnderstoodText = res.DisplayText;
+                        break;
+                    }
+                }
+
+                mTextResponse.setText(mUnderstoodText);
+                verify();
+            }
+        }
+    }
+
+    @Override
+    public void onIntentReceived(final String s) {
+        Log.d(LOGTAG, s);
+    }
+
+    @Override
+    public void onError(int errorCode, final String s) {
+        Loggable.AppError error = new Loggable.AppError(Loggable.Key.APP_ERROR, s);
+        Logger.track(error);
+    }
+
+    @Override
+    public void onAudioEvent(boolean recording) {
+        if (!recording) {
+            stopService();
+        }
+    }
+
+    @Override
+    public void initializeService() {
+        mRecognitionMode = SpeechRecognitionMode.ShortPhrase;
+        try {
+            //TODO: localize
+            String language = "en-us";
+            String subscriptionKey = KeyUtilities.getToken(getActivity(), "speech");
+            if (mMicClient == null) {
+                mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(getActivity(), mRecognitionMode, language, this, subscriptionKey);
+            }
+        }
+        catch(Exception e){
+            Logger.trackException(e);
+        }
+    }
+
+    @Override
+    public void startService() {
+        mMicClient.startMicAndRecognition();
+    }
+
+    @Override
+    public void stopService() {
         if (mMicClient != null) {
             mMicClient.endMicAndRecognition();
         }
-        mTimer.stop();
-        Logger.flush();
+    }
+
+    @Override
+    public void onCountDownTimerExpired() {
+        gameFailure(false);
+    }
+
+    @Override
+    public void onSucceeded() {
+        if (mCallback != null) {
+            mCallback.onMimicSuccess(mSharableUri.getPath());
+        }
+    }
+
+    @Override
+    public void onFailed() {
+        if (mCallback != null) {
+            mCallback.onMimicFailure();
+        }
+    }
+
+    protected void gameSuccess(double difference) {
+        mSuccessMessage = getString(R.string.mimic_success_message);
+        if (difference <= DIFFERENCE_PERFECT_THRESHOLD) {
+            mSuccessMessage = getString(R.string.mimic_twister_perfect_message);
+        }
+        createSharableBitmap();
+        mCoordinator.onMimicSuccess(mSuccessMessage);
+    }
+
+    protected void gameFailure(boolean allowRetry) {
+        if (allowRetry) {
+            String failureMessage = getString(R.string.mimic_failure_message);
+            mCoordinator.onMimicFailureWithRetry(failureMessage);
+        }
+        else {
+            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER_TIMEOUT);
+            userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
+            Logger.track(userAction);
+            String failureMessage = getString(R.string.mimic_time_up_message);
+            mCoordinator.onMimicFailure(failureMessage);
+        }
+    }
+
+    private void initialize(View view) {
+        mTextResponse = (TextView) view.findViewById(R.id.understood_text);
+        generateQuestion(view);
     }
 
     private void generateQuestion(View view) {
@@ -137,150 +272,8 @@ public class MimicTongueTwisterFragment extends Fragment implements ISpeechRecog
         mSharableUri = ShareFragment.saveShareableBitmap(getActivity(), sharableBitmap, title);
     }
 
-    protected void gameSuccess(double difference) {
-        if (getActivity() == null) {
-            return;
-        }
-
-        mTimer.stop();
-        mSuccessMessage = getString(R.string.mimic_success_message);
-        if (difference <= DIFFERENCE_PERFECT_THRESHOLD) {
-            mSuccessMessage = getString(R.string.mimic_twister_perfect_message);
-        }
-
-        createSharableBitmap();
-        mStateBanner.success(mSuccessMessage, new MimicStateBanner.Command() {
-            @Override
-            public void execute() {
-                mCallback.onMimicSuccess(mSharableUri.getPath());
-            }
-        });
-    }
-
-    protected void gameFailure(boolean allowRetry) {
-        if (getActivity() == null) {
-            return;
-        }
-
-        if (allowRetry) {
-            mTimer.pause();
-            String failureMessage = getString(R.string.mimic_failure_message);
-            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
-                @Override
-                public void execute() {
-                    mTimer.resume();
-                    mCaptureButton.readyAudio();
-                }
-            });
-        }
-        else {
-            mCaptureButton.setClickable(false);
-            Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER_TIMEOUT);
-            userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
-            Logger.track(userAction);
-            String failureMessage = getString(R.string.mimic_time_up_message);
-            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
-                @Override
-                public void execute() {
-                    mCallback.onMimicFailure();
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onPartialResponseReceived(String s) {
-        Log.d(LOGTAG, s);
-        mTextResponse.setText(s);
-    }
-
-    @Override
-    public void onFinalResponseReceived(RecognitionResult response) {
-        boolean isFinalDictationMessage = mRecognitionMode == SpeechRecognitionMode.LongDictation &&
-                (response.RecognitionStatus == RecognitionStatus.EndOfDictation ||
-                        response.RecognitionStatus == RecognitionStatus.DictationEndSilenceTimeout);
-        if (mRecognitionMode == SpeechRecognitionMode.ShortPhrase
-                || isFinalDictationMessage) {
-            mMicClient.endMicAndRecognition();
-            for (RecognizedPhrase res : response.Results) {
-                Log.d(LOGTAG, String.valueOf(res.Confidence));
-                Log.d(LOGTAG, String.valueOf(res.DisplayText));
-
-                if(res.Confidence == Confidence.Normal) {
-                    mUnderstoodText = res.DisplayText;
-                }
-                else if(res.Confidence == Confidence.High) {
-                    mUnderstoodText = res.DisplayText;
-                    break;
-                }
-            }
-
-            mTextResponse.setText(mUnderstoodText);
-            verify();
-        }
-    }
-
-    @Override
-    public void onIntentReceived(final String s) {
-        Log.d(LOGTAG, s);
-    }
-
-    @Override
-    public void onError(int errorCode, final String s) {
-        Loggable.AppError error = new Loggable.AppError(Loggable.Key.APP_ERROR, s);
-        Logger.track(error);
-    }
-
-    @Override
-    public void onAudioEvent(boolean recording) {
-        if (!recording) {
-            mMicClient.endMicAndRecognition();
-        }
-    }
-
-    private void initialize(View view) {
-        mRecognitionMode = SpeechRecognitionMode.ShortPhrase;
-
-        try {
-            //TODO: localize
-            String language = "en-us";
-            String subscriptionKey = KeyUtilities.getToken(getActivity(), "speech");
-            if (mMicClient == null) {
-                mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(getActivity(), mRecognitionMode, language, this, subscriptionKey);
-            }
-        }
-        catch(Exception e){
-            Logger.trackException(e);
-        }
-
-
-        mCaptureButton = (ProgressButton) view.findViewById(R.id.capture_button);
-
-        mCaptureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                if (mCaptureButton.isReady()) {
-                    mMicClient.startMicAndRecognition();
-                    mCaptureButton.waiting();
-                } else {
-                    mMicClient.endMicAndRecognition();
-                }
-            }
-        });
-        mCaptureButton.readyAudio();
-
-        mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
-        mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
-            @Override
-            public void execute() {
-                gameFailure(false);
-            }
-        });
-    }
-
-
     //https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance
-    public int levenshteinDistance(CharSequence lhs, CharSequence rhs) {
+    private int levenshteinDistance(CharSequence lhs, CharSequence rhs) {
         if (lhs == null && rhs == null) {
             return 0;
         }

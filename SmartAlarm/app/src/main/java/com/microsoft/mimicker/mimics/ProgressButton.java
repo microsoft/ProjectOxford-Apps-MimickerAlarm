@@ -20,6 +20,7 @@ public class ProgressButton extends ImageView {
     private static final int LOADING_ANIMATION_DURATION = 2000;
     private static int sYellow, sBlue, sGrey, sWhite;
     private State mState;
+    private State mReadyState;
     private Paint mBrush;
     private float mRadius;
     private int mCenterX, mCenterY;
@@ -164,18 +165,15 @@ public class ProgressButton extends ImageView {
         mLoadingAnimationRect = new RectF(mCenterX - radius, mCenterY - radius, mCenterX + radius, mCenterY + radius);
     }
 
-    public void readyCamera() {
-        mState = State.ReadyCamera;
+    public void setReady() {
+        mState = mReadyState;
         setClickable(true);
         stop();
         invalidate();
     }
 
-    public void readyAudio() {
-        mState = State.ReadyAudio;
-        setClickable(true);
-        stop();
-        invalidate();
+    public void setReadyState(State state) {
+        mReadyState = state;
     }
 
     public Boolean isReady() {
@@ -199,7 +197,7 @@ public class ProgressButton extends ImageView {
         mPressedAnimation.cancel();
     }
 
-    private enum State {
+    public enum State {
         ReadyCamera,
         ReadyAudio,
         Loading,

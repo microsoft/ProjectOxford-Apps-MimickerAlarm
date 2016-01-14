@@ -18,16 +18,16 @@ public class AlarmRingtonePlayer {
     public void initialize() {
         try {
             mPlayer = new MediaPlayer();
-            mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-            mPlayer.setLooping(true);
         } catch (Exception e) {
             Logger.trackException(e);
         }
     }
 
     public void cleanup() {
-        mPlayer.release();
-        mPlayer = null;
+        if (mPlayer != null) {
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
     public void play(Uri toneUri) {
@@ -40,6 +40,8 @@ public class AlarmRingtonePlayer {
                     }
                 });
                 mPlayer.setDataSource(mContext, toneUri);
+                mPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                mPlayer.setLooping(true);
                 mPlayer.prepareAsync();
             }
         } catch (Exception e) {
@@ -48,8 +50,10 @@ public class AlarmRingtonePlayer {
     }
 
     public void stop() {
-        if (mPlayer != null && mPlayer.isPlaying()) {
-            mPlayer.stop();
+        if (mPlayer != null) {
+            if (mPlayer.isPlaying()) {
+                mPlayer.stop();
+            }
             mPlayer.reset();
         }
     }
