@@ -22,7 +22,8 @@ import com.microsoft.mimicker.ringing.ShareFragment;
 import com.microsoft.mimicker.utilities.Logger;
 
 @SuppressWarnings("deprecation")
-abstract class MimicWithCameraFragment extends Fragment {
+abstract class MimicWithCameraFragment extends Fragment
+    implements IMimicImplementation {
 
     private static final String LOGTAG = "MimicWithCameraFragment";
     private static final int TIMEOUT_MILLISECONDS = 30000;
@@ -31,9 +32,8 @@ abstract class MimicWithCameraFragment extends Fragment {
     protected static int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     MimicResultListener mCallback;
     private CameraPreview   mCameraPreview;
-    private ProgressButton  mCaptureButton;
-    private CountDownTimerView      mTimer;
-    private MimicStateBanner mStateBanner;
+    private MimicCoordinator mCoordinator;
+    private Uri mSharableUri;
 
     private Point mSize;
     private CameraPreview.ImageCallback onCaptureCallback = new CameraPreview.ImageCallback() {
@@ -47,7 +47,6 @@ abstract class MimicWithCameraFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_camera_mimic, container, false);
 
-        mStateBanner = (MimicStateBanner) view.findViewById(R.id.mimic_state);
         SurfaceView previewView = (SurfaceView) view.findViewById(R.id.camera_preview_view);
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -64,33 +63,23 @@ abstract class MimicWithCameraFragment extends Fragment {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     // Camera sensor ranges from -1000 to 1000 regardless of aspect ratio, sizes, resolution, ...
-                    int deltaX = (int)(((float)mSize.x - event.getX()) / mSize.x * -2000) + 1000;
-                    int deltaY = (int)(((float)mSize.y - event.getY()) / mSize.y * -2000) + 1000;
+                    int deltaX = (int) (((float) mSize.x - event.getX()) / mSize.x * -2000) + 1000;
+                    int deltaY = (int) (((float) mSize.y - event.getY()) / mSize.y * -2000) + 1000;
                     mCameraPreview.onFocus(deltaX, deltaY);
                 }
                 return true;
             }
         });
 
-        mCaptureButton = (ProgressButton) view.findViewById(R.id.capture_button);
-        mCaptureButton.setReadyState(ProgressButton.State.ReadyCamera);
-        mCaptureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTimer.pause();
-                mCaptureButton.loading();
-                mCameraPreview.onCapture(onCaptureCallback);
-            }
-        });
-        mCaptureButton.setReady();
+        ProgressButton progressButton = (ProgressButton) view.findViewById(R.id.capture_button);
+        progressButton.setReadyState(ProgressButton.State.ReadyCamera);
 
-        mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
-        mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
-            @Override
-            public void execute() {
-                gameFailure(null, false);
-            }
-        });
+        mCoordinator = new MimicCoordinator();
+        mCoordinator.registerCountDownTimer(
+                (CountDownTimerView) view.findViewById(R.id.countdown_timer), TIMEOUT_MILLISECONDS);
+        mCoordinator.registerStateBanner((MimicStateBanner) view.findViewById(R.id.mimic_state));
+        mCoordinator.registerProgressButton(progressButton, MimicButtonBehavior.CAMERA);
+        mCoordinator.registerMimic(this);
 
         return view;
     }
@@ -108,9 +97,25 @@ abstract class MimicWithCameraFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
+        mCoordinator.start();
+    }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        mCoordinator.stop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Logger.flush();
+    }
+
+    @Override
+    public void initializeCapture() {
         try {
             mCameraPreview.initPreview();
             mCameraPreview.start();
@@ -118,63 +123,56 @@ abstract class MimicWithCameraFragment extends Fragment {
             Log.e(LOGTAG, "err onResume", ex);
             Logger.trackException(ex);
         }
-
-        mTimer.start();
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void startCapture() {
+        mCameraPreview.onCapture(onCaptureCallback);
+    }
+
+    @Override
+    public void stopCapture() {
         mCameraPreview.stop();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mTimer.stop();
-        mCameraPreview.stop();
-        mCaptureButton.stop();
-        Logger.flush();
+    public void onCountDownTimerExpired() {
+        gameFailure(null, false);
+    }
+
+    @Override
+    public void onSucceeded() {
+        if (mCallback != null) {
+            mCallback.onMimicSuccess(mSharableUri.getPath());
+        }
+    }
+
+    @Override
+    public void onFailed() {
+        if (mCallback != null) {
+            mCallback.onMimicFailure();
+        }
     }
 
     protected void gameSuccess(final GameResult gameResult) {
-        mTimer.stop();
+        mSharableUri = gameResult.shareableUri;
         String successMessage = getString(R.string.mimic_success_message);
-        if (gameResult != null && gameResult.message != null) {
+        if (gameResult.message != null) {
             successMessage = gameResult.message;
         }
-        mStateBanner.success(successMessage, new MimicStateBanner.Command() {
-            @Override
-            public void execute() {
-                if (gameResult.shareableUri != null) {
-                    mCallback.onMimicSuccess(gameResult.shareableUri.getPath());
-                }
-            }
-        });
+        mCoordinator.onMimicSuccess(successMessage);
     }
 
     protected void gameFailure(GameResult gameResult, boolean allowRetry) {
         if (allowRetry) {
             mCameraPreview.start();
-            mCaptureButton.setReady();
             String failureMessage = getString(R.string.mimic_failure_message);
             if (gameResult != null && gameResult.message != null) {
                 failureMessage = gameResult.message;
             }
-            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
-                @Override
-                public void execute() {
-                    mTimer.resume();
-                }
-            });
+            mCoordinator.onMimicFailureWithRetry(failureMessage);
         } else {
-            String failureMessage = getString(R.string.mimic_time_up_message);
-            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
-                @Override
-                public void execute() {
-                    mCallback.onMimicFailure();
-                }
-            });
+            mCoordinator.onMimicFailure(getString(R.string.mimic_time_up_message));
         }
     }
 
@@ -208,16 +206,17 @@ abstract class MimicWithCameraFragment extends Fragment {
         @Override
         protected void onPostExecute(GameResult gameResult) {
             super.onPostExecute(gameResult);
-            mCaptureButton.stop();
-            if (gameResult.success) {
-                gameSuccess(gameResult);
-            } else {
-                gameFailure(gameResult, true);
+            if (!mCoordinator.hasStopped()) {
+                if (gameResult.success) {
+                    gameSuccess(gameResult);
+                } else {
+                    gameFailure(gameResult, true);
+                }
             }
         }
     }
 
-    protected class GameResult  {
+    protected class GameResult {
         boolean success = false;
         String message = null;
         Uri shareableUri = null;

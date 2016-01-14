@@ -60,7 +60,7 @@ public class MimicTongueTwisterFragment extends Fragment
         mCoordinator.registerCountDownTimer(
                 (CountDownTimerView) view.findViewById(R.id.countdown_timer), TIMEOUT_MILLISECONDS);
         mCoordinator.registerStateBanner((MimicStateBanner) view.findViewById(R.id.mimic_state));
-        mCoordinator.registerProgressButton(progressButton);
+        mCoordinator.registerProgressButton(progressButton, MimicButtonBehavior.AUDIO);
         mCoordinator.registerMimic(this);
 
         initialize(view);
@@ -150,12 +150,12 @@ public class MimicTongueTwisterFragment extends Fragment
     @Override
     public void onAudioEvent(boolean recording) {
         if (!recording) {
-            stopService();
+            stopCapture();
         }
     }
 
     @Override
-    public void initializeService() {
+    public void initializeCapture() {
         mRecognitionMode = SpeechRecognitionMode.ShortPhrase;
         try {
             //TODO: localize
@@ -171,12 +171,12 @@ public class MimicTongueTwisterFragment extends Fragment
     }
 
     @Override
-    public void startService() {
+    public void startCapture() {
         mMicClient.startMicAndRecognition();
     }
 
     @Override
-    public void stopService() {
+    public void stopCapture() {
         if (mMicClient != null) {
             mMicClient.endMicAndRecognition();
         }
