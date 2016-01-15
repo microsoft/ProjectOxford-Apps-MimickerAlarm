@@ -43,8 +43,8 @@ public class Alarm {
     public Alarm(UUID id) {
         mId = id;
         Calendar calendar = Calendar.getInstance();
-        mTimeHour = calendar.getTime().getHours();
-        mTimeMinute = calendar.getTime().getMinutes();
+        mTimeHour = calendar.get(Calendar.HOUR_OF_DAY);
+        mTimeMinute = calendar.get(Calendar.MINUTE);
         mRepeatingDays = new boolean[]{ false, false, false, false, false, false, false };
         mAlarmTone = GeneralUtilities.defaultRingtone();
         mIsEnabled = true;

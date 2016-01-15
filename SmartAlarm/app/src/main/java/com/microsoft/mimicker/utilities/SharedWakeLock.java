@@ -11,6 +11,7 @@ public class SharedWakeLock {
     private PowerManager.WakeLock mFullWakeLock;
     private PowerManager.WakeLock mPartialWakeLock;
 
+    @SuppressWarnings("deprecation")
     private SharedWakeLock(Context context) {
         Context appContext = context.getApplicationContext();
         PowerManager pm = (PowerManager) appContext.getSystemService(Context.POWER_SERVICE);

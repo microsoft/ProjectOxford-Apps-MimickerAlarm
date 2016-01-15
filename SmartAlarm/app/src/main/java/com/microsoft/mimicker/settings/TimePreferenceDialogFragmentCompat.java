@@ -27,6 +27,7 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
         TimePreference timePreference = (TimePreference) getPreference();
@@ -42,6 +43,7 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onDialogClosed(boolean resultIsOk) {
         if (resultIsOk) {
             int hour, minute;

@@ -42,6 +42,7 @@ public class MimicColorCaptureFragment extends MimicWithCameraFragment {
     private float[] mQuestionColorRangeLower;
     private float[] mQuestionColorRangeUpper;
 
+    @SuppressWarnings("deprecation")
     public MimicColorCaptureFragment() {
         CameraFacing = Camera.CameraInfo.CAMERA_FACING_BACK;
     }

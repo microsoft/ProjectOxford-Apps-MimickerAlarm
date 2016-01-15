@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
+import com.microsoft.mimicker.utilities.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,7 @@ public final class MimicFactory {
                 fragment = (Fragment) mimic.newInstance();
             } catch (Exception e) {
                 Log.e(TAG, "Couldn't create fragment:", e);
+                Logger.trackException(e);
             }
         }
         return fragment;

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
@@ -55,7 +56,7 @@ public class AlarmListItemTouchHelperCallback extends ItemTouchHelper.Callback {
             int maxDrawWidth = (iconPadding * 2) + icon.getWidth();
 
             Paint paint = new Paint();
-            paint.setColor(resources.getColor(R.color.red));
+            paint.setColor(ContextCompat.getColor(AlarmApplication.getAppContext(), R.color.red));
 
             int x = Math.round(Math.abs(dX));
 
