@@ -75,9 +75,7 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        final String hockeyappToken = KeyUtilities.getToken(this, "hockeyapp");
-        if (!BuildConfig.DEBUG)
-            UpdateManager.register(this, hockeyappToken);
+        GeneralUtilities.registerUpdateManager(this);
         GeneralUtilities.registerCrashReport(this);
 
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
@@ -112,9 +110,11 @@ public class AlarmMainActivity extends AppCompatActivity
 
     public void showFeedback(MenuItem item){
         final String hockeyappToken = KeyUtilities.getToken(this, "hockeyapp");
-        FeedbackManager.register(this, hockeyappToken, null);
-        FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
-        FeedbackManager.showFeedbackActivity(this);
+        if (hockeyappToken != null && !hockeyappToken.equals("")) {
+            FeedbackManager.register(this, hockeyappToken, null);
+            FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
+            FeedbackManager.showFeedbackActivity(this);
+        }
     }
 
     public void showTutorial(MenuItem item){

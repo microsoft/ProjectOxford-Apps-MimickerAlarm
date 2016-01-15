@@ -1,5 +1,6 @@
 package com.microsoft.mimicker.utilities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
@@ -22,6 +23,7 @@ import com.microsoft.mimicker.appcore.AlarmApplication;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
+import net.hockeyapp.android.UpdateManager;
 
 public class GeneralUtilities {
     public static void enableLinks(TextView view) {
@@ -48,17 +50,26 @@ public class GeneralUtilities {
         textView.setText(s);
     }
 
+    public static void registerUpdateManager(Activity context){
+        final String hockeyappToken = KeyUtilities.getToken(context, "hockeyapp");
+        if (hockeyappToken != null && !hockeyappToken.equals("")) {
+            if (!BuildConfig.DEBUG) {
+                UpdateManager.register(context, hockeyappToken);
+            }
+        }
+    }
     public static void registerCrashReport(Context context){
         final String hockeyappToken = KeyUtilities.getToken(context, "hockeyapp");
-        if (!BuildConfig.DEBUG) {
-            CrashManager.register(context, hockeyappToken, new CrashManagerListener() {
-                public boolean shouldAutoUploadCrashes() {
-                    return true;
-                }
-            });
-        }
-        else {
-            CrashManager.register(context, hockeyappToken);
+        if (hockeyappToken != null && !hockeyappToken.equals("")) {
+            if (!BuildConfig.DEBUG) {
+                CrashManager.register(context, hockeyappToken, new CrashManagerListener() {
+                    public boolean shouldAutoUploadCrashes() {
+                        return true;
+                    }
+                });
+            } else {
+                CrashManager.register(context, hockeyappToken);
+            }
         }
     }
 

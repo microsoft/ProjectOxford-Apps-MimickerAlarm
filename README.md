@@ -13,10 +13,32 @@ You can install [Mimicker Alarm in the Google Play Store](<https://play.google.c
 Getting started
 ===============
 
+Build the app
+----------------
+
+1. Get a subscription key for Face, Vision, and Speech API by following instructions in [Subscription key management](<http://www.projectoxford.ai/doc/general/subscription-key-mgmt>).
+
+2.  Start Android Studio and open project.
+
+3.  In Android Studio -\> "Project" panel -\> "Android" view, open file "gradle.properties", provide the keys
+
+4.  In Android Studio, select menu "Build -\> Make Project" to build the app
+
+PS: if you have a [Mixpanel](<http://www.mixpanel.com>) account or [HockeyApp](<http://www.hockeyapp.net>) account you can put in those keys to get event logging, update notifications and crash reports.
+
+Run the sample
+--------------
+
+In Android Studio, select menu "Run", and "Run app" to launch this app.
+
+Microsoft will receive the images you upload and may use them to improve Face API and related services. By submitting an image, you confirm you have consent from everyone in it. This is outlined in the in-app Terms of Use.
 
 Contributing
 ============
 
+You can create new mimics really easily! 
+
+Inherit from the MimicWithCameraFragment class and implement the verify function that takes in a Bitmap. You can readily use the Emotion API and Vision API!
 
 License
 =======
