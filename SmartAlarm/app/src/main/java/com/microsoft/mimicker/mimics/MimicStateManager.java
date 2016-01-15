@@ -20,7 +20,7 @@ import java.lang.ref.WeakReference;
  *      The fragment onStart and onStop implementations should call start and stop
  *      All game failure/success cases must call into this class
  *
- *  The fragment can optionally call the hasMimicStopped method to determine whether to do any
+ *  The fragment can optionally call the isMimicRunning method to determine whether to do any
  *  further processing.
  */
 public class MimicStateManager implements IMimicMediator {
@@ -31,12 +31,12 @@ public class MimicStateManager implements IMimicMediator {
     ProgressButton mProgressButton;
     MimicButtonBehavior mButtonBehavior;
     WeakReference<IMimicImplementation> mMimicRef;
-    boolean mMimicStopped;
+    boolean mMimicRunning;
 
     // Should be called from Fragment::onStart, which is when it becomes visible to the user
     public void start(){
         Log.d(TAG, "Entered start!");
-        mMimicStopped = false;
+        mMimicRunning = true;
         mCountDownTimer.start();
         IMimicImplementation mimic = mMimicRef.get();
         if (mimic != null) {
@@ -47,7 +47,7 @@ public class MimicStateManager implements IMimicMediator {
     // Should be called from Fragment::onStop, when the fragment is invisible
     public void stop() {
         Log.d(TAG, "Entered stop!");
-        mMimicStopped = true;
+        mMimicRunning = false;
         IMimicImplementation mimic = mMimicRef.get();
         if (mimic != null) {
             mimic.stopCapture();
@@ -55,20 +55,20 @@ public class MimicStateManager implements IMimicMediator {
         mProgressButton.setReady();
     }
 
-    public boolean hasMimicStopped() {
-        return mMimicStopped;
+    public boolean isMimicRunning() {
+        return mMimicRunning;
     }
 
     public void onMimicSuccess(String successMessage) {
         Log.d(TAG, "Entered onMimicSuccess!");
-        if (!hasMimicStopped()) {
+        if (isMimicRunning()) {
             handleButtonState();
             mCountDownTimer.stop();
             mMimicStateBanner.success(successMessage, new MimicStateBanner.Command() {
                 @Override
                 public void execute() {
                     Log.d(TAG, "Entered onMimicSuccess callback!");
-                    if (!hasMimicStopped()) {
+                    if (isMimicRunning()) {
                         IMimicImplementation mimic = mMimicRef.get();
                         if (mimic != null) {
                             mimic.onSucceeded();
@@ -83,13 +83,13 @@ public class MimicStateManager implements IMimicMediator {
         Log.d(TAG, "Entered onMimicFailureWithRetry!");
         // If the countdown time has just expired and has already registered a failure command,
         // then we should avoid changing state
-        if (!hasMimicStopped() && !mCountDownTimer.hasExpired()) {
+        if (isMimicRunning() && !mCountDownTimer.hasExpired()) {
             mCountDownTimer.pause();
             mMimicStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
                 @Override
                 public void execute() {
                     Log.d(TAG, "Entered onMimicFailureWithRetry callback!");
-                    if (!hasMimicStopped()) {
+                    if (isMimicRunning()) {
                         mCountDownTimer.resume();
                         mProgressButton.setReady();
                     }
@@ -125,10 +125,12 @@ public class MimicStateManager implements IMimicMediator {
             @Override
             public void execute() {
                 Log.d(TAG, "Countdown timer expired!");
-                IMimicImplementation mimic = mMimicRef.get();
-                if (mimic != null) {
-                    mimic.stopCapture();
-                    mimic.onCountDownTimerExpired();
+                if (isMimicRunning()) {
+                    IMimicImplementation mimic = mMimicRef.get();
+                    if (mimic != null) {
+                        mimic.stopCapture();
+                        mimic.onCountDownTimerExpired();
+                    }
                 }
             }
         });

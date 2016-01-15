@@ -13,7 +13,7 @@ enum MimicButtonBehavior {
 public interface IMimicMediator {
     void start();
     void stop();
-    boolean hasMimicStopped();
+    boolean isMimicRunning();
 
     void onMimicSuccess(String successMessage);
     void onMimicFailureWithRetry(String failureMessage);

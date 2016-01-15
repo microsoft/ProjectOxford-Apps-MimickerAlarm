@@ -129,7 +129,7 @@ public class MimicTongueTwisterFragment extends Fragment
 
     @Override
     public void onFinalResponseReceived(RecognitionResult response) {
-        if (!mStateManager.hasMimicStopped()) {
+        if (mStateManager.isMimicRunning()) {
             boolean isFinalDictationMessage = mRecognitionMode == SpeechRecognitionMode.LongDictation &&
                     (response.RecognitionStatus == RecognitionStatus.EndOfDictation ||
                             response.RecognitionStatus == RecognitionStatus.DictationEndSilenceTimeout);

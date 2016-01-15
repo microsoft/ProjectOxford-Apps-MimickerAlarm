@@ -253,7 +253,7 @@ abstract class MimicWithCameraFragment extends Fragment
         @Override
         protected void onPostExecute(GameResult gameResult) {
             super.onPostExecute(gameResult);
-            if (!mStateManager.hasMimicStopped()) {
+            if (mStateManager.isMimicRunning()) {
                 if (gameResult.success) {
                     gameSuccess(gameResult);
                 } else {
