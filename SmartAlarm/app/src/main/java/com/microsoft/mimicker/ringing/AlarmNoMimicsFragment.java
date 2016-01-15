@@ -16,15 +16,16 @@ import com.microsoft.mimicker.model.AlarmList;
 
 import java.util.UUID;
 
-public class AlarmNoGamesFragment extends Fragment {
+public class AlarmNoMimicsFragment extends Fragment {
+    public static final String NO_MIMICS_FRAGMENT_TAG = "no_mimics_fragment";
     private static final String ARGS_ALARM_ID = "alarm_id";
     private static final int NOGAME_SCREEN_TIMEOUT_DURATION = 5 * 1000;
-    NoGameResultListener mCallback;
+    NoMimicResultListener mCallback;
     private Handler mHandler;
     private Runnable mAutoDismissTask;
 
-    public static AlarmNoGamesFragment newInstance(String alarmId) {
-        AlarmNoGamesFragment fragment = new AlarmNoGamesFragment();
+    public static AlarmNoMimicsFragment newInstance(String alarmId) {
+        AlarmNoMimicsFragment fragment = new AlarmNoMimicsFragment();
         Bundle bundle = new Bundle(1);
         bundle.putString(ARGS_ALARM_ID, alarmId);
         fragment.setArguments(bundle);
@@ -43,37 +44,30 @@ public class AlarmNoGamesFragment extends Fragment {
         TextView alarmTitle = (TextView) view.findViewById(R.id.alarm_no_mimics_label);
 
         String name = alarm.getTitle();
-        if (name == null || name.isEmpty()) {
-            name = getString(R.string.alarm_ringing_default_text);
-        }
-
         alarmTitle.setText(name);
 
         view.findViewById(R.id.alarm_no_mimics_tap_to_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mHandler.removeCallbacks(mAutoDismissTask);
-                mCallback.onNoGameDismiss(true);
+                mCallback.onNoMimicDismiss(true);
             }
         });
 
         mAutoDismissTask = new Runnable() {
             @Override
             public void run() {
-                mCallback.onNoGameDismiss(false);
+                mCallback.onNoMimicDismiss(false);
             }
         };
-
         mHandler = new Handler();
-        mHandler.postDelayed(mAutoDismissTask, NOGAME_SCREEN_TIMEOUT_DURATION);
-
         return view;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mCallback = (NoGameResultListener) context;
+        mCallback = (NoMimicResultListener) context;
     }
 
     @Override
@@ -82,7 +76,19 @@ public class AlarmNoGamesFragment extends Fragment {
         mCallback = null;
     }
 
-    public interface NoGameResultListener {
-        void onNoGameDismiss(boolean launchSettings);
+    @Override
+    public void onPause() {
+        mHandler.removeCallbacks(mAutoDismissTask);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mHandler.postDelayed(mAutoDismissTask, NOGAME_SCREEN_TIMEOUT_DURATION);
+    }
+
+    public interface NoMimicResultListener {
+        void onNoMimicDismiss(boolean launchSettings);
     }
 }

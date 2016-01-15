@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.microsoft.mimicker.database.AlarmDbSchema.AlarmTable;
 
 public class AlarmDatabaseHelper extends SQLiteOpenHelper{
-    private static final String TAG = "AlarmDatabaseHelper";
-    private static final int DATABASE_VERSION = 3;
+
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "alarmDatabase.db";
 
     public AlarmDatabaseHelper(Context context) { super(context, DATABASE_NAME, null, DATABASE_VERSION); }
@@ -28,7 +28,11 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper{
                 AlarmTable.Columns.TONGUE_TWISTER + ", " +
                 AlarmTable.Columns.COLOR_CAPTURE + ", " +
                 AlarmTable.Columns.EXPRESS_YOURSELF + ", " +
-                AlarmTable.Columns.NEW +
+                AlarmTable.Columns.NEW + ", " +
+                AlarmTable.Columns.SNOOZED + ", " +
+                AlarmTable.Columns.SNOOZED_HOUR + ", " +
+                AlarmTable.Columns.SNOOZED_MINUTE + ", " +
+                AlarmTable.Columns.SNOOZED_SECONDS +
                 ")"
         );
     }
@@ -43,10 +47,26 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper{
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.COLOR_CAPTURE);
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.EXPRESS_YOURSELF);
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.NEW);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_HOUR);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_MINUTE);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_SECONDS);
                 break;
             case 2:
                 db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.NEW);
-
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_HOUR);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_MINUTE);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_SECONDS);
+                break;
+            case 3:
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_HOUR);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_MINUTE);
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_SECONDS);
+                break;
+            case 4:
+                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_SECONDS);
         }
     }
 }

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.KeyUtilities;
 import com.microsoft.projectoxford.vision.VisionServiceRestClient;
 import com.microsoft.projectoxford.vision.contract.AnalyzeResult;
 
@@ -22,6 +22,20 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
+/**
+ * The logic and UI implementation of the Color capture mimic game
+ *
+ * See MimicWithCameraFragment for details of the camera interacts with the UI
+ *
+ * In vision_question.xml we defined a bunch of color and their acceptable HSL value ranges
+ * see https://en.wikipedia.org/wiki/HSL_and_HSV for HSL color space
+ *
+ * On creation a random color is selected.
+ * when an image is capture it is sent to the ProjectOxford Vision API which returns the main colors
+ * and accent colors. Accent colors are defined as HEX codes of RGB values which we turn to HSL and
+ * compare to see if it's in range of the color we specified.
+ *
+ */
 public class MimicColorCaptureFragment extends MimicWithCameraFragment {
     private VisionServiceRestClient mVisionServiceRestClient;
     private String mQuestionColorName;
@@ -38,7 +52,7 @@ public class MimicColorCaptureFragment extends MimicWithCameraFragment {
 
         Resources resources = getResources();
 
-        String subscriptionKey = Util.getToken(getActivity(), "vision");
+        String subscriptionKey = KeyUtilities.getToken(getActivity(), "vision");
         mVisionServiceRestClient = new VisionServiceRestClient(subscriptionKey);
 
         String[] questions = resources.getStringArray(R.array.vision_color_questions);

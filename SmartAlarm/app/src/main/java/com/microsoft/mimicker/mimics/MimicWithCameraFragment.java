@@ -4,6 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,25 +19,37 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.mimics.MimicFactory.MimicResultListener;
 import com.microsoft.mimicker.ringing.ShareFragment;
 import com.microsoft.mimicker.utilities.Logger;
 
+/**
+ * Base class for all camera based mimic games
+ * it provides a capture button, countdown timer, game state banner, and a preview surface
+ * Classes that inherits from this will only have to override the verify function.
+ **/
 @SuppressWarnings("deprecation")
-abstract class MimicWithCameraFragment extends Fragment {
+abstract class MimicWithCameraFragment extends Fragment
+    implements IMimicImplementation {
 
     private static final String LOGTAG = "MimicWithCameraFragment";
     private static final int TIMEOUT_MILLISECONDS = 30000;
     // Max width for sending to Project Oxford, reduce latency
     private static final int MAX_WIDTH = 500;
+    private static final int LIGHT_THRESHOLD = 50;
+
     protected static int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     MimicResultListener mCallback;
     private CameraPreview   mCameraPreview;
-    private ProgressButton  mCaptureButton;
-    private CountDownTimerView      mTimer;
-    private MimicStateBanner mStateBanner;
+    private MimicCoordinator mCoordinator;
+    private Uri mSharableUri;
+    private SensorManager mSensorManager;
+    private Sensor mLightSensor;
+    private SensorEventListener mLightSensorListener;
+    private Toast mTooDarkToast;
 
     private Point mSize;
     private CameraPreview.ImageCallback onCaptureCallback = new CameraPreview.ImageCallback() {
@@ -47,7 +63,6 @@ abstract class MimicWithCameraFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_camera_mimic, container, false);
 
-        mStateBanner = (MimicStateBanner) view.findViewById(R.id.mimic_state);
         SurfaceView previewView = (SurfaceView) view.findViewById(R.id.camera_preview_view);
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -64,32 +79,44 @@ abstract class MimicWithCameraFragment extends Fragment {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     // Camera sensor ranges from -1000 to 1000 regardless of aspect ratio, sizes, resolution, ...
-                    int deltaX = (int)(((float)mSize.x - event.getX()) / mSize.x * -2000) + 1000;
-                    int deltaY = (int)(((float)mSize.y - event.getY()) / mSize.y * -2000) + 1000;
+                    int deltaX = (int) (((float) mSize.x - event.getX()) / mSize.x * -2000) + 1000;
+                    int deltaY = (int) (((float) mSize.y - event.getY()) / mSize.y * -2000) + 1000;
                     mCameraPreview.onFocus(deltaX, deltaY);
                 }
                 return true;
             }
         });
 
-        mCaptureButton = (ProgressButton) view.findViewById(R.id.capture_button);
-        mCaptureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTimer.pause();
-                mCaptureButton.loading();
-                mCameraPreview.onCapture(onCaptureCallback);
-            }
-        });
-        mCaptureButton.readyCamera();
+        ProgressButton progressButton = (ProgressButton) view.findViewById(R.id.capture_button);
+        progressButton.setReadyState(ProgressButton.State.ReadyCamera);
 
-        mTimer = (CountDownTimerView) view.findViewById(R.id.countdown_timer);
-        mTimer.init(TIMEOUT_MILLISECONDS, new CountDownTimerView.Command() {
+        mCoordinator = new MimicCoordinator();
+        mCoordinator.registerCountDownTimer(
+                (CountDownTimerView) view.findViewById(R.id.countdown_timer), TIMEOUT_MILLISECONDS);
+        mCoordinator.registerStateBanner((MimicStateBanner) view.findViewById(R.id.mimic_state));
+        mCoordinator.registerProgressButton(progressButton, MimicButtonBehavior.CAMERA);
+        mCoordinator.registerMimic(this);
+
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        if (mSensorManager != null) {
+            mLightSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        }
+        mLightSensorListener = new SensorEventListener() {
             @Override
-            public void execute() {
-                gameFailure(null, false);
+            public void onSensorChanged(SensorEvent event) {
+                if (event.values[0] < LIGHT_THRESHOLD) {
+                    mTooDarkToast.show();
+                }
+                else {
+                    mTooDarkToast.cancel();
+                }
             }
-        });
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+        };
+        // This toast is only shown when there is not enough light
+        mTooDarkToast = Toast.makeText(getActivity(), getString(R.string.mimic_camera_too_dark), Toast.LENGTH_SHORT);
 
         return view;
     }
@@ -107,9 +134,35 @@ abstract class MimicWithCameraFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
 
+        if (mSensorManager != null && mLightSensorListener != null) {
+            mSensorManager.registerListener(mLightSensorListener, mLightSensor, SensorManager.SENSOR_DELAY_UI);
+        }
+
+        mCoordinator.start();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mCoordinator.stop();
+
+        mTooDarkToast.cancel();
+        if (mSensorManager != null && mLightSensorListener != null) {
+            mSensorManager.unregisterListener(mLightSensorListener);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Logger.flush();
+    }
+
+    @Override
+    public void initializeCapture() {
         try {
             mCameraPreview.initPreview();
             mCameraPreview.start();
@@ -117,63 +170,56 @@ abstract class MimicWithCameraFragment extends Fragment {
             Log.e(LOGTAG, "err onResume", ex);
             Logger.trackException(ex);
         }
-
-        mTimer.start();
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void startCapture() {
+        mCameraPreview.onCapture(onCaptureCallback);
+    }
+
+    @Override
+    public void stopCapture() {
         mCameraPreview.stop();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mTimer.stop();
-        mCameraPreview.stop();
-        mCaptureButton.stop();
-        Logger.flush();
+    public void onCountDownTimerExpired() {
+        gameFailure(null, false);
+    }
+
+    @Override
+    public void onSucceeded() {
+        if (mCallback != null) {
+            mCallback.onMimicSuccess(mSharableUri.getPath());
+        }
+    }
+
+    @Override
+    public void onFailed() {
+        if (mCallback != null) {
+            mCallback.onMimicFailure();
+        }
     }
 
     protected void gameSuccess(final GameResult gameResult) {
-        mTimer.stop();
+        mSharableUri = gameResult.shareableUri;
         String successMessage = getString(R.string.mimic_success_message);
-        if (gameResult != null && gameResult.message != null) {
+        if (gameResult.message != null) {
             successMessage = gameResult.message;
         }
-        mStateBanner.success(successMessage, new MimicStateBanner.Command() {
-            @Override
-            public void execute() {
-                if (gameResult.shareableUri != null) {
-                    mCallback.onMimicSuccess(gameResult.shareableUri.getPath());
-                }
-            }
-        });
+        mCoordinator.onMimicSuccess(successMessage);
     }
 
     protected void gameFailure(GameResult gameResult, boolean allowRetry) {
         if (allowRetry) {
             mCameraPreview.start();
-            mCaptureButton.readyCamera();
             String failureMessage = getString(R.string.mimic_failure_message);
             if (gameResult != null && gameResult.message != null) {
                 failureMessage = gameResult.message;
             }
-            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
-                @Override
-                public void execute() {
-                    mTimer.resume();
-                }
-            });
+            mCoordinator.onMimicFailureWithRetry(failureMessage);
         } else {
-            String failureMessage = getString(R.string.mimic_time_up_message);
-            mStateBanner.failure(failureMessage, new MimicStateBanner.Command() {
-                @Override
-                public void execute() {
-                    mCallback.onMimicFailure();
-                }
-            });
+            mCoordinator.onMimicFailure(getString(R.string.mimic_time_up_message));
         }
     }
 
@@ -207,16 +253,17 @@ abstract class MimicWithCameraFragment extends Fragment {
         @Override
         protected void onPostExecute(GameResult gameResult) {
             super.onPostExecute(gameResult);
-            mCaptureButton.stop();
-            if (gameResult.success) {
-                gameSuccess(gameResult);
-            } else {
-                gameFailure(gameResult, true);
+            if (!mCoordinator.hasStopped()) {
+                if (gameResult.success) {
+                    gameSuccess(gameResult);
+                } else {
+                    gameFailure(gameResult, true);
+                }
             }
         }
     }
 
-    protected class GameResult  {
+    protected class GameResult {
         boolean success = false;
         String message = null;
         Uri shareableUri = null;

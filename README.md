@@ -1,32 +1,44 @@
-# You've added your first ReadMe file!
-A README.md file is intended to quickly orient readers to what your project can do.  New to Markdown? [Learn more](http://go.microsoft.com/fwlink/p/?LinkId=524306&clcid=0x409)
+Mimicker Alarm, a Microsoft Garage Project
+====================================
+Mimicker Alarm is a morning alarm clock app for Android that helps you wake up and stay up by playing a simple game, called a "Mimic". To dismiss your alarm, you must mimic the action given, lest your alarm ring again. Each game is powered by [Microsoft Project Oxford](<https://www.projectoxford.ai>), a set of machine learning APIs aimed at helping developers understand and act on the data around them.
 
-## Edit this ReadMe and commit your change to a topic branch
-In Git, branches are cheap.  You should use them whenever you're making changes to your repository.  Edit this file by clicking on the edit icon.
+Express yourself with [Emotion API](<https://www.projectoxford.ai/emotion>) | Color capture with [Computer vision API](<https://www.projectoxford.ai/vision>) | Tongue twister with [Speech API](<https://www.projectoxford.ai/speech>)
+------------- | ------------- |  -------------
+![Express yourself](http://i.imgur.com/Ud7pchO.jpg) | ![Color capture](http://i.imgur.com/Ud7pchO.jpg) | ![Tongue twister](http://i.imgur.com/Ud7pchO.jpgg)
+	
 
-Then make some changes to this ReadMe file.
+You can install [Mimicker Alarm in the Google Play Store](<https://play.google.com/store/apps/details?id=com.microsoft.mimicker>) for free. All of the source code for Mimicker Alarm is available on GitHub for developers to browse and reference how to use [Microsoft Project Oxford](<https://www.projectoxford.ai>). We welcome your comments, feedback, and contributions.
 
-> Make some **edits** to _this_ blockquote
 
-When you are done, click the dropdown arrow next to the save button - that will allow you to commit your changes to a new branch.
+Getting started
+===============
 
-## Create a pull request to contribute your changes back into master
-Pull requests are the way to move changes from a topic branch back into the master branch.
+Build the app
+----------------
 
-Click on the **Pull Requests** page in the **CODE** hub, then click "New Pull Request" to create a new pull request from your topic branch to the master branch.
+1. Get a subscription key for Face, Vision, and Speech API by following instructions in [Subscription key management](<http://www.projectoxford.ai/doc/general/subscription-key-mgmt>).
 
-When you are done adding details, click "Create Pull request". Once a pull request is sent, reviewers can see your changes, recommend modifications, or even push follow-up commits.
+2.  Start Android Studio and open project.
 
-First time creating a pull request?  [Learn more](http://go.microsoft.com/fwlink/?LinkId=533211&clcid=0x409)
+3.  In Android Studio -\> "Project" panel -\> "Android" view, open file "gradle.properties", provide the keys
 
-### Congratulations! You've completed the grand tour of the CODE hub!
+4.  In Android Studio, select menu "Build -\> Make Project" to build the app
 
-# Next steps
+PS: if you have a [Mixpanel](<http://www.mixpanel.com>) account or [HockeyApp](<http://www.hockeyapp.net>) account you can put in those keys to get event logging, update notifications and crash reports.
 
-If you haven't done so yet:
-* [Install Visual Studio](http://go.microsoft.com/fwlink/?LinkId=309297&clcid=0x409&slcid=0x409)
-* [Install Git](http://git-scm.com/downloads)
+Run the sample
+--------------
 
-Then clone this repo to your local machine to get started with your own project.
+In Android Studio, select menu "Run", and "Run app" to launch this app.
 
-Happy coding!
+Microsoft will receive the images you upload and may use them to improve Face API and related services. By submitting an image, you confirm you have consent from everyone in it. This is outlined in the in-app Terms of Use.
+
+Contributing
+============
+
+You can create new mimics really easily! 
+
+Inherit from the MimicWithCameraFragment class and implement the verify function that takes in a Bitmap. You can readily use the Emotion API and Vision API!
+
+License
+=======

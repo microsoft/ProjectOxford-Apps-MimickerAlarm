@@ -73,14 +73,14 @@ public class MimicNoNetworkFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mTimer.start();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
+        super.onStop();
         mTimer.stop();
     }
 

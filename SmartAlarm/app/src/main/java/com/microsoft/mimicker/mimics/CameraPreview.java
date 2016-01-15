@@ -20,6 +20,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class that creates a camera preview for either the front or back camera
+ * since the image captured is not really for artistic purposes or for keeping,
+ * this camera values speed over quality. It chooses a decent resolution, not the max, and
+ * upon capture, immediately returns the last preview frame displayed as opposed to the actual
+ * image captured by the camera
+ *
+ * To use this, pass in
+ * a ImageCallback to process the image returned,
+ * an aspect ratio to use. The class will find the camera setting that best fits this aspect ratio,
+ * a camera facing (Front or Back)
+ *
+ * Public methods:
+ * initPreview (initialize the camera and the preview surface),
+ * start (call initPreview before),
+ * stop,
+ * onCapture (set the ImageCallback),
+ * onFocus (focus the camera at a certain x, y position)
+ */
 @SuppressWarnings("deprecation")
 public class CameraPreview implements SurfaceHolder.Callback {
     private static final String LOGTAG = "CameraPreview";

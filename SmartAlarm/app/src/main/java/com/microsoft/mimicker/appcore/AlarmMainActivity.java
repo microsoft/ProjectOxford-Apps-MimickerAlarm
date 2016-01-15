@@ -1,10 +1,10 @@
 package com.microsoft.mimicker.appcore;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
@@ -16,26 +16,33 @@ import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.onboarding.OnboardingToSFragment;
 import com.microsoft.mimicker.onboarding.OnboardingTutorialFragment;
+import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
+import com.microsoft.mimicker.scheduling.AlarmScheduler;
 import com.microsoft.mimicker.settings.AlarmSettingsFragment;
+import com.microsoft.mimicker.settings.MimicsSettingsFragment;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
 import com.uservoice.uservoicesdk.UserVoice;
+import com.microsoft.mimicker.utilities.KeyUtilities;
+import com.microsoft.mimicker.utilities.SettingsUtilities;
 
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
+import java.util.ArrayList;
+import java.util.UUID;
+
 public class AlarmMainActivity extends AppCompatActivity
         implements AlarmListFragment.AlarmListListener,
         OnboardingTutorialFragment.OnOnboardingTutorialListener,
         OnboardingToSFragment.OnOnboardingToSListener,
-        AlarmSettingsFragment.AlarmSettingsListener {
+        AlarmSettingsFragment.AlarmSettingsListener,
+        MimicsSettingsFragment.MimicsSettingsListener {
 
     public final static String SHOULD_ONBOARD = "onboarding";
     public final static String SHOULD_TOS = "show-tos";
-    private boolean mEditingAlarm = false;
-    private boolean mOboardingStarted = false;
     private SharedPreferences mPreferences = null;
     private AudioManager mAudioManager;
 
@@ -47,21 +54,33 @@ public class AlarmMainActivity extends AppCompatActivity
         mPreferences = getSharedPreferences(packageName, MODE_PRIVATE);
         PreferenceManager.setDefaultValues(this, R.xml.pref_global, false);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        AlarmNotificationManager.get(this).handleNextAlarmNotificationStatus();
+
+        UUID alarmId = (UUID) getIntent().getSerializableExtra(AlarmScheduler.ARGS_ALARM_ID);
+        if (alarmId != null) {
+            showAlarmSettingsFragment(alarmId.toString());
+        }
+
         Logger.init(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        UUID alarmId = (UUID) intent.getSerializableExtra(AlarmScheduler.ARGS_ALARM_ID);
+        if (alarmId != null) {
+            showAlarmSettingsFragment(alarmId.toString());
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        final String hockeyappToken = Util.getToken(this, "hockeyapp");
-        if (!BuildConfig.DEBUG)
-            UpdateManager.register(this, hockeyappToken);
-        Util.registerCrashReport(this);
+        GeneralUtilities.registerUpdateManager(this);
+        GeneralUtilities.registerCrashReport(this);
 
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
-            if (!mOboardingStarted) {
-                mOboardingStarted = true;
-
+            if (!hasOnboardingStarted()) {
                 Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_ONBOARDING);
                 Logger.track(userAction);
 
@@ -70,9 +89,10 @@ public class AlarmMainActivity extends AppCompatActivity
         }
         else if (mPreferences.getBoolean(SHOULD_TOS, true)) {
             showToS();
-        }
-        else if (!mEditingAlarm) {
-            showAlarmList(false);
+        } else if (!SettingsUtilities.areEditingSettings(getSupportFragmentManager())) {
+            GeneralUtilities.showFragment(getSupportFragmentManager(),
+                    new AlarmListFragment(),
+                    AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
         }
     }
 
@@ -90,10 +110,12 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     public void showFeedback(MenuItem item){
-        final String hockeyappToken = Util.getToken(this, "hockeyapp");
-        FeedbackManager.register(this, hockeyappToken, null);
-        FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
-        FeedbackManager.showFeedbackActivity(this);
+        final String hockeyappToken = KeyUtilities.getToken(this, "hockeyapp");
+        if (hockeyappToken != null && !hockeyappToken.equals("")) {
+            FeedbackManager.register(this, hockeyappToken, null);
+            FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
+            FeedbackManager.showFeedbackActivity(this);
+        }
     }
 
     //
@@ -104,7 +126,15 @@ public class AlarmMainActivity extends AppCompatActivity
     }
 
     public void showTutorial(MenuItem item){
-        showFragment(new OnboardingTutorialFragment());
+        if (item != null) {
+            GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                    new OnboardingTutorialFragment(),
+                    OnboardingTutorialFragment.ONBOARDING_FRAGMENT_TAG);
+        } else {
+            GeneralUtilities.showFragment(getSupportFragmentManager(),
+                    new OnboardingTutorialFragment(),
+                    OnboardingTutorialFragment.ONBOARDING_FRAGMENT_TAG);
+        }
     }
 
     @Override
@@ -115,23 +145,23 @@ public class AlarmMainActivity extends AppCompatActivity
             showToS();
         }
         else {
-            showAlarmList(false);
+            GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                    new AlarmListFragment(),
+                    AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
         }
     }
 
     @Override
     public void onAccept() {
-        showAlarmList(false);
+        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                new AlarmListFragment(),
+                AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
     }
 
     @Override
     public void onBackPressed() {
-        if (mEditingAlarm) {
-            AlarmSettingsFragment fragment = ((AlarmSettingsFragment)getSupportFragmentManager()
-                    .findFragmentByTag(AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG));
-            if (fragment != null) {
-                fragment.onCancel();
-            }
+        if (SettingsUtilities.areEditingAlarmSettingsExclusive(getSupportFragmentManager())) {
+            SettingsUtilities.getAlarmSettingsFragment(getSupportFragmentManager()).onCancel();
         } else {
             super.onBackPressed();
         }
@@ -155,24 +185,22 @@ public class AlarmMainActivity extends AppCompatActivity
 
     public void showToS() {
         mPreferences.edit().putBoolean(SHOULD_ONBOARD, false).apply();
-        showFragment(new OnboardingToSFragment());
+        GeneralUtilities.showFragment(getSupportFragmentManager(),
+                new OnboardingToSFragment(),
+                OnboardingToSFragment.TOS_FRAGMENT_TAG);
     }
 
-    public void showAlarmList(boolean animateEntrance) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (animateEntrance) {
-            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-        }
-        transaction.replace(R.id.fragment_container, new AlarmListFragment(),
-                AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
-        transaction.commit();
-        setTitle(R.string.alarm_list_title);
+    private boolean hasOnboardingStarted() {
+        return (getSupportFragmentManager()
+                .findFragmentByTag(OnboardingTutorialFragment.ONBOARDING_FRAGMENT_TAG) != null);
     }
 
     @Override
     public void onSettingsSaveOrIgnoreChanges() {
-        showAlarmList(true);
-        mEditingAlarm = false;
+        GeneralUtilities.showFragmentFromLeft(getSupportFragmentManager(),
+                new AlarmListFragment(),
+                AlarmListFragment.ALARM_LIST_FRAGMENT_TAG);
+        onAlarmChanged();
     }
 
     @Override
@@ -181,27 +209,34 @@ public class AlarmMainActivity extends AppCompatActivity
         transaction.setCustomAnimations(android.R.anim.fade_in, R.anim.slide_down);
         transaction.replace(R.id.fragment_container, new AlarmListFragment());
         transaction.commit();
-        setTitle(R.string.alarm_list_title);
+        onAlarmChanged();
+    }
+
+    @Override
+    public void onMimicsSettingsDismiss(ArrayList<String> enabledMimics) {
+        AlarmSettingsFragment settingsFragment = SettingsUtilities.
+                getAlarmSettingsFragment(getSupportFragmentManager());
+        if (settingsFragment != null){
+            settingsFragment.updateMimicsPreference(enabledMimics);
+        }
+    }
+
+    @Override
+    public void onShowMimicsSettings(ArrayList<String> enabledMimics) {
+        SettingsUtilities.transitionFromAlarmToMimicsSettings(getSupportFragmentManager(), enabledMimics);
     }
 
     @Override
     public void onAlarmSelected(Alarm alarm) {
         showAlarmSettingsFragment(alarm.getId().toString());
-        mEditingAlarm = true;
     }
 
-    private void showFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.commit();
+    @Override
+    public void onAlarmChanged() {
+        AlarmNotificationManager.get(this).handleNextAlarmNotificationStatus();
     }
 
     private void showAlarmSettingsFragment(String alarmId) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
-        transaction.replace(R.id.fragment_container,
-                            AlarmSettingsFragment.newInstance(alarmId),
-                            AlarmSettingsFragment.SETTINGS_FRAGMENT_TAG);
-        transaction.commit();
+        SettingsUtilities.transitionFromAlarmListToSettings(getSupportFragmentManager(), alarmId);
     }
 }

@@ -14,8 +14,9 @@ public class AlarmWakeReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "Broadcast from AlarmManager received!");
-        Intent service = new Intent(context, AlarmRingingService.class);
-        service.putExtras(intent);
-        startWakefulService(context, service);
+        Intent serviceIntent = new Intent(AlarmRingingService.ACTION_DISPATCH_ALARM);
+        serviceIntent.setClass(context, AlarmRingingService.class);
+        serviceIntent.putExtras(intent);
+        startWakefulService(context, serviceIntent);
     }
 }

@@ -17,23 +17,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.model.AlarmList;
-import com.microsoft.mimicker.scheduling.AlarmScheduler;
+import com.microsoft.mimicker.utilities.DateTimeUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     public static final String SETTINGS_FRAGMENT_TAG = "settings_fragment";
     private static final String ARGS_ALARM_ID = "alarm_id";
+    private static final String ARGS_ENABLED_MIMICS = "enabled_mimics";
     private static final String PREFERENCE_DIALOG_FRAGMENT_CLASS = "android.support.v7.preference.PreferenceFragment.DIALOG";
-    public final String TAG = this.getClass().getSimpleName();
+
     AlarmSettingsListener mCallback;
-    private UUID mAlarmId;
     private Alarm mAlarm;
     private TimePreference mTimePreference;
     private RepeatingDaysPreference mRepeatingDaysPreference;
@@ -47,6 +49,15 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         AlarmSettingsFragment fragment = new AlarmSettingsFragment();
         Bundle bundle = new Bundle(1);
         bundle.putString(ARGS_ALARM_ID, alarmId);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    public static AlarmSettingsFragment newInstance(String alarmId, ArrayList<String> enabledMimics) {
+        AlarmSettingsFragment fragment = new AlarmSettingsFragment();
+        Bundle bundle = new Bundle(1);
+        bundle.putString(ARGS_ALARM_ID, alarmId);
+        bundle.putStringArrayList(ARGS_ENABLED_MIMICS, enabledMimics);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -69,13 +80,15 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         addPreferencesFromResource(R.xml.pref_alarm);
 
         Bundle args = getArguments();
-        mAlarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
-        mAlarm = AlarmList.get(getContext()).getAlarm(mAlarmId);
+        UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
+        mAlarm = AlarmList.get(getContext()).getAlarm(alarmId);
+        ArrayList<String> enabledMimics = args.getStringArrayList(ARGS_ENABLED_MIMICS);
 
+        // Initialize the preferences from the alarm object before populating the settings list
         initializeTimePreference();
         initializeRepeatingDaysPreference();
         initializeNamePreference();
-        initializeMimicsPreference();
+        initializeMimicsPreference(enabledMimics);
         initializeRingtonePreference();
         initializeVibratePreference();
         initializeButtons();
@@ -84,7 +97,8 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public RecyclerView onCreateRecyclerView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         LinearLayout rootLayout = (LinearLayout) parent.getParent();
-        AppBarLayout appBarLayout = (AppBarLayout) LayoutInflater.from(getContext()).inflate(R.layout.settings_toolbar, rootLayout, false);
+        AppBarLayout appBarLayout = (AppBarLayout) LayoutInflater.from(getContext())
+                .inflate(R.layout.settings_toolbar, rootLayout, false);
         rootLayout.addView(appBarLayout, 0); // insert at top
         Toolbar bar = (Toolbar) appBarLayout.findViewById(R.id.settings_toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(bar);
@@ -105,7 +119,17 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         }
         Logger.track(userAction);
 
-        return super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+        RecyclerView recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState);
+        int timePreferenceOrder = mTimePreference.getOrder();
+        int buttonsPreferenceOrder = mButtonsPreference.getOrder();
+        int[] excludeDividerList = new int[] { timePreferenceOrder, buttonsPreferenceOrder };
+        recyclerView.addItemDecoration(new SettingsDividerItemDecoration(getContext(), excludeDividerList));
+
+        return recyclerView;
+    }
+
+    public void updateMimicsPreference(ArrayList<String> enabledMimics) {
+        mMimicsPreference.setMimicValuesAndSummary(enabledMimics);
     }
 
     private void initializeTimePreference() {
@@ -127,12 +151,21 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         mNamePreference.setAlarmName(mAlarm.getTitle());
     }
 
-    private void initializeMimicsPreference() {
+    private void initializeMimicsPreference(ArrayList<String> enabledValues) {
         mMimicsPreference = (MimicsPreference) findPreference(getString(R.string.pref_mimics_key));
-        mMimicsPreference.setTongueTwisterEnabled(mAlarm.isTongueTwisterEnabled());
-        mMimicsPreference.setColorCaptureEnabled(mAlarm.isColorCaptureEnabled());
-        mMimicsPreference.setExpressYourselfEnabled(mAlarm.isExpressYourselfEnabled());
-        mMimicsPreference.setInitialValues();
+        mMimicsPreference.setInitialValues(mAlarm);
+        if (enabledValues == null) {
+            mMimicsPreference.setInitialSummary();
+        } else {
+            mMimicsPreference.setMimicValuesAndSummary(enabledValues);
+        }
+        mMimicsPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                mCallback.onShowMimicsSettings(mMimicsPreference.getEnabledMimicValues());
+                return true;
+            }
+        });
     }
 
     private void initializeRingtonePreference() {
@@ -177,10 +210,6 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
             DialogFragment dialogFragment = NamePreferenceDialogFragmentCompat.newInstance(preference);
             dialogFragment.setTargetFragment(this, 0);
             dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);
-        } else if (preference instanceof MimicsPreference) {
-            DialogFragment dialogFragment = MultiSelectListPreferenceDialogFragmentCompat.newInstance(preference);
-            dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getFragmentManager(), PREFERENCE_DIALOG_FRAGMENT_CLASS);
         } else super.onDisplayPreferenceDialog(preference);
     }
 
@@ -217,15 +246,12 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
 
         populateUpdatedSettings();
 
-        if (mAlarm.isEnabled() && !mAlarm.isNew()) {
-            AlarmScheduler.cancelAlarm(getContext(), mAlarm);
-        } else {
-            mAlarm.setIsEnabled(true);
-        }
+        long alarmTime = mAlarm.schedule();
 
-        mAlarm.setNew(false);
-        AlarmList.get(getActivity()).updateAlarm(mAlarm);
-        AlarmScheduler.scheduleAlarm(getContext(), mAlarm);
+        Toast.makeText(getActivity(),
+                DateTimeUtilities.getTimeUntilAlarmDisplayString(getActivity(), alarmTime),
+                Toast.LENGTH_LONG)
+                .show();
 
         mCallback.onSettingsSaveOrIgnoreChanges();
     }
@@ -235,10 +261,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         userAction.putJSON(mAlarm.toJSON());
         Logger.track(userAction);
 
-        if (mAlarm.isEnabled() && !mAlarm.isNew()) {
-            AlarmScheduler.cancelAlarm(getContext(), mAlarm);
-        }
-        AlarmList.get(getActivity()).deleteAlarm(mAlarm);
+        mAlarm.delete();
 
         mCallback.onSettingsDeleteOrNewCancel();
     }
@@ -264,7 +287,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         updateTimeSetting();
         updateRepeatingDaysSetting();
         updateNameSetting();
-        updateGamesSetting();
+        updateMimicsSetting();
         updateRingtoneSetting();
         updateVibrateSetting();
     }
@@ -281,7 +304,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    private void updateGamesSetting() {
+    private void updateMimicsSetting() {
         if (mMimicsPreference.hasChanged()) {
             mAlarm.setTongueTwisterEnabled(mMimicsPreference.isTongueTwisterEnabled());
             mAlarm.setColorCaptureEnabled(mMimicsPreference.isColorCaptureEnabled());
@@ -320,8 +343,8 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     }
 
     public interface AlarmSettingsListener {
+        void onShowMimicsSettings(ArrayList<String> enabledMimics);
         void onSettingsSaveOrIgnoreChanges();
-
         void onSettingsDeleteOrNewCancel();
     }
 }

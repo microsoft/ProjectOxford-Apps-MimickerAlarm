@@ -10,7 +10,7 @@
     <item android:id="@+id/action_feedbackUserVoice" android:title="@string/action_feedback_UserVoice"
           android:orderInCategory="103" android:onClick="showUserVoiceFeedback" />
     <item android:id="@+id/action_tutorial" android:title="@string/action_tutorial"
-          android:orderInCategory="104" android:onClick="showTutorial" />
-    <item android:id="@+id/action_add_alarm" android:icon="@drawable/ic_add_alarm_black_36dp"
-          android:title="@string/action_add_alarm" app:showAsAction="ifRoom"/>
-</menu>
+          android:orderInCategory="103" android:onClick="showTutorial" />
+    <item android:id="@+id/action_add_alarm" android:icon="@drawable/add_alarm_button"
+        android:title="@string/action_add_alarm" app:showAsAction="ifRoom"/>
+    </menu>

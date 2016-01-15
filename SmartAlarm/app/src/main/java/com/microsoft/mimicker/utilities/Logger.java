@@ -29,9 +29,15 @@ public class Logger {
         if (!sStarted && isLogging()) {
             String android_id = Secure.getString(caller.getContentResolver(), Secure.ANDROID_ID);
             try {
-                sMixpanelToken = Util.getToken(caller, "mixpanel");
-                sStarted = true;
 
+                sMixpanelToken = KeyUtilities.getToken(caller, "mixpanel");
+
+                if (sMixpanelToken == null || sMixpanelToken.equals("")){
+                    sStarted = false;
+                    return;
+                }
+
+                sStarted = true;
                 MixpanelAPI mixpanel = MixpanelAPI.getInstance(sContext, sMixpanelToken);
                 mixpanel.identify(android_id);
                 mixpanel.getPeople().identify(android_id);
@@ -52,7 +58,7 @@ public class Logger {
     }
 
     public static void track(Loggable loggable){
-        if (isLogging()) {
+        if (isLogging() && sStarted) {
             try {
                 MixpanelAPI.getInstance(sContext, sMixpanelToken).track(loggable.Name, loggable.Properties);
             }
@@ -71,7 +77,7 @@ public class Logger {
     }
 
     public static void trackDurationStart(Loggable loggable){
-        if (isLogging()) {
+        if (isLogging() && sStarted) {
             try {
                 MixpanelAPI.getInstance(sContext, sMixpanelToken).timeEvent(loggable.Name);
             }
@@ -87,7 +93,7 @@ public class Logger {
     }
 
     public static void trackException(Exception ex) {
-        if (isLogging()) {
+        if (isLogging() && sStarted) {
             try {
                 Loggable.AppException appException = new Loggable.AppException(Loggable.Key.APP_EXCEPTION, ex);
                 MixpanelAPI.getInstance(sContext, sMixpanelToken).track(appException.Name, appException.Properties);
@@ -101,7 +107,7 @@ public class Logger {
     }
 
     public static void flush() {
-        if (isLogging()) {
+        if (isLogging() && sStarted) {
             try {
                 MixpanelAPI.getInstance(sContext, sMixpanelToken).flush();
             } catch (Exception ex) {

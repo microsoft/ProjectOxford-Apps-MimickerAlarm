@@ -2,13 +2,14 @@ package com.microsoft.mimicker.appcore;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.microsoft.mimicker.utilities.Util;
+import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 public class LearnMoreActivity extends AppCompatActivity {
     @Override
@@ -16,10 +17,13 @@ public class LearnMoreActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_more);
 
+        Toolbar bar = (Toolbar) findViewById(R.id.learn_more_toolbar);
+        setSupportActionBar(bar);
+
         LinearLayout linksHolder = (LinearLayout) findViewById(R.id.learn_more_links);
         for( int i = 0; i < linksHolder.getChildCount(); i++ ) {
             TextView child = (TextView) linksHolder.getChildAt(i);
-            Util.enableLinks(child);
+            GeneralUtilities.enableLinks(child);
         }
 
         Logger.init(this);

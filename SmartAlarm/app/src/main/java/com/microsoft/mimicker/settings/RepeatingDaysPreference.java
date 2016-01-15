@@ -14,41 +14,35 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
-import com.microsoft.mimicker.utilities.AlarmUtils;
+import com.microsoft.mimicker.utilities.DateTimeUtilities;
 
 public class RepeatingDaysPreference extends Preference {
 
-    private boolean mLayoutInitialized;
     private boolean mChanged;
-    private DayView[] mDayViews;
+    private boolean[] mRepeatingDays;
+    private String[] mDayNames;
 
     public RepeatingDaysPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mDayViews = new DayView[7];
-
-        //TODO How do we handle this better from a locale perspective i.e first day of week
-        String[] dayNames = AlarmUtils.getShortDayNames();
-        for(int i = 0; i < 7; i++) {
-            DayView dayView = new DayView(getContext(), this);
-            dayView.setText(dayNames[i]);
-            mDayViews[i] = dayView;
-        }
+        mDayNames = DateTimeUtilities.getShortDayNames();
+        mRepeatingDays = new boolean[7];
     }
 
     @Override
     public void onBindViewHolder(PreferenceViewHolder holder) {
-        if (!mLayoutInitialized) {
-            LinearLayout container = (LinearLayout) holder.findViewById(R.id.pref_repeating_container);
-            for(DayView day : mDayViews){
-                container.addView(day);
-            }
-            mLayoutInitialized = true;
+        LinearLayout container = (LinearLayout) holder.findViewById(R.id.pref_repeating_container);
+        container.removeAllViews();
+        for(int i = 0; i < mRepeatingDays.length; i++) {
+            DayView dayView = new DayView(getContext(), this, i);
+            dayView.setText(mDayNames[i]);
+            dayView.setRepeating(mRepeatingDays[i]);
+            container.addView(dayView);
         }
         super.onBindViewHolder(holder);
     }
 
     public void setRepeatingDay(int index, boolean doesRepeat){
-        mDayViews[index].setRepeating(doesRepeat);
+        mRepeatingDays[index] = doesRepeat;
     }
 
     public boolean hasChanged() {
@@ -60,22 +54,19 @@ public class RepeatingDaysPreference extends Preference {
     }
 
     public boolean[] getRepeatingDays() {
-        boolean[] repeatingDays = new boolean[mDayViews.length];
-        for(int i = 0; i < mDayViews.length; i++){
-            repeatingDays[i] = mDayViews[i].getRepeating();
-        }
-        return repeatingDays;
+        return mRepeatingDays;
     }
 
     private class DayView extends TextView {
-        private boolean mRepeating = false;
         private Paint mPaint;
         private int mPadding;
         private RepeatingDaysPreference mParent;
+        private int mDayIndex;
 
-        public DayView(Context context, RepeatingDaysPreference parent) {
+        public DayView(Context context, RepeatingDaysPreference parent, int dayIndex) {
             super(context);
             mParent = parent;
+            mDayIndex = dayIndex;
             mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mPaint.setColor(ContextCompat.getColor(context, R.color.yellow2));
 
@@ -95,10 +86,10 @@ public class RepeatingDaysPreference extends Preference {
 
         @Override
         protected void onDraw(Canvas canvas) {
-            if (mRepeating){
+            if (getRepeating()){
                 float centerX = getWidth() / 2;
                 float centerY = getHeight() / 2;
-                canvas.drawCircle(centerX, centerY, centerX - mPadding, mPaint);
+                canvas.drawCircle(centerX, centerY, centerY - mPadding, mPaint);
                 setTypeface(null, Typeface.BOLD);
             }
             else{
@@ -114,11 +105,11 @@ public class RepeatingDaysPreference extends Preference {
         }
 
         public boolean getRepeating() {
-            return mRepeating;
+            return mParent.getRepeatingDays()[mDayIndex];
         }
 
         public void setRepeating(boolean repeating) {
-            mRepeating = repeating;
+            mParent.setRepeatingDay(mDayIndex, repeating);
         }
     }
 }

@@ -14,12 +14,22 @@ import android.widget.ImageView;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * Simple UI class that implements a button with states
+ *
+ * The states are :
+ * capture image,
+ * capture audio,
+ * stop capturing audio,
+ * processing
+ **/
 public class ProgressButton extends ImageView {
     private static final int PRESSED_ANIMATION_DURATION = 200;
     private static final float sPressedAnimationSize = 1.2f;
     private static final int LOADING_ANIMATION_DURATION = 2000;
     private static int sYellow, sBlue, sGrey, sWhite;
     private State mState;
+    private State mReadyState;
     private Paint mBrush;
     private float mRadius;
     private int mCenterX, mCenterY;
@@ -59,6 +69,7 @@ public class ProgressButton extends ImageView {
         this(context, null);
     }
 
+    // These setters and getters are required by animator
     public float getRadius() {
         return mRadius;
     }
@@ -164,18 +175,15 @@ public class ProgressButton extends ImageView {
         mLoadingAnimationRect = new RectF(mCenterX - radius, mCenterY - radius, mCenterX + radius, mCenterY + radius);
     }
 
-    public void readyCamera() {
-        mState = State.ReadyCamera;
+    public void setReady() {
+        mState = mReadyState;
         setClickable(true);
         stop();
         invalidate();
     }
 
-    public void readyAudio() {
-        mState = State.ReadyAudio;
-        setClickable(true);
-        stop();
-        invalidate();
+    public void setReadyState(State state) {
+        mReadyState = state;
     }
 
     public Boolean isReady() {
@@ -199,7 +207,7 @@ public class ProgressButton extends ImageView {
         mPressedAnimation.cancel();
     }
 
-    private enum State {
+    public enum State {
         ReadyCamera,
         ReadyAudio,
         Loading,

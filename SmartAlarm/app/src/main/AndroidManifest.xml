@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.microsoft.mimicker"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.microsoft.mimicker">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -12,6 +11,10 @@
 
     <uses-feature
         android:name="android.hardware.camera.front"
+        android:required="false"/>
+
+    <uses-feature
+        android:name="android.hardware.sensor.light"
         android:required="false"/>
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -27,8 +30,7 @@
 
         <activity
             android:name="com.microsoft.mimicker.appcore.AlarmMainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -37,6 +39,7 @@
 
         <activity
             android:name="com.microsoft.mimicker.ringing.AlarmRingingActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
 
@@ -71,7 +74,6 @@
 
         <activity
             android:name="com.microsoft.mimicker.appcore.LearnMoreActivity"
-            android:label="@string/title_activity_learn_more"
             android:parentActivityName="com.microsoft.mimicker.appcore.AlarmMainActivity"
             android:screenOrientation="portrait">
             <meta-data
