@@ -102,7 +102,8 @@ public class Logger {
             }
         }
         else {
-            Log.e(TAG, ex.getMessage());
+            // This is called in a debug only scenario
+            Log.e(TAG, "Logging exception:" , ex);
         }
     }
 

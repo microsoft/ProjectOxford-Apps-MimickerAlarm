@@ -44,7 +44,7 @@ abstract class MimicWithCameraFragment extends Fragment
     protected static int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     MimicResultListener mCallback;
     private CameraPreview   mCameraPreview;
-    private MimicCoordinator mCoordinator;
+    private IMimicMediator mStateManager;
     private Uri mSharableUri;
     private SensorManager mSensorManager;
     private Sensor mLightSensor;
@@ -90,12 +90,12 @@ abstract class MimicWithCameraFragment extends Fragment
         ProgressButton progressButton = (ProgressButton) view.findViewById(R.id.capture_button);
         progressButton.setReadyState(ProgressButton.State.ReadyCamera);
 
-        mCoordinator = new MimicCoordinator();
-        mCoordinator.registerCountDownTimer(
+        mStateManager = new MimicStateManager();
+        mStateManager.registerCountDownTimer(
                 (CountDownTimerView) view.findViewById(R.id.countdown_timer), TIMEOUT_MILLISECONDS);
-        mCoordinator.registerStateBanner((MimicStateBanner) view.findViewById(R.id.mimic_state));
-        mCoordinator.registerProgressButton(progressButton, MimicButtonBehavior.CAMERA);
-        mCoordinator.registerMimic(this);
+        mStateManager.registerStateBanner((MimicStateBanner) view.findViewById(R.id.mimic_state));
+        mStateManager.registerProgressButton(progressButton, MimicButtonBehavior.CAMERA);
+        mStateManager.registerMimic(this);
 
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager != null) {
@@ -141,13 +141,13 @@ abstract class MimicWithCameraFragment extends Fragment
             mSensorManager.registerListener(mLightSensorListener, mLightSensor, SensorManager.SENSOR_DELAY_UI);
         }
 
-        mCoordinator.start();
+        mStateManager.start();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mCoordinator.stop();
+        mStateManager.stop();
 
         mTooDarkToast.cancel();
         if (mSensorManager != null && mLightSensorListener != null) {
@@ -207,7 +207,7 @@ abstract class MimicWithCameraFragment extends Fragment
         if (gameResult.message != null) {
             successMessage = gameResult.message;
         }
-        mCoordinator.onMimicSuccess(successMessage);
+        mStateManager.onMimicSuccess(successMessage);
     }
 
     protected void gameFailure(GameResult gameResult, boolean allowRetry) {
@@ -217,9 +217,9 @@ abstract class MimicWithCameraFragment extends Fragment
             if (gameResult != null && gameResult.message != null) {
                 failureMessage = gameResult.message;
             }
-            mCoordinator.onMimicFailureWithRetry(failureMessage);
+            mStateManager.onMimicFailureWithRetry(failureMessage);
         } else {
-            mCoordinator.onMimicFailure(getString(R.string.mimic_time_up_message));
+            mStateManager.onMimicFailure(getString(R.string.mimic_time_up_message));
         }
     }
 
@@ -253,7 +253,7 @@ abstract class MimicWithCameraFragment extends Fragment
         @Override
         protected void onPostExecute(GameResult gameResult) {
             super.onPostExecute(gameResult);
-            if (!mCoordinator.hasStopped()) {
+            if (mStateManager.isMimicRunning()) {
                 if (gameResult.success) {
                     gameSuccess(gameResult);
                 } else {

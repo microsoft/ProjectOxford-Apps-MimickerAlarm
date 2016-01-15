@@ -6,12 +6,21 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * This class implements the swipe UI experience for the items in the alarm list. This callback
+ * class is attached to the RecyclerView upon initialization. The onChildDraw method takes care of
+ * drawing the swipe visuals in the item that is being manipulated.
+ *
+ * When the swipe action fires in onSwiped, we call back into the adaptor with the index of the
+ * item that needs to be removed.
+ */
 public class AlarmListItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     private final ItemTouchHelperAdapter mAdapter;
@@ -55,7 +64,7 @@ public class AlarmListItemTouchHelperCallback extends ItemTouchHelper.Callback {
             int maxDrawWidth = (iconPadding * 2) + icon.getWidth();
 
             Paint paint = new Paint();
-            paint.setColor(resources.getColor(R.color.red));
+            paint.setColor(ContextCompat.getColor(AlarmApplication.getAppContext(), R.color.red));
 
             int x = Math.round(Math.abs(dX));
 

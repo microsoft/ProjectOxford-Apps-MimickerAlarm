@@ -38,6 +38,7 @@ public class MimicExpressYourselfFragment extends MimicWithCameraFragment {
     private EmotionServiceRestClient mEmotionServiceRestClient;
     private String                  mEmotion;
 
+    @SuppressWarnings("deprecation")
     public MimicExpressYourselfFragment() {
         CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     }

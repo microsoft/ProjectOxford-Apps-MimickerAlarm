@@ -9,6 +9,9 @@ import com.microsoft.mimicker.model.Alarm;
 
 import java.util.UUID;
 
+/**
+ * This class implements a SQLite CursorWrapper for the alarm object data.
+ */
 public class AlarmCursorWrapper extends CursorWrapper {
     public AlarmCursorWrapper(Cursor cursor) { super(cursor); }
 

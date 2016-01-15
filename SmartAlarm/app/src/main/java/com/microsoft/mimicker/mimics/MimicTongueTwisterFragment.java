@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,7 +66,7 @@ public class MimicTongueTwisterFragment extends Fragment
     private TextView mTextResponse;
     private String mSuccessMessage;
     private Uri mSharableUri;
-    private MimicCoordinator mCoordinator;
+    private IMimicMediator mStateManager;
 
     @Nullable
     @Override
@@ -74,12 +75,12 @@ public class MimicTongueTwisterFragment extends Fragment
         ProgressButton progressButton = (ProgressButton) view.findViewById(R.id.capture_button);
         progressButton.setReadyState(ProgressButton.State.ReadyAudio);
 
-        mCoordinator = new MimicCoordinator();
-        mCoordinator.registerCountDownTimer(
+        mStateManager = new MimicStateManager();
+        mStateManager.registerCountDownTimer(
                 (CountDownTimerView) view.findViewById(R.id.countdown_timer), TIMEOUT_MILLISECONDS);
-        mCoordinator.registerStateBanner((MimicStateBanner) view.findViewById(R.id.mimic_state));
-        mCoordinator.registerProgressButton(progressButton, MimicButtonBehavior.AUDIO);
-        mCoordinator.registerMimic(this);
+        mStateManager.registerStateBanner((MimicStateBanner) view.findViewById(R.id.mimic_state));
+        mStateManager.registerProgressButton(progressButton, MimicButtonBehavior.AUDIO);
+        mStateManager.registerMimic(this);
 
         initialize(view);
 
@@ -105,13 +106,13 @@ public class MimicTongueTwisterFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-        mCoordinator.start();
+        mStateManager.start();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mCoordinator.stop();
+        mStateManager.stop();
     }
 
     @Override
@@ -128,7 +129,7 @@ public class MimicTongueTwisterFragment extends Fragment
 
     @Override
     public void onFinalResponseReceived(RecognitionResult response) {
-        if (!mCoordinator.hasStopped()) {
+        if (mStateManager.isMimicRunning()) {
             boolean isFinalDictationMessage = mRecognitionMode == SpeechRecognitionMode.LongDictation &&
                     (response.RecognitionStatus == RecognitionStatus.EndOfDictation ||
                             response.RecognitionStatus == RecognitionStatus.DictationEndSilenceTimeout);
@@ -225,20 +226,20 @@ public class MimicTongueTwisterFragment extends Fragment
             mSuccessMessage = getString(R.string.mimic_twister_perfect_message);
         }
         createSharableBitmap();
-        mCoordinator.onMimicSuccess(mSuccessMessage);
+        mStateManager.onMimicSuccess(mSuccessMessage);
     }
 
     protected void gameFailure(boolean allowRetry) {
         if (allowRetry) {
             String failureMessage = getString(R.string.mimic_failure_message);
-            mCoordinator.onMimicFailureWithRetry(failureMessage);
+            mStateManager.onMimicFailureWithRetry(failureMessage);
         }
         else {
             Loggable.UserAction userAction = new Loggable.UserAction(Loggable.Key.ACTION_GAME_TWISTER_TIMEOUT);
             userAction.putProp(Loggable.Key.PROP_QUESTION, mQuestion);
             Logger.track(userAction);
             String failureMessage = getString(R.string.mimic_time_up_message);
-            mCoordinator.onMimicFailure(failureMessage);
+            mStateManager.onMimicFailure(failureMessage);
         }
     }
 
@@ -262,7 +263,7 @@ public class MimicTongueTwisterFragment extends Fragment
     private void createSharableBitmap() {
         Bitmap sharableBitmap = Bitmap.createBitmap(getView().getWidth(), getView().getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(sharableBitmap);
-        canvas.drawColor(getResources().getColor(R.color.white));
+        canvas.drawColor(ContextCompat.getColor(getContext(), R.color.white));
 
         // Load the view for the sharable. This will be drawn to the bitmap
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);

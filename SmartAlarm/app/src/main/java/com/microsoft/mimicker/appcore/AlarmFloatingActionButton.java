@@ -5,6 +5,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
 import android.view.View;
 
+/**
+ * Specialization of the FloatingApplicationButton so that we can listen for visibility
+ * changes in the collapsing header of the Alarm list
+ */
 public class AlarmFloatingActionButton extends FloatingActionButton {
     private OnVisibilityChangedListener mVisibilityListener;
 

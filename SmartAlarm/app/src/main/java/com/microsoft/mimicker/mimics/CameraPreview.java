@@ -84,7 +84,6 @@ public class CameraPreview implements SurfaceHolder.Callback {
         try {
             mCamera.setPreviewDisplay(mPreviewView.getHolder());
         } catch (IOException e) {
-            e.printStackTrace();
             Logger.trackException(e);
         }
     }
@@ -131,7 +130,6 @@ public class CameraPreview implements SurfaceHolder.Callback {
                 public void onAutoFocus(boolean success, Camera camera) {}
             });
         } catch (Exception e) {
-            e.printStackTrace();
             Logger.trackException(e);
         }
     }

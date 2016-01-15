@@ -22,6 +22,16 @@ import com.microsoft.mimicker.scheduling.AlarmNotificationManager;
 
 import java.util.List;
 
+/**
+ * This activity hosts the user experience for the applications global settings, which are launched
+ * by selecting Settings from the options menu on the alarm list.
+ *
+ * This class has a nested class (AlarmGlobalSettingsFragment) which handles the UX and persisting
+ * of the different settings.
+ *
+ * One special feature of this class is that it listens for volume button presses and updates the
+ * volume slider settings accordingly.
+ */
 public class AlarmGlobalSettingsActivity extends AppCompatActivity {
 
     @Override

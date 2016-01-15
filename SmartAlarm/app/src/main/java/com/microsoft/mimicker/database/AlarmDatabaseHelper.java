@@ -6,6 +6,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.microsoft.mimicker.database.AlarmDbSchema.AlarmTable;
 
+/**
+ * This class implements the methods needed to create the SQLite alarm database.
+ *
+ * onCreate - is called to create a new database with a SQL query
+ * onUpdate - is called in the cases where the database is already created.  Depending on the
+ * database version, new columns are added.
+ *
+ */
 public class AlarmDatabaseHelper extends SQLiteOpenHelper{
 
     private static final int DATABASE_VERSION = 5;

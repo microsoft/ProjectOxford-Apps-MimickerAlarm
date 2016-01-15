@@ -5,6 +5,11 @@ import android.content.Context;
 
 import com.uservoice.uservoicesdk.UserVoice;
 
+/**
+ * Specialization of the Application class to enable:
+ *      Application context access from non-Android framework classes
+ *      Initialization of the UserVoice object
+ */
 public class AlarmApplication extends Application {
     private static Context sContext;
     private static final String MICROSOFT_GARAGE_USER_VOICE_SITE =  "microsoftgarage.uservoice.com";

@@ -11,6 +11,10 @@ import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 import com.microsoft.mimicker.utilities.GeneralUtilities;
 
+/**
+ * This class hosts the learn more/help experience for the application.  It is invoked from the
+ * options menu.
+ */
 public class LearnMoreActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {

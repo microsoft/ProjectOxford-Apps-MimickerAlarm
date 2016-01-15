@@ -1,7 +1,7 @@
 package com.microsoft.mimicker.mimics;
 
 /**
- * This interface is implemented by the MimicCoordinator class to control the state of common
+ * This interface is implemented by the MimicStateManager class to control the state of common
  * Mimic UI controls
  */
 
@@ -13,7 +13,7 @@ enum MimicButtonBehavior {
 public interface IMimicMediator {
     void start();
     void stop();
-    boolean hasStopped();
+    boolean isMimicRunning();
 
     void onMimicSuccess(String successMessage);
     void onMimicFailureWithRetry(String failureMessage);
