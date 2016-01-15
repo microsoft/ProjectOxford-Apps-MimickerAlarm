@@ -109,19 +109,10 @@ public class AlarmMainActivity extends AppCompatActivity
         Logger.flush();
     }
 
-    public void showFeedback(MenuItem item){
-        final String hockeyappToken = KeyUtilities.getToken(this, "hockeyapp");
-        if (hockeyappToken != null && !hockeyappToken.equals("")) {
-            FeedbackManager.register(this, hockeyappToken, null);
-            FeedbackManager.setRequireUserEmail(FeedbackUserDataElement.OPTIONAL);
-            FeedbackManager.showFeedbackActivity(this);
-        }
-    }
-
     //
     // Launch User Voice forum form to allow user feedback submission
     //
-    public void showUserVoiceFeedback(MenuItem item){
+    public void showUserVoiceFeedback(MenuItem item) {
         UserVoice.launchUserVoice(this);
     }
 
