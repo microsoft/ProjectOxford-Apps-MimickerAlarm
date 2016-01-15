@@ -25,6 +25,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+/**
+ * This is source code taken from the Android samples for ItemDecoration.
+ *
+ * We add this class to the alarm list RecyclerView to enable drawing of a list item divider.
+ */
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
     public static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
     public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;

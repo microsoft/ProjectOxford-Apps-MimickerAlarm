@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This class is a singleton which represents the current list of alarms.  This is the class via
+ * which we interact with the database.  This class enables us to query, update and delete alarm
+ * information from the database.
+ */
 public class AlarmList {
     private static final String ORDER_BY = AlarmTable.Columns.HOUR + ", " +
                                             AlarmTable.Columns.MINUTE;

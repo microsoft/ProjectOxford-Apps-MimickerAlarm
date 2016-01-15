@@ -9,6 +9,10 @@ import android.widget.SeekBar;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * This class is a custom preference to enable the display of a volume slider.  As the user slides
+ * the SeekBar, the system alarm volume is changed.
+ */
 public class VolumeSliderPreference extends Preference
     implements SeekBar.OnSeekBarChangeListener {
 

@@ -16,6 +16,24 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.UUID;
 
+/**
+ * This class is the representation of an Alarm within the app.  Apart from encapsulating all the
+ * necessary data to help with alarm scheduling and the user experience, it exposes the following
+ * alarm actions:
+ *
+ * schedule - updates the alarm state appropriately and schedules the alarm via the
+ * AlarmScheduler, cancelling any previous alarms that may have been set.
+ *
+ * snooze - updates the alarm state and also sets the appropriate snooze data fields.  Schedules the
+ * snoozed alarm via the AlarmScheduler.
+ *
+ * delete - cancels the alarm if necessary and removes it from the database.
+ *
+ * cancel - resets the enabled state and tells the AlarmScheduler to cancel the alarm.
+ *
+ * onDismiss - this method gets called when an alarm is dismissed in the user interface.  If the
+ * alarm is oneshot it will be disabled, otherwise the next recurring alarm will be scheduled.
+ */
 public class Alarm {
     private static final int SNOOZE_DURATION_INTEGER = (5 * 60) * 1000;
 

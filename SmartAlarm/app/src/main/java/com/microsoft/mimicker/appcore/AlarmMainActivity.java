@@ -11,7 +11,6 @@ import android.support.v7.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
-import com.microsoft.mimicker.BuildConfig;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.onboarding.OnboardingToSFragment;
@@ -24,16 +23,49 @@ import com.microsoft.mimicker.utilities.GeneralUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
 import com.uservoice.uservoicesdk.UserVoice;
-import com.microsoft.mimicker.utilities.KeyUtilities;
 import com.microsoft.mimicker.utilities.SettingsUtilities;
 
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
-import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * The AlarmMainActivity is the launch activity for the application.  It has the following
+ * features:
+ *
+ *      On launch it is determined whether the onboarding/tutorial experience has been completed. If
+ *      not, the user is presented with the tutorial. On completion the user does not see the
+ *      tutorial again unless it is accessed from the options menu.
+ *
+ *      After the tutorial is completed, the user is presented with the consent ux with the terms of
+ *      service.  The user will not be able to use the application until the terms fo service have
+ *      been accepted.
+ *
+ *      Once the terms of service have been accepted, the alarm list will be shown (AlarmListFragment)
+ *      on first run and subsequent launches of the application.
+ *
+ *      Once the user adds or selects an alarm, the activity will transition from the alarm list to
+ *      the alarm settings page (AlarmSettingsFragment).  From there, the user can transition
+ *      further to the Mimics settings page (MimicsSettingsFragment).
+ *
+ *      If the user selects any options on the Options menu - Settings (AlarmGlobalSettingsActivity)
+ *      , Tutorial, Learn more (LearnMoreActivity) this activity will schedule the transitions to
+ *      those screens.
+ *
+ *      This activity can be started (onCreate) or restarted (onIntent) with an alarm id argument,
+ *      to enable launches to a specific alarm settings page.
+ *
+ *      This activity overrides the back button to better handle the specific transitions
+ *      between the different settings pages etc.
+ *
+ *      This activity listens for volume key presses and updates the alarm volume state while
+ *      displaying the system volume ui.
+ *
+ * The different fragments that are launched from this activity communicate their status back
+ * to the activity via listener interfaces.
+ */
 public class AlarmMainActivity extends AppCompatActivity
         implements AlarmListFragment.AlarmListListener,
         OnboardingTutorialFragment.OnOnboardingTutorialListener,

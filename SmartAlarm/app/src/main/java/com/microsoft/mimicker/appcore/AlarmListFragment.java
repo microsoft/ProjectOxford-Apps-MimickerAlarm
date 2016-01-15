@@ -37,8 +37,31 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-
-
+/**
+ * This class holds the UI implementation of the Alarm list.  The alarm list consists of a
+ * CoordinatorLayout at the root, with nested a AppBarLayout to hold the collapsing toolbar and a
+ * RecyclerView to show the list of alarms.  If the RecyclerView is empty we swap it out for a
+ * static layout which informs the user to click the FloatingActionButton to add a new alarm.
+ *
+ * This class contains two nested classes which are necessary for the implementation of the
+ * RecyclerView:
+ *      AlarmAdaptor - this is an implementation of RecyclerView.Adapter which manages the
+ *      RecyclerView.ViewHolder classes.
+ *
+ *      AlarmHolder - this is an implementation of the RecyclerView.ViewHolder class, which
+ *      initializes the list of alarm items.
+ *
+ * Some special features of this implementation:
+ *      We treat the first item in the alarm list specially as we give it more height to avoid
+ *      clashing with the the Floating Action Button.
+ *
+ *      We listen for visibility changes of the Floating Action Button as the header is expanded
+ *      and collapsed. The visibility changes trigger the visibility of an "add alarm" button in
+ *      the toolbar.
+ *
+ *      When the last item is removed from the alarm list we make the alarm header sticky so that
+ *      it cannot be collapsed.
+ */
 public class AlarmListFragment extends Fragment implements
     AlarmFloatingActionButton.OnVisibilityChangedListener {
 

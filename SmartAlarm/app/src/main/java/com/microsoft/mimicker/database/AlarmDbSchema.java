@@ -1,5 +1,8 @@
 package com.microsoft.mimicker.database;
 
+/**
+ * This static class defines the constants for the alarm database schema.
+ */
 public class AlarmDbSchema {
     public static final class AlarmTable {
         public static final String NAME = "alarms";
