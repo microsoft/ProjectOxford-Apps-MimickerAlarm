@@ -11,7 +11,6 @@ import android.support.v7.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
-import com.microsoft.mimicker.BuildConfig;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.model.Alarm;
 import com.microsoft.mimicker.onboarding.OnboardingToSFragment;
@@ -23,13 +22,10 @@ import com.microsoft.mimicker.settings.MimicsSettingsFragment;
 import com.microsoft.mimicker.utilities.GeneralUtilities;
 import com.microsoft.mimicker.utilities.Loggable;
 import com.microsoft.mimicker.utilities.Logger;
-import com.uservoice.uservoicesdk.UserVoice;
-import com.microsoft.mimicker.utilities.KeyUtilities;
 import com.microsoft.mimicker.utilities.SettingsUtilities;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import net.hockeyapp.android.FeedbackManager;
-import net.hockeyapp.android.UpdateManager;
-import net.hockeyapp.android.objects.FeedbackUserDataElement;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -76,7 +72,6 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        GeneralUtilities.registerUpdateManager(this);
         GeneralUtilities.registerCrashReport(this);
 
         if (mPreferences.getBoolean(SHOULD_ONBOARD, true)) {
@@ -99,7 +94,6 @@ public class AlarmMainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        UpdateManager.unregister();
     }
 
     @Override

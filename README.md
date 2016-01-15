@@ -40,5 +40,12 @@ You can create new mimics really easily!
 
 Inherit from the MimicWithCameraFragment class and implement the verify function that takes in a Bitmap. You can readily use the Emotion API and Vision API!
 
+For more Project Oxford APIs just include their maven packages. 
+
+For the new Mimic to show up, include it in pref_mimics so users can enable/disable it.
+
+Finally add the class into the MimicFactory class.
+
+
 License
 =======
