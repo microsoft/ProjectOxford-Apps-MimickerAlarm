@@ -55,7 +55,7 @@
         <FrameLayout
             android:layout_width="80dp"
             android:layout_height="40dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginRight="10dp"
             android:layout_toLeftOf="@+id/alarm_ringing_clock"
             android:layout_centerVertical="true">
             <ImageView
@@ -68,7 +68,7 @@
         <FrameLayout
             android:layout_width="80dp"
             android:layout_height="40dp"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/alarm_ringing_clock"
             android:layout_centerVertical="true">
             <ImageView
