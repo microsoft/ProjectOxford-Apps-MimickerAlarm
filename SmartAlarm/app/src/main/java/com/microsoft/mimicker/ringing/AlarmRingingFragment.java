@@ -30,12 +30,6 @@ import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 import java.util.UUID;
 
-enum DragZone {
-    NEAR_MIDDLE_OF_VIEW,
-    DRAGGING_TO_LEFT,
-    DRAGGING_TO_RIGHT
-}
-
 public class AlarmRingingFragment extends Fragment {
     public static final String RINGING_FRAGMENT_TAG = "ringing_fragment";
     private static final String ARGS_ALARM_ID = "alarm_id";
@@ -315,5 +309,11 @@ public class AlarmRingingFragment extends Fragment {
         void onRingingSnooze();
 
         void onRingingDismiss();
+    }
+
+    enum DragZone {
+        NEAR_MIDDLE_OF_VIEW,
+        DRAGGING_TO_LEFT,
+        DRAGGING_TO_RIGHT
     }
 }

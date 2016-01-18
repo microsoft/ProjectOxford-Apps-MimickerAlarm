@@ -301,7 +301,9 @@ public class ShareFragment extends Fragment {
 
     public void finishShare() {
         mHandler.removeCallbacks(mSharingFragmentDismissTask);
-        mCallback.onShareCompleted();
+        if (mCallback != null) {
+            mCallback.onShareCompleted();
+        }
     }
 
     public interface ShareResultListener {

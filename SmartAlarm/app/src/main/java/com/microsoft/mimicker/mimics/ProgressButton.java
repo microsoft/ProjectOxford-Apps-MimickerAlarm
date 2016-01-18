@@ -167,7 +167,8 @@ public class ProgressButton extends ImageView {
         super.onSizeChanged(w, h, oldw, oldh);
         mCenterX = w / 2;
         mCenterY = h / 2;
-        mInitialRadius = Math.min(w, h) / 2 - 20;
+        mInitialRadius = Math.min(w, h) / 2 - getContext().getResources()
+                .getDimensionPixelSize(R.dimen.progress_button_padding);
         mRadius = mInitialRadius;
         prepareDrawText(sWhite);
 

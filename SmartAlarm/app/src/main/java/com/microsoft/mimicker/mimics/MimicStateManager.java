@@ -81,7 +81,7 @@ public class MimicStateManager implements IMimicMediator {
 
     public void onMimicFailureWithRetry(String failureMessage) {
         Log.d(TAG, "Entered onMimicFailureWithRetry!");
-        // If the countdown time has just expired and has already registered a failure command,
+        // If the countdown timer has just expired and has already registered a failure command,
         // then we should avoid changing state
         if (isMimicRunning() && !mCountDownTimer.hasExpired()) {
             mCountDownTimer.pause();
