@@ -49,14 +49,23 @@
             android:layout_alignParentLeft="true"
             android:src="@drawable/snooze_button" />
 
+        <ImageView
+            android:id="@+id/alarm_ringing_dismiss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/dismiss_button" />
+
         <!-- Left arrows and right arrows surrounding the clock -->
         <!-- Make these two lower in the z-order so that the clock is above both arrows -->
         <!-- FrameLayout is used to animate arrows inside the frame -->
         <FrameLayout
             android:layout_width="80dp"
             android:layout_height="40dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
             android:layout_toLeftOf="@+id/alarm_ringing_clock"
+            android:layout_toRightOf="@+id/alarm_ringing_snooze"
             android:layout_centerVertical="true">
             <ImageView
                 android:id="@+id/alarm_ringing_left_arrow"
@@ -68,8 +77,10 @@
         <FrameLayout
             android:layout_width="80dp"
             android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_toRightOf="@+id/alarm_ringing_clock"
+            android:layout_toLeftOf="@+id/alarm_ringing_dismiss"
             android:layout_centerVertical="true">
             <ImageView
                 android:id="@+id/alarm_ringing_right_arrow"
@@ -85,13 +96,5 @@
             android:layout_centerInParent="true"
             android:src="@drawable/alarm_ringing_clock" />
 
-        <ImageView
-            android:id="@+id/alarm_ringing_dismiss"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/dismiss_button" />
     </RelativeLayout>
-
-
 </LinearLayout>
