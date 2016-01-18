@@ -1,6 +1,7 @@
 package com.microsoft.mimicker.mimics;
 
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,6 +10,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
@@ -25,8 +27,10 @@ import com.microsoft.mimicker.R;
  **/
 public class ProgressButton extends ImageView {
     private static final int PRESSED_ANIMATION_DURATION = 200;
-    private static final float sPressedAnimationSize = 1.2f;
+    private static final float PRESSED_ANIMATION_GROW_FACTOR = 1.2f;
     private static final int LOADING_ANIMATION_DURATION = 2000;
+    private static final long INTERACTION_HINT_ANIMATION_DURATION = 1000;
+    private static final float INTERACTION_HINT_GROW_FACTOR = 1.1f;
     private static int sYellow, sBlue, sGrey, sWhite;
     private State mState;
     private State mReadyState;
@@ -38,6 +42,8 @@ public class ProgressButton extends ImageView {
     private Bitmap mCameraIcon;
     private ObjectAnimator mPressedAnimation;
     private ObjectAnimator mLoadingAnimation;
+    // A growing/shrinking animation of the button border to give the hint to the user to press the button
+    private ObjectAnimator mInteractionHintAnimation;
     private float mLoadingAnimationProgress;
     private RectF mLoadingAnimationRect;
     public ProgressButton(Context context, AttributeSet attrs, int defStyle) {
@@ -114,7 +120,7 @@ public class ProgressButton extends ImageView {
     public void setPressed(boolean pressed) {
         super.setPressed(pressed);
         if (pressed) {
-            mPressedAnimation.setFloatValues(mRadius, mInitialRadius * sPressedAnimationSize);
+            mPressedAnimation.setFloatValues(mRadius, mInitialRadius * PRESSED_ANIMATION_GROW_FACTOR);
             mPressedAnimation.start();
         }
         else{
@@ -174,12 +180,21 @@ public class ProgressButton extends ImageView {
 
         float radius = mInitialRadius / 2f;
         mLoadingAnimationRect = new RectF(mCenterX - radius, mCenterY - radius, mCenterX + radius, mCenterY + radius);
+
+        mInteractionHintAnimation = ObjectAnimator.ofFloat(this, "radius", mInitialRadius, mInitialRadius * INTERACTION_HINT_GROW_FACTOR, mInitialRadius);
+        mInteractionHintAnimation.setDuration(INTERACTION_HINT_ANIMATION_DURATION);
+        mInteractionHintAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        mInteractionHintAnimation.setRepeatCount(ValueAnimator.INFINITE);
+        mInteractionHintAnimation.start();
     }
 
     public void setReady() {
         mState = mReadyState;
         setClickable(true);
         stop();
+        if (mInteractionHintAnimation != null) {
+            mInteractionHintAnimation.start();
+        }
         invalidate();
     }
 
@@ -193,13 +208,14 @@ public class ProgressButton extends ImageView {
 
     public void waiting() {
         mState = State.Waiting;
+        mInteractionHintAnimation.cancel();
         invalidate();
     }
 
     public void loading() {
         mState = State.Loading;
         setClickable(false);
-
+        mInteractionHintAnimation.cancel();
         mLoadingAnimation.start();
     }
 
