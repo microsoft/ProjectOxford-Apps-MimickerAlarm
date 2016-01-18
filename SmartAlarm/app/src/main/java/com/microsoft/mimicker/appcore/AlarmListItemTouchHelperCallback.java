@@ -73,10 +73,10 @@ public class AlarmListItemTouchHelperCallback extends ItemTouchHelper.Callback {
                 mCanDismiss = false;
             }
 
-            // If we have travelled beyond twice the icon area via direct user interaction
+            // If we have travelled beyond the icon area via direct user interaction
             // we will dismiss when we get a swipe callback.  We do this to try to avoid
             // unwanted swipe dismissal
-            if (x > (maxDrawWidth * 2) && isCurrentlyActive) {
+            if ((x > maxDrawWidth) && isCurrentlyActive) {
                 mCanDismiss = true;
             }
 

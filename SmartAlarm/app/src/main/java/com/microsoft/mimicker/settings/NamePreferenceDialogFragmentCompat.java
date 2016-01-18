@@ -16,7 +16,7 @@ public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialog
 
     private static final String ARGS_KEY = "key";
     private static int KEYBOARD_SHOW_DELAY = 100;
-    private static int NAME_LENGTH_MAX = 50;
+    private static int NAME_LENGTH_MAX = 33;
     private EditText mEditText;
 
     public static NamePreferenceDialogFragmentCompat newInstance(Preference preference) {
@@ -26,7 +26,6 @@ public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialog
         fragment.setArguments(bundle);
         return fragment;
     }
-
 
     @Override
     protected void onBindDialogView(View view) {

@@ -16,7 +16,7 @@ import java.lang.ref.WeakReference;
  *  class implements the IMimicMediator interface
  *
  *  The fragment should call into this class in the following cases:
- *      It should the appropriate controls and itself
+ *      It should register the appropriate controls and itself
  *      The fragment onStart and onStop implementations should call start and stop
  *      All game failure/success cases must call into this class
  *
