@@ -193,6 +193,11 @@ public class ProgressButton extends ImageView {
         setClickable(true);
         stop();
         if (mInteractionHintAnimation != null) {
+            // When the game starts, setReady() will be called before onSizeChanged() is called.
+            // However, we will not have mInitialRadius set until OnSizeChanged() is called.
+            // So we will start animation in OnSizeChanged().
+            // However, if the user fails the mimics, setReady() will be called for several times.
+            // In that case, we will re-start the animation here.
             mInteractionHintAnimation.start();
         }
         invalidate();
@@ -222,6 +227,9 @@ public class ProgressButton extends ImageView {
     public void stop() {
         mLoadingAnimation.cancel();
         mPressedAnimation.cancel();
+        if (mInteractionHintAnimation != null) {
+            mInteractionHintAnimation.cancel();
+        }
     }
 
     public enum State {
