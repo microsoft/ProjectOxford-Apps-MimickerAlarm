@@ -41,10 +41,12 @@ public class AlarmNoMimicsFragment extends Fragment {
         UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
         Alarm alarm = AlarmList.get(getContext()).getAlarm(alarmId);
 
-        TextView alarmTitle = (TextView) view.findViewById(R.id.alarm_no_mimics_label);
-
         String name = alarm.getTitle();
-        alarmTitle.setText(name);
+        if (name != null && !name.isEmpty()) {
+            TextView alarmTitle = (TextView) view.findViewById(R.id.alarm_no_mimics_label);
+            alarmTitle.setText(name);
+            alarmTitle.setVisibility(View.VISIBLE);
+        }
 
         view.findViewById(R.id.alarm_no_mimics_tap_to_add).setOnClickListener(new View.OnClickListener() {
             @Override
