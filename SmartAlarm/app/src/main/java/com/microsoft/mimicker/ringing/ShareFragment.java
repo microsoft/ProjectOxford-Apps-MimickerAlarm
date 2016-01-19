@@ -270,7 +270,8 @@ public class ShareFragment extends Fragment {
 
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // this causes issues with gmail
+        //shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         File file = new File(mShareableUri);
         Uri uri = Uri.fromFile(file);
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);

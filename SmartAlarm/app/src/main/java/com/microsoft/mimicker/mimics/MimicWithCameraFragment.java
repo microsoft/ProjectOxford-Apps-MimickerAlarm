@@ -74,7 +74,7 @@ abstract class MimicWithCameraFragment extends Fragment
     private static final int TIMEOUT_MILLISECONDS = 30000;
     // Max width for sending to Project Oxford, reduce latency
     private static final int MAX_WIDTH = 500;
-    private static final int LIGHT_THRESHOLD = 50;
+    private static final int LIGHT_THRESHOLD = 15;
 
     protected static int CameraFacing = Camera.CameraInfo.CAMERA_FACING_FRONT;
     MimicResultListener mCallback;
@@ -139,7 +139,7 @@ abstract class MimicWithCameraFragment extends Fragment
         mLightSensorListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
-                if (event.values[0] < LIGHT_THRESHOLD) {
+                if (event.values[0] < LIGHT_THRESHOLD && CameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                     mTooDarkToast.show();
                 }
                 else {
