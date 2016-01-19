@@ -1,5 +1,4 @@
 <resources>
-
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -56,5 +55,14 @@
     </style>
     <style name="Font.Action.Main">
         <item name="android:textColor">@color/green3</item>
+    </style>
+    <style name="Font.Mimic">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="Font.Mimic.Large">
+        <item name="android:textSize">32sp</item>
+    </style>
+    <style name="Font.Mimic.Small">
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>
