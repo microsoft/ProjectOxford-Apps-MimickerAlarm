@@ -69,7 +69,7 @@ import java.util.UUID;
  * case a random Mimic fragment will be launched, but if no Mimics are selected the user will see
  * the No Mimics screen (AlarmNoMimicsFragment).
  *
- * This activity is started as a new task by the AlarmRingingController.  The activity reports to \
+ * This activity is started as a new task by the AlarmRingingController.  The activity reports to
  * the controller - via bound calls to the AlarmRingingService - the state of the ringing user
  * experience.
  *

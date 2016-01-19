@@ -60,7 +60,7 @@ import java.util.ArrayList;
 
 /**
  * This is a special PreferenceFragment class that lists the different Mimic settings for an
- * alarm.  The list of Mimics is populated from pref_mimics.xml/
+ * alarm.  The list of Mimics is populated from pref_mimics.xml.
  */
 public class MimicsSettingsFragment extends PreferenceFragmentCompat {
     public static final String MIMICS_SETTINGS_FRAGMENT_TAG = "mimics_settings_fragment";

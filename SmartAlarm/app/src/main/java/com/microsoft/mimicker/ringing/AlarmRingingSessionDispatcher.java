@@ -42,7 +42,7 @@ import java.util.Queue;
 
 /**
  * This class is an abstract utility class that implements a serialized queue dispatcher.  The
- * caller with register alarm intents using registerAlarm and the subsequent alarms will be
+ * caller will register alarm intents using registerAlarm and the subsequent alarms will be
  * dispatched on each call of alarmRingingSessionCompleted.
  */
 public abstract class AlarmRingingSessionDispatcher {

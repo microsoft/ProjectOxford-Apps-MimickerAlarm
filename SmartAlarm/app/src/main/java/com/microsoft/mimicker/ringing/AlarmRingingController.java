@@ -54,14 +54,14 @@ import java.util.UUID;
  * This class derives from the AlarmRingingSessionDispatcher which is an abstract class that
  * handles the serialized queueing logic for the ringing of alarms. The controller implements the
  * abstract methods which are called when the first item enters the queue (for resource
- * initialization, when each item is dispatched and when the queue is drained (for resource
+ * initialization), when each item is dispatched and when the queue is drained (for resource
  * cleanup).
  *
- * This alarm ringing user experience (AlarmRingingActivity) calls back into this class via bound
+ * The alarm ringing user experience (AlarmRingingActivity) calls back into this class via bound
  * calls to the AlarmRingingService to notify when:
  *
  *  We should start and stop playing the alarm ringtone and vibrate the device
- *  The user experience was completed using by finishing a game correctly
+ *  The user experience was completed by finishing a game correctly
  *  The user experience was dismissed without finishing a game correctly e.g. by pressing the
  *  home button. In this case the alarm intent is resent to ensure the ringing experience is
  *  reshown to the user

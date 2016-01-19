@@ -42,9 +42,9 @@ import android.util.Log;
 
 /**
  * This class is a special BroadcastReceiver that receives the PendingIntent from the AlarmManager
- * while holding the wakelock.  It forward the intent to the AlarmRingingService to dispath the
+ * while holding the wakelock.  It forwards the intent to the AlarmRingingService to dispatch the
  * alarm. The service calls AlarmWakeReceiver.completeWakefulIntent() once it has acquired the
- * wakelock to ensure the system does not kill the service.
+ * wakelock.
  */
 public class AlarmWakeReceiver extends WakefulBroadcastReceiver {
 

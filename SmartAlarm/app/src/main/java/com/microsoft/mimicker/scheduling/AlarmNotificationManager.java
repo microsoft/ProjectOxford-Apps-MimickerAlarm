@@ -73,7 +73,7 @@ import java.util.UUID;
  *  taps on the notification, it should launch the alarm ringing screen if it is not already
  *  visible.
  *
- *  This class is a singleton, which is called at boot and from various key points with the
+ *  This class is a singleton which is called at boot and from various key points with the
  *  application lifetime.
  */
 public class AlarmNotificationManager {

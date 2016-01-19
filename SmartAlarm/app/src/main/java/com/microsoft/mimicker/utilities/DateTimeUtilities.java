@@ -51,7 +51,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * This utility class centralizes all the Date and Time formatting functionality for the app.
+ * This utility class centralizes all the Date and Time formatting functionality for the app
  */
 public final class DateTimeUtilities {
 

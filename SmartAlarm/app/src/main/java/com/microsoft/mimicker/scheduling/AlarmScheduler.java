@@ -48,11 +48,13 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
- * This static class implements all the alarm scheduling logic. The key functionality
+ * This static class implements all the alarm scheduling logic. The process of creating an alarm
+ * is as follows:
  *
- *  It uses the Calendar class to calculate the time of the alarm to be scheduled
- *  A PendingIntent is created to call into the AlarmWakeReceiver with the appropriate alarm id
- *  The PendingIntent is registered with the AlarmManager to call back at the future alarm time
+ *  - We use the Calendar class to calculate the time of the alarm to be scheduled
+ *  - A PendingIntent is created to call into the AlarmWakeReceiver with the appropriate alarm id
+ *  - The PendingIntent is registered with the AlarmManager to call back at the future alarm time we
+ *  calculated
  *
  *  This class is utilized by the AlarmRegistrar and the Alarm class.
  */

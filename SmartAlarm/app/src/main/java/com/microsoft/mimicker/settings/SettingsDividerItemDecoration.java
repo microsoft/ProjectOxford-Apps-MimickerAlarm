@@ -48,7 +48,7 @@ import java.util.List;
 
 /**
  * This is a special ItemDecoration class that allows the passing of a list of items to exclude
- * the drawing of the item divider.
+ * when drawing the item dividers.
  */
 public class SettingsDividerItemDecoration extends RecyclerView.ItemDecoration {
 
