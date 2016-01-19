@@ -39,7 +39,7 @@ import java.util.UUID;
  *      tutorial again unless it is accessed from the options menu.
  *
  *      After the tutorial is completed, the user is presented with the consent ux with the terms of
- *      service.  The user will not be able to use the application until the terms fo service have
+ *      service.  The user will not be able to use the application until the terms of service have
  *      been accepted.
  *
  *      Once the terms of service have been accepted, the alarm list will be shown (AlarmListFragment)

@@ -14,16 +14,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingTop="36dp"
+        android:paddingTop="20dp"
         android:paddingBottom="16dp">
 
         <TextView
             android:id="@+id/time_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pref_title_repeating"
             android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textSize="30sp"
             android:ellipsize="marquee"
             />
 
