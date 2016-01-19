@@ -44,6 +44,10 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.DateTimeUtilities;
 
+/**
+ * This is a custom preference class that handles the time settings for an alarm.  The time
+ * string is displayed as per the users preference in the system time settings.
+ */
 public class TimePreference extends DialogPreference {
 
     private TextView mTimeLabel;

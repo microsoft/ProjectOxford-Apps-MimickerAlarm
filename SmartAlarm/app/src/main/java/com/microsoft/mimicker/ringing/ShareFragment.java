@@ -70,6 +70,11 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * This class handles the Sharing user experience once a user has successfully completed a Mimic
+ * game.  The class utilizes the system sharing action to allow the user to share with the
+ * application of their choice.
+ */
 public class ShareFragment extends Fragment {
     public static final String SHARE_FRAGMENT_TAG = "share_fragment";
     public static final String SHAREABLE_URI = "shareable-uri";

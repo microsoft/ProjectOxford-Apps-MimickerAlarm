@@ -110,6 +110,7 @@ public class Alarm {
         mSnoozeHour = 0;
         mSnoozeMinute = 0;
         mSnoozeSeconds = 0;
+        mTitle = AlarmApplication.getAppContext().getString(R.string.app_name);
     }
 
     public long schedule() {
@@ -187,7 +188,7 @@ public class Alarm {
     }
 
     public String getTitle() {
-        return mTitle == null ? "" : mTitle;
+        return mTitle;
     }
 
     public void setTitle(String title) {

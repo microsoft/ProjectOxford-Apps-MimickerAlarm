@@ -43,6 +43,9 @@ import android.util.AttributeSet;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * A custom preference class that handles the alarm label/title setting.
+ */
 public class NamePreference extends EditTextPreference {
 
     private boolean mChanged;

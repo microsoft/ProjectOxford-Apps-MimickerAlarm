@@ -51,6 +51,12 @@ import com.microsoft.mimicker.model.AlarmList;
 
 import java.util.UUID;
 
+/**
+ * This class handles the user experience when a user dismisses an alarm that has no Mimics
+ * selected.  This screen gives the user the option to open the Mimics setting page of the
+ * dismissed alarm so that they can set and play a Mimic the next time the alarm rings.  This screen
+ * will timeout if the user does not interact with it.
+ */
 public class AlarmNoMimicsFragment extends Fragment {
     public static final String NO_MIMICS_FRAGMENT_TAG = "no_mimics_fragment";
     private static final String ARGS_ALARM_ID = "alarm_id";
@@ -76,10 +82,12 @@ public class AlarmNoMimicsFragment extends Fragment {
         UUID alarmId = UUID.fromString(args.getString(ARGS_ALARM_ID));
         Alarm alarm = AlarmList.get(getContext()).getAlarm(alarmId);
 
-        TextView alarmTitle = (TextView) view.findViewById(R.id.alarm_no_mimics_label);
-
         String name = alarm.getTitle();
-        alarmTitle.setText(name);
+        if (name != null && !name.isEmpty()) {
+            TextView alarmTitle = (TextView) view.findViewById(R.id.alarm_no_mimics_label);
+            alarmTitle.setText(name);
+            alarmTitle.setVisibility(View.VISIBLE);
+        }
 
         view.findViewById(R.id.alarm_no_mimics_tap_to_add).setOnClickListener(new View.OnClickListener() {
             @Override

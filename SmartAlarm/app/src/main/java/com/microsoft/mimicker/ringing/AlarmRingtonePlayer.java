@@ -42,6 +42,10 @@ import android.net.Uri;
 
 import com.microsoft.mimicker.utilities.Logger;
 
+/**
+ * A simple utility class to wrap the system media player.  This class is utilized by the
+ * AlarmRingingController.
+ */
 public class AlarmRingtonePlayer {
     private MediaPlayer mPlayer;
     private Context mContext;

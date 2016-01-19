@@ -64,6 +64,11 @@ import com.microsoft.mimicker.utilities.Logger;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * This is the main class that handles all the settings for an Alarm.  This class is a
+ * PreferenceFragment which creates the list of settings based on the different preferences
+ * listed in pref_alarm.xml.
+ */
 public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     public static final String SETTINGS_FRAGMENT_TAG = "settings_fragment";
     private static final String ARGS_ALARM_ID = "alarm_id";

@@ -48,6 +48,25 @@ import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 import java.util.UUID;
 
+/**
+ * This class is the main application Service that handles the following:
+ *
+ *  Hosting the AlarmRingingController which receives inbound intents with the DISPATCH_ALARM
+ *  action.  These intents are sent from the AlarmWakeReceiver.
+ *
+ *  Transitioning to a foreground service to host the appropriate alarm notifications when an intent
+ *  with the START_FOREGROUND action is received. These intents are sent from the
+ *  AlarmNotificationManager.
+ *
+ *  Toggling the partial wakelock to try to enable better alarm reliability when an intent with the
+ *  TOOGLE_WAKELOCK action is received. These intents are sent from the AlarmNotificationManager.
+ *
+ *  Transition from a foreground service back to a standard sticky service when an intent with the
+ *  STOP_FOREGROUND action is received. These intents are sent from the AlarmNotificationManager.
+ *
+ * The service is bound to by the AlarmRingingActivity and it proxies calls to the hosted
+ * AlarmRingingController.
+ */
 public class AlarmRingingService extends Service {
 
     public static final String ACTION_START_FOREGROUND =

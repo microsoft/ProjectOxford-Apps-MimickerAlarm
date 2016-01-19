@@ -38,6 +38,7 @@ package com.microsoft.mimicker.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.microsoft.mimicker.database.AlarmDbSchema.AlarmTable;
 
@@ -46,12 +47,12 @@ import com.microsoft.mimicker.database.AlarmDbSchema.AlarmTable;
  *
  * onCreate - is called to create a new database with a SQL query
  * onUpdate - is called in the cases where the database is already created.  Depending on the
- * database version, new columns are added.
+ * database version, structural changes can be made to the database.
  *
  */
 public class AlarmDatabaseHelper extends SQLiteOpenHelper{
 
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "alarmDatabase.db";
 
     public AlarmDatabaseHelper(Context context) { super(context, DATABASE_NAME, null, DATABASE_VERSION); }
@@ -80,36 +81,11 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper{
         );
     }
 
-    // TODO: Clean this up before publish
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        switch (oldVersion) {
-            case 1:
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.VIBRATE);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.TONGUE_TWISTER);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.COLOR_CAPTURE);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.EXPRESS_YOURSELF);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.NEW);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_HOUR);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_MINUTE);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_SECONDS);
-                break;
-            case 2:
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.NEW);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_HOUR);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_MINUTE);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_SECONDS);
-                break;
-            case 3:
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_HOUR);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_MINUTE);
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_SECONDS);
-                break;
-            case 4:
-                db.execSQL("ALTER TABLE " + AlarmTable.NAME + " ADD COLUMN " + AlarmTable.Columns.SNOOZED_SECONDS);
-        }
+        Log.w(AlarmDatabaseHelper.class.getSimpleName(),
+                "Upgrading database from version " + oldVersion + " to " + newVersion);
+        db.execSQL("DROP TABLE IF EXISTS " + AlarmTable.NAME);
+        onCreate(db);
     }
 }

@@ -60,6 +60,9 @@ import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.UpdateManager;
 
+/**
+ * This static utility class groups together utility methods utilized throughout the app
+ */
 public class GeneralUtilities {
     public static void enableLinks(TextView view) {
         if (view != null) {

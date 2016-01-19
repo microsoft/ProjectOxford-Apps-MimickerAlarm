@@ -65,6 +65,13 @@ import com.microsoft.mimicker.utilities.GeneralUtilities;
 
 import java.util.UUID;
 
+/**
+ * This class encapsulates the user experience of the alarm ringing screen.
+ *
+ * The user can drag and drop the animating clock to the snooze or dismiss buttons, which will
+ * call back into the hosting activity (AlarmRingingActivity) to take care of the screen
+ * transitioning to the appropriate next screen.
+ */
 public class AlarmRingingFragment extends Fragment {
     public static final String RINGING_FRAGMENT_TAG = "ringing_fragment";
     private static final String ARGS_ALARM_ID = "alarm_id";

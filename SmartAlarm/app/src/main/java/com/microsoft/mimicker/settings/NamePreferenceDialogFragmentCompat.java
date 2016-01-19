@@ -46,6 +46,13 @@ import android.widget.EditText;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * This is a custom DialogFragment that allows us to customize the EditTextPreferenceDialog.  We
+ * create a custom dialog to enable the following features:
+ *
+ *  Auto-invoke of the soft keyboard on showing of the dialog
+ *  Overriding of the text input field parameters
+ */
 public class NamePreferenceDialogFragmentCompat extends EditTextPreferenceDialogFragmentCompat
         implements View.OnFocusChangeListener {
 

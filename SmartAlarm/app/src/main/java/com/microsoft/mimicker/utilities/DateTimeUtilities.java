@@ -50,6 +50,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * This utility class centralizes all the Date and Time formatting functionality for the app.
+ */
 public final class DateTimeUtilities {
 
     // As per http://icu-project.org/apiref/icu4j/com/ibm/icu/text/SimpleDateFormat.html, we

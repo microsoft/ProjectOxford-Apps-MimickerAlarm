@@ -39,6 +39,10 @@ import android.content.Context;
 import android.media.AudioAttributes;
 import android.os.Vibrator;
 
+/**
+ * This simple utility class is a wrapper of the system vibrator.  This class is called by the
+ * AlarmRingingController.
+ */
 public class AlarmVibrator {
     private boolean mVibrating;
     private Vibrator mVibrator;
