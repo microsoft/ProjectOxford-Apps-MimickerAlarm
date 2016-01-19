@@ -14,6 +14,11 @@ import android.widget.TextView;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * This class handles the user experience when a user presses snooze on the alarm ringing screen.
+ * The screen will time out after three seconds if the user does not dismiss it with the back
+ * button.
+ */
 public class AlarmSnoozeFragment extends Fragment {
     public static final String SNOOZE_FRAGMENT_TAG = "snooze_fragment";
     private static final int SNOOZE_SCREEN_TIMEOUT_DURATION = 3 * 1000;

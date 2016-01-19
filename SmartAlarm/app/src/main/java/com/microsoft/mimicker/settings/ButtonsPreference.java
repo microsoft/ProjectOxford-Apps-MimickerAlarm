@@ -9,6 +9,10 @@ import android.widget.Button;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * A custom preference class that handles the different buttons at the bottom of the alarm
+ * settings screen
+ */
 public class ButtonsPreference extends Preference {
 
     private String mLeftButtonText;

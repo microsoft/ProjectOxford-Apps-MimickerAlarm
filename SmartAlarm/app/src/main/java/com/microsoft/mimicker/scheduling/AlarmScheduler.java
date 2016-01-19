@@ -12,6 +12,15 @@ import com.microsoft.mimicker.ringing.AlarmWakeReceiver;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * This static class implements all the alarm scheduling logic. The key functionality
+ *
+ *  It uses the Calendar class to calculate the time of the alarm to be scheduled
+ *  A PendingIntent is created to call into the AlarmWakeReceiver with the appropriate alarm id
+ *  The PendingIntent is registered with the AlarmManager to call back at the future alarm time
+ *
+ *  This class is utilized by the AlarmRegistrar and the Alarm class.
+ */
 public final class AlarmScheduler {
 
     public static final String ARGS_ALARM_ID = "alarm_id";

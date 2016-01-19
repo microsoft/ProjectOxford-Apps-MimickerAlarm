@@ -6,6 +6,9 @@ import android.support.v7.preference.PreferenceViewHolder;
 import android.support.v7.preference.SwitchPreferenceCompat;
 import android.util.AttributeSet;
 
+/**
+ * This custom preference class handles the vibration setting for an alarm.
+ */
 public class VibratePreference extends SwitchPreferenceCompat {
 
     public boolean mChanged;

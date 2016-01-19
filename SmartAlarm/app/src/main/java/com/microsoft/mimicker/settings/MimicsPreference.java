@@ -9,6 +9,9 @@ import com.microsoft.mimicker.model.Alarm;
 
 import java.util.ArrayList;
 
+/**
+ * A custom preferences class that encapsulates the Mimics settings for an alarm.
+ */
 public class MimicsPreference extends Preference {
     private String[] mMimicLabels;
     private String[] mMimicValues;

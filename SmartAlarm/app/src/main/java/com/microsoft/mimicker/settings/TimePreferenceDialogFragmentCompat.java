@@ -9,6 +9,13 @@ import android.widget.TimePicker;
 
 import com.microsoft.mimicker.R;
 
+/**
+ * This class is a specialization of a PreferenceDialogFragment so that we can host the time picker
+ * of choice, depending on the host platform.
+ *
+ * If the platform is Lollipop or newer we show the new clock picker, otherwise we show the spinner
+ * time picker. We query the system settings to ensure the picker is set to 24 hour format or not.
+ */
 public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragmentCompat {
 
     private static final String ARGS_KEY = "key";

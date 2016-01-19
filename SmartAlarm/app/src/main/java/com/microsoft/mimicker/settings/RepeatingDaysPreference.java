@@ -16,6 +16,10 @@ import android.widget.TextView;
 import com.microsoft.mimicker.R;
 import com.microsoft.mimicker.utilities.DateTimeUtilities;
 
+/**
+ * A custom preference class that handles the settings for a repeating alarm.  This class takes
+ * care of drawing the custom settings user experience for the different days of the week.
+ */
 public class RepeatingDaysPreference extends Preference {
 
     private boolean mChanged;

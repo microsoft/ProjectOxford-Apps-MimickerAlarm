@@ -25,6 +25,22 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
+/**
+ * This class handles the state of the Mimicker alarm notification.  It communicates with the
+ * AlarmRingingService to display the alarm hosted by a foreground service.  The notification will
+ * display the following:
+ *
+ *  The next alarm that is scheduled.  If the next alarm is a snoozed alarm, the notification will
+ *  correctly reflect that case.  If the user taps the notification, the Mimicker app should
+ *  launch at the correct alarm setting page.
+ *
+ *  If an alarm is ringing, the notification will display that an alarm is ringing. If the user
+ *  taps on the notification, it should launch the alarm ringing screen if it is not already
+ *  visible.
+ *
+ *  This class is a singleton, which is called at boot and from various key points with the
+ *  application lifetime.
+ */
 public class AlarmNotificationManager {
     public final static int NOTIFICATION_ID = 60653426;
     public static final String NOTIFICATION_NEXT_ALARM = "next_alarm";

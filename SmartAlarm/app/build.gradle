@@ -90,7 +90,8 @@ dependencies {
 }
 
 // The location of the HP Fortify sourceanalyzer tool needs to be added to the PATH variable
-// for this task to run correctly. You also need to add SDL files from http://codebox/sdlfortify.
+// for this task to run correctly. You can run this task from the Android Studio Terminal window
+// using the command line: gradlew fortify
 task fortify << {
     // Default classpath should be set to the location of the default android SDK - not totally necessary though
     def classpath = "C:\\Program Files (x86)\\Android\\android-sdk\\platforms\\android-22\\android.jar;"
@@ -118,7 +119,7 @@ task fortify << {
     println "Step 3 - Scan source for potential flaws... "
     exec {
         executable "sourceanalyzer"
-        args "-b", "MyBuild", "-scan", "-filter", "C:\\Program Files\\HP_Fortify\\HP_Fortify_SCA_and_Apps_4.31\\SDL\\SDL_Filter_Java.txt", "-f", "mimicker.fpr"
+        args "-b", "MyBuild", "-scan", "-f", "mimicker.fpr"
     }
 
     println "Scan completed!"

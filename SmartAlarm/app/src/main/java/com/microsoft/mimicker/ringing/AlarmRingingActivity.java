@@ -25,6 +25,24 @@ import com.microsoft.mimicker.utilities.SettingsUtilities;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * This class controls all the alarm ringing experience from a user experience perspective.  It
+ * hosts the main ringing fragment (AlarmRingingFragment) and transitions to further screens based
+ * on the choice of the user.
+ *
+ * On ringing of an alarm a user has the choice to snooze or dismiss the alarm.  In the dismiss
+ * case a random Mimic fragment will be launched, but if no Mimics are selected the user will see
+ * the No Mimics screen (AlarmNoMimicsFragment).
+ *
+ * This activity is started as a new task by the AlarmRingingController.  The activity reports to \
+ * the controller - via bound calls to the AlarmRingingService - the state of the ringing user
+ * experience.
+ *
+ * All the hosted fragments communicate to the activity via callback listener interfaces.
+ *
+ * This activity has a launch mode of singleTask, as we do not want more than one instance to be
+ * launched at a time.
+ */
 public class AlarmRingingActivity extends AppCompatActivity
         implements MimicFactory.MimicResultListener,
         ShareFragment.ShareResultListener,

@@ -11,6 +11,10 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is a special ItemDecoration class that allows the passing of a list of items to exclude
+ * the drawing of the item divider.
+ */
 public class SettingsDividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private static final int[] ATTRS = new int[]{

@@ -9,6 +9,10 @@ import com.microsoft.mimicker.settings.MimicsSettingsFragment;
 
 import java.util.ArrayList;
 
+/**
+ * This utility class groups together common Settings user experience functionality which is
+ * utilized from within both the AlarmMainActivity and AlarmRingingActivity.
+ */
 public final class SettingsUtilities {
     private SettingsUtilities() {}
 
