@@ -10,6 +10,7 @@
         android:layout_height="match_parent"
         android:layout_toLeftOf="@+id/right_settings_button"
         android:textAppearance="?android:attr/textAppearanceButton"
+        android:textSize="16sp"
         android:background="@drawable/abc_btn_borderless_material"
         android:padding="20dp"
         />
@@ -21,6 +22,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:textAppearance="?android:attr/textAppearanceButton"
+        android:textSize="16sp"
         android:textColor="@color/green3"
         android:background="@drawable/abc_btn_borderless_material"
         android:padding="20dp"

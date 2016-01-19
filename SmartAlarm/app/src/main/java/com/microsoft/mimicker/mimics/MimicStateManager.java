@@ -1,3 +1,38 @@
+/*
+ *
+ * Copyright (c) Microsoft. All rights reserved.
+ * Licensed under the MIT license.
+ *
+ * Project Oxford: http://ProjectOxford.ai
+ *
+ * Project Oxford Mimicker Alarm Github:
+ * https://github.com/Microsoft/ProjectOxford-Apps-MimickerAlarm
+ *
+ * Copyright (c) Microsoft Corporation
+ * All rights reserved.
+ *
+ * MIT License:
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED ""AS IS"", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package com.microsoft.mimicker.mimics;
 
 import android.util.Log;
@@ -16,7 +51,7 @@ import java.lang.ref.WeakReference;
  *  class implements the IMimicMediator interface
  *
  *  The fragment should call into this class in the following cases:
- *      It should the appropriate controls and itself
+ *      It should register the appropriate controls and itself
  *      The fragment onStart and onStop implementations should call start and stop
  *      All game failure/success cases must call into this class
  *
@@ -81,7 +116,7 @@ public class MimicStateManager implements IMimicMediator {
 
     public void onMimicFailureWithRetry(String failureMessage) {
         Log.d(TAG, "Entered onMimicFailureWithRetry!");
-        // If the countdown time has just expired and has already registered a failure command,
+        // If the countdown timer has just expired and has already registered a failure command,
         // then we should avoid changing state
         if (isMimicRunning() && !mCountDownTimer.hasExpired()) {
             mCountDownTimer.pause();

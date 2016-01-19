@@ -1,6 +1,42 @@
+/*
+ *
+ * Copyright (c) Microsoft. All rights reserved.
+ * Licensed under the MIT license.
+ *
+ * Project Oxford: http://ProjectOxford.ai
+ *
+ * Project Oxford Mimicker Alarm Github:
+ * https://github.com/Microsoft/ProjectOxford-Apps-MimickerAlarm
+ *
+ * Copyright (c) Microsoft Corporation
+ * All rights reserved.
+ *
+ * MIT License:
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED ""AS IS"", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 package com.microsoft.mimicker.mimics;
 
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,6 +45,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
@@ -25,8 +62,10 @@ import com.microsoft.mimicker.R;
  **/
 public class ProgressButton extends ImageView {
     private static final int PRESSED_ANIMATION_DURATION = 200;
-    private static final float sPressedAnimationSize = 1.2f;
+    private static final float PRESSED_ANIMATION_GROW_FACTOR = 1.2f;
     private static final int LOADING_ANIMATION_DURATION = 2000;
+    private static final long INTERACTION_HINT_ANIMATION_DURATION = 1000;
+    private static final float INTERACTION_HINT_GROW_FACTOR = 1.1f;
     private static int sYellow, sBlue, sGrey, sWhite;
     private State mState;
     private State mReadyState;
@@ -38,6 +77,8 @@ public class ProgressButton extends ImageView {
     private Bitmap mCameraIcon;
     private ObjectAnimator mPressedAnimation;
     private ObjectAnimator mLoadingAnimation;
+    // A growing/shrinking animation of the button border to give the hint to the user to press the button
+    private ObjectAnimator mInteractionHintAnimation;
     private float mLoadingAnimationProgress;
     private RectF mLoadingAnimationRect;
     public ProgressButton(Context context, AttributeSet attrs, int defStyle) {
@@ -114,7 +155,7 @@ public class ProgressButton extends ImageView {
     public void setPressed(boolean pressed) {
         super.setPressed(pressed);
         if (pressed) {
-            mPressedAnimation.setFloatValues(mRadius, mInitialRadius * sPressedAnimationSize);
+            mPressedAnimation.setFloatValues(mRadius, mInitialRadius * PRESSED_ANIMATION_GROW_FACTOR);
             mPressedAnimation.start();
         }
         else{
@@ -167,18 +208,33 @@ public class ProgressButton extends ImageView {
         super.onSizeChanged(w, h, oldw, oldh);
         mCenterX = w / 2;
         mCenterY = h / 2;
-        mInitialRadius = Math.min(w, h) / 2 - 20;
+        mInitialRadius = Math.min(w, h) / 2 - getContext().getResources()
+                .getDimensionPixelSize(R.dimen.progress_button_padding);
         mRadius = mInitialRadius;
         prepareDrawText(sWhite);
 
         float radius = mInitialRadius / 2f;
         mLoadingAnimationRect = new RectF(mCenterX - radius, mCenterY - radius, mCenterX + radius, mCenterY + radius);
+
+        mInteractionHintAnimation = ObjectAnimator.ofFloat(this, "radius", mInitialRadius, mInitialRadius * INTERACTION_HINT_GROW_FACTOR, mInitialRadius);
+        mInteractionHintAnimation.setDuration(INTERACTION_HINT_ANIMATION_DURATION);
+        mInteractionHintAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        mInteractionHintAnimation.setRepeatCount(ValueAnimator.INFINITE);
+        mInteractionHintAnimation.start();
     }
 
     public void setReady() {
         mState = mReadyState;
         setClickable(true);
         stop();
+        if (mInteractionHintAnimation != null) {
+            // When the game starts, setReady() will be called before onSizeChanged() is called.
+            // However, we will not have mInitialRadius set until OnSizeChanged() is called.
+            // So we will start animation in OnSizeChanged().
+            // However, if the user fails the mimics, setReady() will be called for several times.
+            // In that case, we will re-start the animation here.
+            mInteractionHintAnimation.start();
+        }
         invalidate();
     }
 
@@ -192,19 +248,23 @@ public class ProgressButton extends ImageView {
 
     public void waiting() {
         mState = State.Waiting;
+        mInteractionHintAnimation.cancel();
         invalidate();
     }
 
     public void loading() {
         mState = State.Loading;
         setClickable(false);
-
+        mInteractionHintAnimation.cancel();
         mLoadingAnimation.start();
     }
 
     public void stop() {
         mLoadingAnimation.cancel();
         mPressedAnimation.cancel();
+        if (mInteractionHintAnimation != null) {
+            mInteractionHintAnimation.cancel();
+        }
     }
 
     public enum State {

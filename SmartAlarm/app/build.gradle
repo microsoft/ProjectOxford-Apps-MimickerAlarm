@@ -57,10 +57,8 @@ android {
         }
     }
 
-    allprojects {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:deprecation"
-        }
+    configurations {
+        compile.exclude group: "org.apache.httpcomponents", module: "httpclient"
     }
 
     packagingOptions {
