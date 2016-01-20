@@ -1,0 +1,19 @@
+<resources>
+    <style name="Font">
+    </style>
+    <style name="Font.Mimic">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="Font.Mimic.Large">
+        <item name="android:textSize">32sp</item>
+    </style>
+    <style name="Font.Mimic.Small">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="Font.Mimic.Shareable">
+        <item name="android:textSize">34sp</item>
+    </style>
+    <style name="Font.Ringing">
+        <item name="android:textSize">34sp</item>
+    </style>
+</resources>
