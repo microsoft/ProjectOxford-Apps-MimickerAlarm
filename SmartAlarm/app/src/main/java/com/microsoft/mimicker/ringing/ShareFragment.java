@@ -139,8 +139,8 @@ public class ShareFragment extends Fragment {
         float opacity = 0.7f;
         int horizontalPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, context.getResources().getDisplayMetrics());
         int verticalPadding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, context.getResources().getDisplayMetrics());
-        int textSize = 20; // defined in SP
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 25, context.getResources().getDisplayMetrics());
+        int textSize = 16; // defined in SP
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16, context.getResources().getDisplayMetrics());
 
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.HORIZONTAL);
@@ -159,7 +159,7 @@ public class ShareFragment extends Fragment {
         } else {
             textView.setText("Mimicker");
         }
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize);
         textView.setPadding(horizontalPadding, 0, 0, 0);
 
         LinearLayout.LayoutParams centerInParent = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -169,7 +169,9 @@ public class ShareFragment extends Fragment {
         layout.measure(canvas.getWidth(), height);
         layout.layout(0, 0, layout.getMeasuredWidth(), layout.getMeasuredHeight());
 
-        canvas.translate((canvas.getWidth() - layout.getMeasuredWidth()) / 2, (float) (canvas.getHeight() * 0.8 - height));
+        canvas.translate(horizontalPadding, (float) (canvas.getHeight() * 0.8 - height));
+        float scale = Math.min(1.0f, canvas.getWidth() / 1080f);
+        canvas.scale(scale, scale);
         layout.draw(canvas);
     }
 
