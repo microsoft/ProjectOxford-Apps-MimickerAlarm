@@ -62,6 +62,7 @@
                 android:paddingRight="16dp"
                 android:text="@string/mimic_twister_i_said"
                 style="@style/Font.Mimic.Small"/>
+
             <TextView
                 android:id="@+id/understood_text"
                 android:layout_width="match_parent"
@@ -85,6 +86,9 @@
                     android:layout_centerInParent="true" />
 
             </RelativeLayout>
+
         </LinearLayout>
+
     </LinearLayout>
+
 </RelativeLayout>
