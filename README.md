@@ -4,7 +4,7 @@ Mimicker Alarm is a morning alarm clock app for Android that helps you wake up a
 
 Manage your alarms | Express yourself with [Emotion API](<https://www.projectoxford.ai/emotion>) | Color capture with [Computer vision API](<https://www.projectoxford.ai/vision>) | Tongue twister with [Speech API](<https://www.projectoxford.ai/speech>)
 ------------- | ------------- | ------------- | -------------
-![Manage your alarms](/screenshots/Screenshot_AlarmList.png) | ![Express yourself](/screenshots/Screenshot_ExpressYourself.png) | ![Color capture](/screenshots/Screenshot_ColorCapture.png) | ![Tongue twister](/screenshots/Screenshot_TongueTwister.png)
+![Manage your alarms](/screenshots/Screenshot_AlarmList.png =278x533) | ![Express yourself](/screenshots/Screenshot_ExpressYourself.png =278x533) | ![Color capture](/screenshots/Screenshot_ColorCapture.png =278x533) | ![Tongue twister](/screenshots/Screenshot_TongueTwister.png =278x533)
 
 You can install [Mimicker Alarm in the Google Play Store](<https://play.google.com/store/apps/details?id=com.microsoft.mimickeralarm>) for free. All of the source code for Mimicker Alarm is available on GitHub for developers to browse and reference how to use [Microsoft Project Oxford](<https://www.projectoxford.ai>). We welcome your comments, feedback, and contributions.
 
@@ -56,3 +56,7 @@ All Project Oxford SDKs and samples are licensed with the MIT License. For more 
 [LICENSE](</LICENSE.md>).
 
 Sample images are licensed separately, please refer to [LICENSE-IMAGE](</LICENSE-IMAGE.md>).
+
+Contact Us
+==========
+Reach out to us by posting [issues](<https://github.com/Microsoft/ProjectOxford-Apps-MimickerAlarm/issues>) here in GitHub, visiting our [UserVoice forum](<https://microsoftgarage.uservoice.com/forums/336969-mimicker-alarm>), or emailing us directly at [project-oxford-apps@microsoft.com](<mailto://project-oxford-apps@microsoft.com>). 
