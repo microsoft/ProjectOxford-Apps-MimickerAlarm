@@ -6,6 +6,9 @@ Express yourself with [Emotion API](<https://www.projectoxford.ai/emotion>) | Co
 ------------- | ------------- |  -------------
 <img src="screenshots/Screenshot_ExpressYourself.png" width="100%"/> | <img src="screenshots/Screenshot_ColorCapture.png" width="100%"/> | <img src="screenshots/Screenshot_TongueTwister.png" width="100%"/>
 
+<img src="screenshots/Screenshot_ExpressYourself.png" width="100%"/>
+<img src="screenshots/Screenshot_ColorCapture.png" width="100%"/>
+<img src="screenshots/Screenshot_TongueTwister.png" width="100%"/>
 
 You can install [Mimicker Alarm in the Google Play Store](<https://play.google.com/store/apps/details?id=com.microsoft.mimicker>) for free. All of the source code for Mimicker Alarm is available on GitHub for developers to browse and reference how to use [Microsoft Project Oxford](<https://www.projectoxford.ai>). We welcome your comments, feedback, and contributions.
 
