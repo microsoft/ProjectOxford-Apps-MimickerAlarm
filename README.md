@@ -4,7 +4,7 @@ Mimicker Alarm is a morning alarm clock app for Android that helps you wake up a
 
 Express yourself with [Emotion API](<https://www.projectoxford.ai/emotion>) | Color capture with [Computer vision API](<https://www.projectoxford.ai/vision>) | Tongue twister with [Speech API](<https://www.projectoxford.ai/speech>)
 ------------- | ------------- |  -------------
-![Express yourself](http://i.imgur.com/Ud7pchO.jpg) | ![Color capture](http://i.imgur.com/Ud7pchO.jpg) | ![Tongue twister](http://i.imgur.com/Ud7pchO.jpgg)
+![Express yourself]<img src="screenshots/Screenshot_ExpressYourself.png" width="100%"/> | ![Color capture]<img src="screenshots/Screenshot_ColorCapture.png" width="100%"/> | ![Tongue twister]<img src="screenshots/Screenshot_TongueTwister.png" width="100%"/>
 
 
 You can install [Mimicker Alarm in the Google Play Store](<https://play.google.com/store/apps/details?id=com.microsoft.mimicker>) for free. All of the source code for Mimicker Alarm is available on GitHub for developers to browse and reference how to use [Microsoft Project Oxford](<https://www.projectoxford.ai>). We welcome your comments, feedback, and contributions.
