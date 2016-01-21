@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.microsoft.mimicker.mimics.MimicStateBanner
+    <com.microsoft.mimickeralarm.mimics.MimicStateBanner
         android:id="@+id/mimic_state"
         android:layout_width="match_parent"
         android:layout_height="90dp"
@@ -21,7 +21,7 @@
         android:orientation="vertical"
         android:padding="0dp">
 
-        <com.microsoft.mimicker.mimics.CountDownTimerView
+        <com.microsoft.mimickeralarm.mimics.CountDownTimerView
             android:id="@+id/countdown_timer"
             android:layout_width="match_parent"
             android:layout_height="20dp" />
@@ -79,7 +79,7 @@
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <com.microsoft.mimicker.mimics.ProgressButton
+                <com.microsoft.mimickeralarm.mimics.ProgressButton
                     android:id="@+id/capture_button"
                     android:layout_width="80dp"
                     android:layout_height="80dp"

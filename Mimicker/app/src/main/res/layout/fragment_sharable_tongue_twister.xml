@@ -7,7 +7,7 @@
     android:layout_marginBottom="20dp"
     android:background="@color/white">
 
-    <com.microsoft.mimicker.mimics.MimicStateBanner
+    <com.microsoft.mimickeralarm.mimics.MimicStateBanner
         android:id="@+id/mimic_twister_share_success"
         android:layout_width="match_parent"
         android:layout_height="90dp"

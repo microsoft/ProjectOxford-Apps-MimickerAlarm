@@ -43,7 +43,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context=".AlarmMainActivity"/>
 
-    <com.microsoft.mimicker.appcore.AlarmFloatingActionButton
+    <com.microsoft.mimickeralarm.appcore.AlarmFloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
