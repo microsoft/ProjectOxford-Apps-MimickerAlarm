@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_item_container"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/alarm_list_item_height">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/selectableItemBackground">
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/list_item_alarm_enabled_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:paddingRight="16dp"
+            android:paddingLeft="30dp"
+            android:paddingTop="30dp"
+            android:paddingBottom="30dp"
+            android:layout_centerInParent="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:paddingLeft="16dp"
+            android:layout_toLeftOf="@id/list_item_alarm_enabled_switch">
+            <TextView
+                android:id="@+id/list_item_alarm_time_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+            <TextView
+                android:id="@+id/list_item_alarm_title_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

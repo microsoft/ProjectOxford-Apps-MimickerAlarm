@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">Mimicker Alarm</string>
+    <string name="app_short_name">Mimicker</string>
+    <string name="alarm_list_title">Alarms</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_learn_more">Learn more</string>
+    <string name="action_add_alarm">Add alarm</string>
+    <string name="title_activity_alarm_settings">Settings</string>
+    <string name="empty_alarm_list_text">You don\'t have any alarms set!\nUse the button to add alarms</string>
+    <string name="title_activity_learn_more">Learn more</string>
+    <string name="alarm_list_weekend">Weekend</string>
+    <string name="alarm_list_weekdays">Weekdays</string>
+    <string name="alarm_list_every_day">Every day</string>
+    <string name="alarm_snooze_label">Snoozed</string>
+    <string name="alarm_no_mimics_label">No Mimics selected</string>
+    <string name="alarm_no_mimics_tap_to_add">Tap to add!</string>
+
+    <string name="mimic_twister_name">Tongue twister</string>
+    <string name="mimic_twister_prompt">Say the following tongue twister</string>
+    <string name="mimic_twister_i_said">I said</string>
+    <string name="mimic_twister_sharable_title">Say this fast!</string>
+
+    <string name="mimic_vision_prompt">Find something %s</string>
+    <string name="mimic_emotion_prompt">Make a %s face</string>
+    <string name="action_feedback_UserVoice">Feedback</string>
+    <string name="action_tutorial">Tutorial</string>
+    <string name="mimic_time_up_message">Time\'s Up!</string>
+    <string name="mimic_failure_message">That does not look quite right</string>
+    <string name="mimic_success_message">You did it!</string>
+    <string name="mimic_emotion_failure">You look too %s, try again</string>
+    <string name="mimic_emotion_failure_not_enough">You don\'t look %s enough, try again</string>
+    <string name="mimic_twister_perfect_message">Perfect!</string>
+
+    <string name="onboarding_tutorial_title_1">Set your alarm</string>
+    <string name="onboarding_tutorial_text_1">Tell us when you want to wake up and leave the rest to us</string>
+    <string name="onboarding_tutorial_title_2">Act when you hear it</string>
+    <string name="onboarding_tutorial_text_2">Decide between waking up or snoozing your alarm</string>
+    <string name="onboarding_tutorial_title_3">Play a mimic game</string>
+    <string name="onboarding_tutorial_text_3">Turn off your alarm by playing a mimic game</string>
+    <string name="onboarding_tutorial_title_4">Wake up</string>
+    <string name="onboarding_tutorial_text_4">And enjoy your morning</string>
+    <string name="onboarding_welcome_title">Welcome to Mimicker!</string>
+    <string name="onboarding_welcome_text">Play mimic games to wake up and stay up</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="accept">accept</string>
+    <string name="game_nonetwork_prompt">catch the sleepyhead!</string>
+    <string name="game_nonetwork_prompt2">keep going</string>
+    <string name="game_nonetwork_prompt3">almost there</string>
+    <string name="learn_more_text">Mimicker Alarm helps you wake up and stay up by making you complete a mimic, or game, to dismiss your alarm. You can’t fool us. We use <a href="http://www.projectoxford.ai/">Microsoft Project Oxford</a> to understand faces, images, videos, and language. The APIs are easy to get started and you can use them for free. <a href="https://www.projectoxford.ai">Visit ProjectOxford.ai to learn more.</a>\n\nAll of the code is available on GitHub where you can see how to use Microsoft Project Oxford. <a href="https://github.com/Microsoft/ProjectOxford-Apps-MimickerAlarm">Go to GitHub</a> to view the repo now.\n\nQuestions, bugs, or suggestions? <a href="https://microsoftgarage.uservoice.com/forums/336969-mimicker-alarm">Connect with us on UserVoice.</a>\n\n</string>
+    <string name="learn_more_oxford_link"><a href="http://www.projectoxford.ai/">Get started with Project Oxford</a></string>
+    <string name="learn_more_terms_link"><a href="http://go.microsoft.com/fwlink/?LinkID=206977">Terms of Use</a></string>
+    <string name="learn_more_privacy_link"><a href="http://go.microsoft.com/fwlink/?LinkId=521839">Privacy Statement</a></string>
+    <string name="learn_more_contact_link"><a href="http://www.uservoice.com">Contact us</a></string>
+    <string name="learn_more_other_link">Other links</string>
+    <string name="share_button">Share your mimic</string>
+    <string name="share_action_description">Share via …</string>
+    <string name="share_text_template">I woke up this morning with Mimicker http://mimicker.ai</string>
+    <string name="share_subject_template">I woke up!</string>
+    <string name="share_download_success">Your mimic picture has been saved!</string>
+    <string name="share_download_failure">Sorry, something went wrong and we cannot save your picture</string>
+    <string name="default_ringtone_name">Mimicker</string>
+
+    <string name="alarm_set_day_hour_minute">Alarm will ring in {days, plural, =1{# day} other{# days}}, {hours, plural, =1{# hour} other{# hours}} and {minutes, plural, =1 {# minute} other {# minutes}}</string>
+    <string name="alarm_set_day_hour">Alarm will ring in {days, plural, =1{# day} other{# days}} and {hours, plural, =1{# hour} other{# hours}}</string>
+    <string name="alarm_set_day_minute">Alarm will ring in {days, plural, =1{# day} other{# days}} and {minutes, plural, =1 {# minute} other {# minutes}}</string>
+    <string name="alarm_set_day">Alarm will ring in {days, plural, =1{# day} other{# days}}</string>
+    <string name="alarm_set_hour_minute">Alarm will ring in {hours, plural, =1{# hour} other{# hours}} and {minutes, plural, =1 {# minute} other {# minutes}}</string>
+    <string name="alarm_set_hour">Alarm will ring in {hours, plural, =1{# hour} other{# hours}}</string>
+    <string name="alarm_set_minute">Alarm will ring in {minutes, plural, =1{# minute} other{# minutes}}</string>
+    <string name="alarm_set_less_than_minute">Alarm will ring in less than a minute</string>
+
+    <string name="notification_next_alarm_content_title">Next Mimicker alarm</string>
+    <string name="notification_alarm_ringing_content_title">Mimicker alarm is ringing</string>
+    <string name="mimic_camera_too_dark">It\'s really dark here</string>
+    <string name="learn_more_data_collection">Images, audio, and other data uploaded when using Mimicker may be used by Microsoft for service improvement. To protect your privacy, we do not use this data to identify or contact you.</string>
+</resources>

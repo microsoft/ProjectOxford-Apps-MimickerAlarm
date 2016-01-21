@@ -1,0 +1,117 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "com.microsoft.mimickeralarm"
+        minSdkVersion 16
+        targetSdkVersion 22
+        versionCode 2
+        versionName "1.0"
+    }
+
+    productFlavors {
+        x86 {
+            ndk {
+                abiFilter "x86"
+            }
+        }
+        arm {
+            ndk {
+                abiFilters "armeabi"
+            }
+        }
+    }
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java']
+            jniLibs.srcDir 'libs'
+        }
+
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
+        }
+        debug {
+            applicationIdSuffix '.dev'
+        }
+        all {
+            manifestPlaceholders = [MIXPANEL_TOKEN: mixpanel_token, SPEECH_TOKEN: speech_token, VISION_TOKEN: vision_token, EMOTION_TOKEN: emotion_token, HOCKEYAPP_TOKEN: hockeyapp_token]
+        }
+    }
+
+    configurations {
+        compile.exclude group: "org.apache.httpcomponents", module: "httpclient"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
+    compile 'com.android.support:support-v4:23.1.1'
+    compile 'com.android.support:preference-v7:23.1.1'
+    compile 'com.android.support:preference-v14:23.1.1'
+    compile 'com.microsoft.projectoxford:speechrecognition:0.5.0'
+    compile 'com.microsoft.projectoxford:vision:0.5.0'
+    compile 'com.microsoft.projectoxford:emotion:0.4.0'
+    compile 'net.hockeyapp.android:HockeySDK:3.7.0-beta.1'
+    compile 'com.ibm.icu:icu4j:56.1'
+    compile 'org.apache.commons:commons-lang3:3.4'
+
+    compile "com.mixpanel.android:mixpanel-android:4.6.4"
+    compile 'com.uservoice:uservoice-android-sdk:+'
+
+    compile files('libs/gson-2.3.1.jar')
+}
+
+// The location of the HP Fortify sourceanalyzer tool needs to be added to the PATH variable
+// for this task to run correctly. You can run this task from the Android Studio Terminal window
+// using the command line: gradlew fortify
+task fortify << {
+    // Default classpath should be set to the location of the default android SDK - not totally necessary though
+    def classpath = "C:\\Program Files (x86)\\Android\\android-sdk\\platforms\\android-22\\android.jar;"
+    // We build the classpath with all the imported jars from the dependencies
+    def variant = android.applicationVariants.getAt(0)
+    variant.javaCompile.classpath.each { path ->
+        classpath = classpath + path + ";"
+    }
+
+    println "Running Fortify analysis tool.."
+    println "Step 1 - Clean..."
+    exec {
+        executable "sourceanalyzer"
+        args "-b", "MyBuild", "-clean"
+    }
+
+    println "Clean complete!"
+    println "Step 2 - Build intermediate files for analysis..."
+    exec {
+        executable "sourceanalyzer"
+        args "-b", "MyBuild", "-jdk", "1.8", "-cp", classpath, "src/main/**/*.java"
+    }
+
+    println "Build completed!"
+    println "Step 3 - Scan source for potential flaws... "
+    exec {
+        executable "sourceanalyzer"
+        args "-b", "MyBuild", "-scan", "-f", "mimicker.fpr"
+    }
+
+    println "Scan completed!"
+}

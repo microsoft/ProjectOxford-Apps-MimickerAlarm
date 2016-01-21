@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="vision_color_questions">
+        <item>red</item>
+        <item>green</item>
+        <item>yellow</item>
+        <item>blue</item>
+    </string-array>
+
+    <array name="red_range_lower">
+        <item>313</item>
+        <item>0.3</item>
+        <item>0.15</item>
+    </array>
+    <array name="red_range_upper">
+        <item>28</item>
+        <item>1.0</item>
+        <item>0.8</item>
+    </array>
+
+    <array name="green_range_lower">
+        <item>61</item>
+        <item>0.3</item>
+        <item>0.15</item>
+    </array>
+    <array name="green_range_upper">
+        <item>171</item>
+        <item>1.0</item>
+        <item>0.8</item>
+    </array>
+
+    <array name="yellow_range_lower">
+        <item>24</item>
+        <item>0.3</item>
+        <item>0.15</item>
+    </array>
+    <array name="yellow_range_upper">
+        <item>70</item>
+        <item>1.0</item>
+        <item>0.8</item>
+    </array>
+
+    <array name="blue_range_lower">
+        <item>159</item>
+        <item>0.3</item>
+        <item>0.15</item>
+    </array>
+    <array name="blue_range_upper">
+        <item>270</item>
+        <item>1.0</item>
+        <item>0.8</item>
+    </array>
+
+</resources>

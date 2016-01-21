@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/shareable_image"
+        android:scaleType="fitCenter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            style="@style/Font.Title"
+            android:layout_marginTop="0dp"
+            android:layout_alignParentTop="true"
+            android:id="@android:id/title"
+            android:text="@string/share_button"
+            android:background="@color/yellow2"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <ImageView
+            android:id="@+id/finish_button"
+            android:layout_alignRight="@android:id/title"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_centerVertical="true"
+            android:src="@drawable/close_button"
+            style="@style/Font.Title"
+            android:background="@color/invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/share_buttons_container"
+            android:background="@color/yellow2"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+            <ImageButton
+                android:id="@+id/download_button"
+                android:src="@drawable/download_button"
+                android:background="@drawable/share_button_colors"
+                android:layout_weight="1"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:scaleType="fitCenter"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+            <ImageButton
+                android:id="@+id/share_button"
+                android:src="@drawable/share_button"
+                android:background="@drawable/share_button_colors"
+                android:layout_weight="1"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:scaleType="fitCenter"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
+        <View
+            android:background="#FF000000"
+            android:layout_centerInParent="true"
+            android:layout_width="1dp"
+            android:layout_height="40dp"/>
+    </RelativeLayout>
+
+    <!-- Home-made toast message at the bottom of the screen -->
+    <!-- We cannot use android.widget.toast because system toast does not work in lock screen -->
+    <!-- This is invisible until being programmatically shown -->
+    <RelativeLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp">
+
+        <TextView
+            style="@style/Font.Title"
+            android:id="@+id/share_toast_message"
+            android:visibility="invisible"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            android:textStyle="normal"
+            android:background="@drawable/share_toast_border"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Strings related to Settings -->
+    <!-- Global settings -->
+
+    <string name="pref_enable_notifications_key">KEY_ENABLE_NOTIFICATIONS</string>
+    <string name="pref_ring_volume_key">KEY_RING_VOLUME</string>
+    <string name="pref_ring_duration_key">KEY_RING_DURATION</string>
+    <string name="pref_snooze_duration_key">KEY_SNOOZE_DURATION</string>
+    <string name="pref_enable_reliability_key">KEY_ENABLE_RELIABILITY</string>
+    <string name="pref_snooze_duration_display_key">KEY_SNOOZE_DURATION_DISPLAY</string>
+
+    <string name="pref_title_volume">Volume</string>
+
+    <string name="pref_title_ring_duration">Alarm duration</string>
+    <string name="pref_default_ring_duration_label">2 hours</string>
+    <string name="pref_default_ring_duration_value">7200000</string>
+
+    <string-array name="pref_ring_duration_labels">
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>@string/pref_default_ring_duration_label</item>
+        <item>5 hours</item>
+        <item>Forever</item>
+    </string-array>
+
+    <string-array name="pref_ring_duration_values">
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>@string/pref_default_ring_duration_value</item>
+        <item>18000000</item>
+        <item>0</item>
+    </string-array>
+
+    <string name="pref_title_snooze_duration">Snooze duration</string>
+    <string name="pref_default_snooze_duration_label">5 minutes</string>
+    <string name="pref_default_snooze_duration_value">300000</string>
+
+    <string-array name="pref_snooze_duration_labels">
+        <item>30 seconds</item>
+        <item>1 minute</item>
+        <item>@string/pref_default_snooze_duration_label</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+    </string-array>
+
+    <string-array name="pref_snooze_duration_values">
+        <item>30000</item>
+        <item>60000</item>
+        <item>@string/pref_default_snooze_duration_value</item>
+        <item>600000</item>
+        <item>900000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+    </string-array>
+
+    <string name="pref_title_enable_notifications">Show Notifications</string>
+    <string name="pref_title_enable_reliability">Improve Alarm Reliability</string>
+    <string name="pref_title_enable_reliability_description">Alarms should ring more reliably, but at the cost of battery life</string>
+
+    <!-- Alarm settings -->
+
+    <string name="pref_time_key">KEY_ALARM_TIME</string>
+    <string name="pref_repeating_days_key">KEY_ALARM_REPEATING_DAYS</string>
+    <string name="pref_name_key">KEY_ALARM_NAME</string>
+    <string name="pref_mimics_key">KEY_ALARM_MIMICS</string>
+    <string name="pref_ringtone_key">KEY_ALARM_RINGTONE</string>
+    <string name="pref_vibrate_key">KEY_ALARM_VIBRATE</string>
+    <string name="pref_buttons_key">KEY_ALARM_BUTTONS</string>
+
+    <string name="pref_title_repeating">Repeat</string>
+    <string name="pref_no_repeating">Does not repeat</string>
+
+    <string-array name="pref_mimic_labels">
+        <item>@string/pref_mimic_color_capture_label</item>
+        <item>@string/pref_mimic_express_yourself_label</item>
+        <item>@string/pref_mimic_tongue_twister_label</item>
+    </string-array>
+
+    <string name="pref_mimic_tongue_twister_id">tongue_twister</string>
+    <string name="pref_mimic_color_capture_id">color_capture</string>
+    <string name="pref_mimic_express_yourself_id">express_yourself</string>
+
+    <string-array name="pref_mimic_values">
+        <item>@string/pref_mimic_color_capture_id</item>
+        <item>@string/pref_mimic_express_yourself_id</item>
+        <item>@string/pref_mimic_tongue_twister_id</item>
+    </string-array>
+
+    <string name="pref_mimic_color_capture_label">Color capture</string>
+    <string name="pref_mimic_express_yourself_label">Express yourself</string>
+    <string name="pref_mimic_tongue_twister_label">Tongue twister</string>
+
+    <string name="pref_mimic_color_capture_summary">Match the color by snapping a pic</string>
+    <string name="pref_mimic_express_yourself_summary">Mimic the emotion by taking a selfie</string>
+    <string name="pref_mimic_tongue_twister_summary">Repeat the phrase by speaking out loud</string>
+
+    <string name="pref_mimic_not_supported">Your phone does not support this game</string>
+
+    <string name="pref_title_new">Add alarm</string>
+    <string name="pref_title_edit">Edit alarm</string>
+    <string name="pref_title_name">Alarm name</string>
+    <string name="pref_title_description_hint">Describe your alarm</string>
+    <string name="pref_title_mimics">Mimics</string>
+    <string name="pref_no_mimics">No Mimics selected</string>
+    <string name="pref_title_ringtone">Alarm ringtone</string>
+    <string name="pref_no_ringtone">Silent</string>
+    <string name="pref_title_vibrate">Vibration</string>
+    <string name="pref_button_delete">Delete</string>
+    <string name="pref_button_save">Save</string>
+    <string name="pref_dialog_save_changes_message">Would you like to save your changes before continuing?</string>
+    <string name="pref_dialog_save_changes_negative_button">Discard</string>
+    <string name="pref_dialog_save_changes_positive_button">Save changes</string>
+
+</resources>

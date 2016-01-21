@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.microsoft.mimickeralarm.settings.TimePreference
+        android:key="@string/pref_time_key" />
+
+    <com.microsoft.mimickeralarm.settings.RepeatingDaysPreference
+        android:key="@string/pref_repeating_days_key"
+        android:layout="@layout/preference_repeatingdays"
+        android:title="@string/pref_title_repeating"/>
+
+    <com.microsoft.mimickeralarm.settings.NamePreference
+        android:key="@string/pref_name_key"
+        android:title="@string/pref_title_name"/>
+
+    <com.microsoft.mimickeralarm.settings.MimicsPreference
+        android:key="@string/pref_mimics_key"
+        android:title="@string/pref_title_mimics"/>
+
+    <com.microsoft.mimickeralarm.settings.RingtonePreference
+        android:key="@string/pref_ringtone_key"
+        android:title="@string/pref_title_ringtone" />
+
+    <com.microsoft.mimickeralarm.settings.VibratePreference
+        android:key="@string/pref_vibrate_key"
+        android:title="@string/pref_title_vibrate" />
+
+    <com.microsoft.mimickeralarm.settings.ButtonsPreference
+        android:key="@string/pref_buttons_key" />
+
+</PreferenceScreen>

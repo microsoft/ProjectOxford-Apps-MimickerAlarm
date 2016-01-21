@@ -1,0 +1,31 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreferenceCompat
+        android:key="@string/pref_enable_notifications_key"
+        android:title="@string/pref_title_enable_notifications"
+        android:defaultValue="true"/>
+
+    <com.microsoft.mimickeralarm.globalsettings.VolumeSliderPreference
+        android:key="@string/pref_ring_volume_key"/>
+
+    <ListPreference
+        android:key="@string/pref_ring_duration_key"
+        android:defaultValue="@string/pref_default_ring_duration_value"
+        android:entries="@array/pref_ring_duration_labels"
+        android:entryValues="@array/pref_ring_duration_values"
+        android:title="@string/pref_title_ring_duration"/>
+
+    <ListPreference
+        android:key="@string/pref_snooze_duration_key"
+        android:defaultValue="@string/pref_default_snooze_duration_value"
+        android:entries="@array/pref_snooze_duration_labels"
+        android:entryValues="@array/pref_snooze_duration_values"
+        android:title="@string/pref_title_snooze_duration"/>
+
+    <SwitchPreferenceCompat
+        android:key="@string/pref_enable_reliability_key"
+        android:title="@string/pref_title_enable_reliability"
+        android:summary="@string/pref_title_enable_reliability_description"
+        android:defaultValue="false"/>
+
+</PreferenceScreen>

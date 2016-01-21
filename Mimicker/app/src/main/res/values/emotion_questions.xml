@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="emotions">
+        <item>anger</item>
+        <item>disgust</item>
+        <item>fear</item>
+        <item>happiness</item>
+        <item>neutral</item>
+        <item>sadness</item>
+        <item>surprise</item>
+    </string-array>
+    <!-- THIS WILL ALLOW US TO HAVE DIFFERENT ACCEPTANCE CRITERION FOR EACH EMOTION-->
+    <array name="emotion_acceptance">
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+        <item>0.5</item>
+    </array>
+
+    <string name="emotion_anger">angry</string>
+    <string name="emotion_disgust">disgusted</string>
+    <string name="emotion_fear">scared</string>
+    <string name="emotion_happiness">happy</string>
+    <string name="emotion_neutral">neutral</string>
+    <string name="emotion_sadness">sad</string>
+    <string name="emotion_surprise">surprised</string>
+</resources>

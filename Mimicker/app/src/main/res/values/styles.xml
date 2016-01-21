@@ -1,0 +1,74 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="Font">
+        <item name="android:textColor">@color/dark4</item>
+    </style>
+    <style name="Font.Title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Font.Display1">
+        <item name="android:textSize">30sp</item>
+    </style>
+    <style name="Font.Display2">
+        <item name="android:textSize">40sp</item>
+    </style>
+    <style name="Font.Headline">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginBottom">20dp</item>
+    </style>
+    <style name="Font.Body">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="Font.Body.Link">
+        <item name="android:textColorLink">@color/green3</item>
+    </style>
+    <style name="Font.Body.Secondary">
+        <item name="android:textColor">@color/dark3</item>
+    </style>
+    <style name="Font.Button">
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="Font.Action">
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="Font.Action.Main">
+        <item name="android:textColor">@color/green3</item>
+    </style>
+    <style name="Font.Mimic">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="Font.Mimic.Large">
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="Font.Mimic.Small">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="Font.Mimic.Shareable">
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="Font.Ringing">
+        <item name="android:textSize">24sp</item>
+    </style>
+</resources>
