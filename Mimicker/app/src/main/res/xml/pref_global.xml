@@ -5,7 +5,7 @@
         android:title="@string/pref_title_enable_notifications"
         android:defaultValue="true"/>
 
-    <com.microsoft.mimicker.globalsettings.VolumeSliderPreference
+    <com.microsoft.mimickeralarm.globalsettings.VolumeSliderPreference
         android:key="@string/pref_ring_volume_key"/>
 
     <ListPreference
