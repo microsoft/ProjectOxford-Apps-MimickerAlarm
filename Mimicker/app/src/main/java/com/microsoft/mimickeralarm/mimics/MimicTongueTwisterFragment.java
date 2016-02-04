@@ -256,6 +256,11 @@ public class MimicTongueTwisterFragment extends Fragment
         }
     }
 
+    @Override
+    public void onInternalError() {
+        //TODO: implement
+    }
+
     protected void gameSuccess(double difference) {
         mSuccessMessage = getString(R.string.mimic_success_message);
         if (difference <= DIFFERENCE_PERFECT_THRESHOLD) {

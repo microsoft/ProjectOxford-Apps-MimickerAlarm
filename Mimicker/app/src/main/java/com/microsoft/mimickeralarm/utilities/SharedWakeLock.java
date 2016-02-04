@@ -50,7 +50,10 @@ public class SharedWakeLock {
     private SharedWakeLock(Context context) {
         Context appContext = context.getApplicationContext();
         PowerManager pm = (PowerManager) appContext.getSystemService(Context.POWER_SERVICE);
-        mFullWakeLock = pm.newWakeLock((PowerManager.FULL_WAKE_LOCK | PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), TAG);
+        mFullWakeLock = pm.newWakeLock((PowerManager.FULL_WAKE_LOCK |
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
+                PowerManager.ACQUIRE_CAUSES_WAKEUP |
+                PowerManager.ON_AFTER_RELEASE), TAG);
         mPartialWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
     }
 

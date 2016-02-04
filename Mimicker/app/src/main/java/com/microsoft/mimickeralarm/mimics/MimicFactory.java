@@ -105,9 +105,20 @@ public final class MimicFactory {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    public static Fragment getNoNetworkMimic(Activity caller) {
+        Fragment fragment = null;
+        try {
+            fragment = MimicNoNetworkFragment.class.newInstance();
+        } catch (Exception e) {
+            Log.e(TAG, "Couldn't create fragment:", e);
+            Logger.trackException(e);
+        }
+        return fragment;
+    }
+
     public interface MimicResultListener {
         void onMimicSuccess(String shareable);
-
         void onMimicFailure();
+        void onMimicError();
     }
 }

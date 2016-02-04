@@ -48,4 +48,5 @@ public interface IMimicImplementation {
     void onCountDownTimerExpired();
     void onSucceeded();
     void onFailed();
+    void onInternalError();
 }

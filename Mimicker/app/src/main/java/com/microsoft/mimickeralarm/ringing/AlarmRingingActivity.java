@@ -35,9 +35,11 @@
 
 package com.microsoft.mimickeralarm.ringing;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,9 +47,11 @@ import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.microsoft.mimickeralarm.R;
 import com.microsoft.mimickeralarm.mimics.MimicFactory;
+import com.microsoft.mimickeralarm.mimics.MimicNoNetworkFragment;
 import com.microsoft.mimickeralarm.model.Alarm;
 import com.microsoft.mimickeralarm.model.AlarmList;
 import com.microsoft.mimickeralarm.scheduling.AlarmScheduler;
@@ -56,6 +60,7 @@ import com.microsoft.mimickeralarm.settings.MimicsPreference;
 import com.microsoft.mimickeralarm.settings.MimicsSettingsFragment;
 import com.microsoft.mimickeralarm.utilities.GeneralUtilities;
 import com.microsoft.mimickeralarm.utilities.SettingsUtilities;
+import com.microsoft.mimickeralarm.utilities.SharedWakeLock;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -117,6 +122,31 @@ public class AlarmRingingActivity extends AppCompatActivity
         }
     };
 
+    private BroadcastReceiver mScreenReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                // If the alarm is ringing, stop playing the sound and vibrating. The vibrator may
+                // already have already been cancelled by the screen turning off. We do this
+                // so that we can have a clean restart of vibration and sound playing after turning
+                // on the screen again.
+                if (isAlarmRinging()) {
+                    notifyControllerSilenceAlarmRinging();
+                }
+
+                // We release and reacquire the wakelock so that we can turn the screen back on
+                SharedWakeLock.get(getApplicationContext()).releaseFullWakeLock();
+                SharedWakeLock.get(getApplicationContext()).acquireFullWakeLock();
+
+                // Restart the alarm and vibrator playing if they were both turned off
+                if (isAlarmRinging()) {
+                    notifyControllerStartAlarmRinging();
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,6 +183,8 @@ public class AlarmRingingActivity extends AppCompatActivity
             mHandler.postDelayed(mAlarmCancelTask, ringingDuration);
         }
 
+        registerReceiver(mScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+
         bindRingingService();
     }
 
@@ -176,6 +208,14 @@ public class AlarmRingingActivity extends AppCompatActivity
         } else {
             transitionBackToRingingScreen();
         }
+    }
+
+    @Override
+    public void onMimicError() {
+        Toast.makeText(this, getString(R.string.mimic_error_toast), Toast.LENGTH_SHORT).show();
+        GeneralUtilities.showFragmentFromRight(getSupportFragmentManager(),
+                MimicFactory.getNoNetworkMimic(this),
+                MimicNoNetworkFragment.NO_NETWORK_FRAGMENT_TAG);
     }
 
     @Override
@@ -283,6 +323,7 @@ public class AlarmRingingActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "Entered onDestroy!");
+        unregisterReceiver(mScreenReceiver);
         unbindRingingService();
     }
 

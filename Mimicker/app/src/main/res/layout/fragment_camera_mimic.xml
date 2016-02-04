@@ -62,5 +62,17 @@
             android:padding="20dp"
             android:textAllCaps="true"/>
 
+        <ToggleButton
+            android:visibility="invisible"
+            android:id="@+id/camera_flash_toggle"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="right"
+            android:textOn=""
+            android:textOff=""
+            android:background="@drawable/flashlight_bg"
+            />
     </LinearLayout>
 </RelativeLayout>

@@ -47,14 +47,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.microsoft.mimickeralarm.R;
 import com.microsoft.mimickeralarm.mimics.MimicFactory.MimicResultListener;
@@ -85,12 +86,38 @@ abstract class MimicWithCameraFragment extends Fragment
     private Sensor mLightSensor;
     private SensorEventListener mLightSensorListener;
     private Toast mTooDarkToast;
+    private ToggleButton mFlashButton;
 
     private Point mSize;
-    private CameraPreview.ImageCallback onCaptureCallback = new CameraPreview.ImageCallback() {
+    private CameraPreview.CapturedImageCallbackAsync onCaptureCallback = new CameraPreview.CapturedImageCallbackAsync() {
         @Override
-        public void run(Bitmap bitmap) {
+        public void execute(Bitmap bitmap) {
             new processOnProjectOxfordAsync().execute(bitmap);
+        }
+    };
+
+    private CameraPreview.CameraInitializedCallback onCameraInitialized = new CameraPreview.CameraInitializedCallback() {
+        @Override
+        public void execute(boolean success) {
+            if (success) {
+                if (mCameraPreview.isFlashSupported()){
+                    mFlashButton.setVisibility(View.VISIBLE);
+                    mFlashButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+                            mCameraPreview.changeFlashState(isChecked);
+                            button.setChecked(mCameraPreview.getFlashState());
+                        }
+                    });
+                }
+            }
+        }
+    };
+
+    private CameraPreview.FlashStateCallback onFlashStateCallback = new CameraPreview.FlashStateCallback() {
+        @Override
+        public void execute(boolean state) {
+            mFlashButton.setChecked(state);
         }
     };
 
@@ -106,7 +133,15 @@ abstract class MimicWithCameraFragment extends Fragment
         mSize = size;
         double aspectRatio = size.y > size.x ?
                 (double)size.y / (double)size.x : (double)size.x / (double)size.y;
-        mCameraPreview = new CameraPreview(previewView, aspectRatio, CameraFacing);
+        mCameraPreview = new CameraPreview(previewView,
+                new CameraPreview.OnCameraPreviewException() {
+                    @Override
+                    public void execute() {
+                        mStateManager.onMimicInternalError();
+                    }
+                },
+                onCameraInitialized,
+                aspectRatio, CameraFacing);
 
         View overlay = view.findViewById(R.id.camera_preview_overlay);
         overlay.setOnTouchListener(new View.OnTouchListener() {
@@ -121,6 +156,8 @@ abstract class MimicWithCameraFragment extends Fragment
                 return true;
             }
         });
+
+        mFlashButton = (ToggleButton) view.findViewById(R.id.camera_flash_toggle);
 
         ProgressButton progressButton = (ProgressButton) view.findViewById(R.id.capture_button);
         progressButton.setReadyState(ProgressButton.State.ReadyCamera);
@@ -198,18 +235,11 @@ abstract class MimicWithCameraFragment extends Fragment
 
     @Override
     public void initializeCapture() {
-        try {
-            mCameraPreview.initPreview();
-            mCameraPreview.start();
-        } catch (Exception ex) {
-            Log.e(LOGTAG, "err onResume", ex);
-            Logger.trackException(ex);
-        }
     }
 
     @Override
     public void startCapture() {
-        mCameraPreview.onCapture(onCaptureCallback);
+        mCameraPreview.onCapture(onCaptureCallback, onFlashStateCallback);
     }
 
     @Override
@@ -236,6 +266,13 @@ abstract class MimicWithCameraFragment extends Fragment
         }
     }
 
+    @Override
+    public void onInternalError() {
+        if (mCallback != null) {
+            mCallback.onMimicError();
+        }
+    }
+
     protected void gameSuccess(final GameResult gameResult) {
         mSharableUri = gameResult.shareableUri;
         String successMessage = getString(R.string.mimic_success_message);
@@ -247,7 +284,14 @@ abstract class MimicWithCameraFragment extends Fragment
 
     protected void gameFailure(GameResult gameResult, boolean allowRetry) {
         if (allowRetry) {
-            mCameraPreview.start();
+            try {
+                mCameraPreview.start();
+            }
+            catch (MimicException ex) {
+                Logger.trackException(ex);
+                mStateManager.onMimicInternalError();
+            }
+
             String failureMessage = getString(R.string.mimic_failure_message);
             if (gameResult != null && gameResult.message != null) {
                 failureMessage = gameResult.message;

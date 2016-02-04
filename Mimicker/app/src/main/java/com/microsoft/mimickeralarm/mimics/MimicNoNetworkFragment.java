@@ -61,6 +61,8 @@ import com.microsoft.mimickeralarm.utilities.Logger;
 import java.util.Random;
 
 public class MimicNoNetworkFragment extends Fragment {
+    public static final String NO_NETWORK_FRAGMENT_TAG = "mimic_no_network";
+
     private final static int TIMEOUT_MILLISECONDS = 30000;
     MimicResultListener mCallback;
     private CountDownTimerView mTimer;

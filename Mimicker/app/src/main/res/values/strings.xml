@@ -74,4 +74,5 @@
     <string name="notification_alarm_ringing_content_title">Mimicker alarm is ringing</string>
     <string name="mimic_camera_too_dark">It\'s really dark here</string>
     <string name="learn_more_data_collection">Images, audio, and other data uploaded when using Mimicker may be used by Microsoft for service improvement. To protect your privacy, we do not use this data to identify or contact you.</string>
+    <string name="mimic_error_toast">Something went wrong :( play this instead</string>
 </resources>

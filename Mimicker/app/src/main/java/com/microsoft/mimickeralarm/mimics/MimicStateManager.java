@@ -150,6 +150,17 @@ public class MimicStateManager implements IMimicMediator {
         });
     }
 
+    public void onMimicInternalError() {
+        Log.d(TAG, "Entered onMimicInternalError!");
+        handleButtonState();
+        mCountDownTimer.stop();
+        mProgressButton.setClickable(false);
+        IMimicImplementation mimic = mMimicRef.get();
+        if (mimic != null) {
+            mimic.onInternalError();
+        }
+    }
+
     public void registerStateBanner(MimicStateBanner mimicStateBanner) {
         mMimicStateBanner = mimicStateBanner;
     }

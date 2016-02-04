@@ -44,6 +44,7 @@ import android.graphics.RectF;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -63,7 +64,7 @@ import java.util.List;
  * image captured by the camera
  *
  * To use this, pass in
- * a ImageCallback to process the image returned,
+ * a CapturedImageCallbackAsync to process the image returned,
  * an aspect ratio to use. The class will find the camera setting that best fits this aspect ratio,
  * a camera facing (Front or Back)
  *
@@ -71,7 +72,7 @@ import java.util.List;
  * initPreview (initialize the camera and the preview surface),
  * start (call initPreview before),
  * stop,
- * onCapture (set the ImageCallback),
+ * onCapture (set the CapturedImageCallbackAsync),
  * onFocus (focus the camera at a certain x, y position)
  */
 @SuppressWarnings("deprecation")
@@ -84,21 +85,60 @@ public class CameraPreview implements SurfaceHolder.Callback {
     private int mCameraFacing;
     private int mCameraRotation;
     private double mCameraAspectRatio;
-    private ImageCallback mCallbackOnCaptured;
+    private Boolean mIsFlashSupported; // we only want torch mode. Boolean type so we can cache the result
+    private boolean mFlashState;
+    private FlashStateCallback mFlashStateCallback;
+    private CapturedImageCallbackAsync mCapturedCapturedImageCallbackAsync;
+    private CameraInitializedCallback mCameraInitializedCallback;
+
     private Camera.PreviewCallback mCaptureCallback = new Camera.PreviewCallback() {
         public void onPreviewFrame(byte[] data, Camera camera) {
             camera.stopPreview();
+            if (mIsFlashSupported) {
+                // Delay turning off flash for 0.5s to allow camera to capture image
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        changeFlashState(false);
+                        if (mFlashStateCallback != null) {
+                            mFlashStateCallback.execute(false);
+                        }
+                    }
+                }, 500);
+            }
             new processCaptureImage().execute(data, camera);
         }
     };
 
-    public CameraPreview(SurfaceView surfaceView, double aspectRatio, int facing) {
+    public interface CapturedImageCallbackAsync {
+        void execute(Bitmap bitmap);
+    }
+
+    public interface CameraInitializedCallback {
+        void execute(boolean success);
+    }
+
+    public interface FlashStateCallback {
+        void execute(boolean state);
+    }
+
+    private OnCameraPreviewException mOnException;
+
+    public CameraPreview(SurfaceView surfaceView,
+                         OnCameraPreviewException onException,
+                         CameraInitializedCallback onCameraInitialized,
+                         double aspectRatio, int facing) {
         mCameraAspectRatio = aspectRatio;
         mCameraFacing = facing;
         mPreviewView = surfaceView;
         mCameraRotation = 0;
+        mIsFlashSupported = null;
+        mFlashState = false;
         final SurfaceHolder surfaceHolder = mPreviewView.getHolder();
         surfaceHolder.addCallback(this);
+        mOnException = onException;
+        mCameraInitializedCallback = onCameraInitialized;
     }
 
     @Override
@@ -112,12 +152,14 @@ public class CameraPreview implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {}
 
-    public void initPreview() {
+    private void initPreview(){
         if (mCamera == null) {
             mCamera = getNewCamera();
         }
         try {
-            mCamera.setPreviewDisplay(mPreviewView.getHolder());
+            if (mCamera != null) {
+                mCamera.setPreviewDisplay(mPreviewView.getHolder());
+            }
         } catch (IOException e) {
             Logger.trackException(e);
         }
@@ -125,19 +167,26 @@ public class CameraPreview implements SurfaceHolder.Callback {
 
     public void stop() {
         if (mCamera != null) {
+            changeFlashState(false);
             mCamera.stopPreview();
             mCamera.release();
             mCamera = null;
         }
     }
-    public void start() {
+    public void start() throws MimicException{
         if (mCamera != null) {
             mCamera.startPreview();
         }
+        else{
+            MimicException e = new MimicException("failed to open camera");
+            Logger.trackException(e);
+            throw e;
+        }
     }
 
-    public void onCapture(ImageCallback callback) {
-        mCallbackOnCaptured = callback;
+    public void onCapture(CapturedImageCallbackAsync callback, FlashStateCallback flashCallback) {
+        mCapturedCapturedImageCallbackAsync = callback;
+        mFlashStateCallback = flashCallback;
         if (mCamera != null) {
             mCamera.setOneShotPreviewCallback(mCaptureCallback);
         }
@@ -150,23 +199,101 @@ public class CameraPreview implements SurfaceHolder.Callback {
         rotateMatrix.mapRect(focusRectF);
         Rect focusRect = new Rect();
         focusRectF.round(focusRect);
-        Camera.Parameters parameters = mCamera.getParameters();
-        if (parameters.getMaxNumFocusAreas() > 0) {
-            List<Camera.Area> focusAreas = new ArrayList<>();
-            focusAreas.add(new Camera.Area(focusRect, 1000));
-            parameters.setFocusAreas(focusAreas);
+        if (mCamera == null){
+            return;
         }
-
         try {
-            mCamera.cancelAutoFocus();
-            mCamera.setParameters(parameters);
-            mCamera.autoFocus(new Camera.AutoFocusCallback() {
-                @Override
-                public void onAutoFocus(boolean success, Camera camera) {}
-            });
+            Camera.Parameters parameters = mCamera.getParameters();
+            if (parameters == null)
+            {
+                return;
+            }
+            if (parameters.getMaxNumFocusAreas() > 0) {
+                List<Camera.Area> focusAreas = new ArrayList<>();
+                focusAreas.add(new Camera.Area(focusRect, 1000));
+                parameters.setFocusAreas(focusAreas);
+
+                mCamera.cancelAutoFocus();
+                mCamera.setParameters(parameters);
+                mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                    @Override
+                    public void onAutoFocus(boolean success, Camera camera) {
+                    }
+                });
+            }
         } catch (Exception e) {
             Logger.trackException(e);
         }
+    }
+
+    public boolean isFlashSupported() {
+        if (mIsFlashSupported != null) {
+            return mIsFlashSupported;
+        }
+        // use mIsFlashSupported to cache;
+        mIsFlashSupported = false;
+
+        // Currently let's limit flash to back camera only
+        if (mCameraFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            return false;
+        }
+
+        if (mCamera == null) {
+            return false;
+        }
+
+        Camera.Parameters parameters = mCamera.getParameters();
+        if (parameters == null) {
+            return false;
+        }
+        List<String> flashModes = parameters.getSupportedFlashModes();
+        if (flashModes != null && !flashModes.isEmpty()){
+            if (flashModes.contains(Camera.Parameters.FLASH_MODE_TORCH)) {
+                mIsFlashSupported = true;
+            }
+        }
+
+        return mIsFlashSupported;
+    }
+
+    public boolean changeFlashState(boolean turnOn) {
+        if (mFlashState == turnOn) {
+            return true;
+        }
+
+        if (mCamera == null) {
+            return false;
+        }
+
+        if (!isFlashSupported()) {
+            return false;
+        }
+
+        Camera.Parameters parameters = mCamera.getParameters();
+        if (parameters == null) {
+            return false;
+        }
+
+        try {
+            if (turnOn) {
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            }
+            else {
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            }
+            mCamera.setParameters(parameters);
+        }
+        catch (Exception e) {
+            Logger.trackException(e);
+            return false;
+        }
+
+        mFlashState = turnOn;
+        return true;
+    }
+
+    public boolean getFlashState() {
+        return mFlashState;
     }
 
     private Camera getNewCamera() {
@@ -237,22 +364,41 @@ public class CameraPreview implements SurfaceHolder.Callback {
         return cam;
     }
 
-    public interface ImageCallback {
-        void run(Bitmap bitmap);
-    }
-
     private class OpenCameraTask extends AsyncTask<Object, String, Boolean> {
         @Override
         protected Boolean doInBackground(Object... params) {
-            if (mCamera != null) {
-                try {
-                    initPreview();
-                } catch (Exception ex) {
-                    Log.e(LOGTAG, "err starting camera preview", ex);
-                    Logger.trackException(ex);
+            if(mCamera == null) {
+                initPreview();
+            }
+
+            boolean success = false;
+            try {
+                start();
+                success = true;
+            }
+            catch (MimicException ex) {
+                Logger.trackException(ex);
+            }
+            catch (Exception ex) {
+                Log.e(LOGTAG, "err starting camera preview", ex);
+                Logger.trackException(ex);
+            }
+            return success;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+            if (!success) {
+                if (mOnException != null) {
+                    mOnException.execute();
                 }
             }
-            return null;
+            else {
+                if (mCameraInitializedCallback != null) {
+                    mCameraInitializedCallback.execute(true);
+                }
+            }
         }
     }
 
@@ -285,12 +431,16 @@ public class CameraPreview implements SurfaceHolder.Callback {
                 transform.postRotate(mCameraRotation);
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), transform, true);
 
-                if (mCallbackOnCaptured != null) {
-                    mCallbackOnCaptured.run(bitmap);
+                if (mCapturedCapturedImageCallbackAsync != null) {
+                    mCapturedCapturedImageCallbackAsync.execute(bitmap);
                 }
             }
             return null;
         }
+    }
+
+    public interface OnCameraPreviewException{
+        void execute();
     }
 }
 

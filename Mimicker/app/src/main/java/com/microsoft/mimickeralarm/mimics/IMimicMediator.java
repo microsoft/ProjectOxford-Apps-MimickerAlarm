@@ -53,6 +53,7 @@ public interface IMimicMediator {
     void onMimicSuccess(String successMessage);
     void onMimicFailureWithRetry(String failureMessage);
     void onMimicFailure(String failureMessage);
+    void onMimicInternalError();
 
     void registerStateBanner(MimicStateBanner mimicStateBanner);
     void registerCountDownTimer(CountDownTimerView countDownTimerView, int timeout);
