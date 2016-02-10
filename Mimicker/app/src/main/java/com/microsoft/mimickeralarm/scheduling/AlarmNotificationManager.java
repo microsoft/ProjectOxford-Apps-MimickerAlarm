@@ -111,6 +111,7 @@ public class AlarmNotificationManager {
 
         builder.setContentTitle(context.getString(R.string.notification_next_alarm_content_title));
         builder.setContentText(DateTimeUtilities.getDayAndTimeAlarmDisplayString(context, alarmTime));
+        builder.setPriority(Notification.PRIORITY_MIN);
 
         Intent startIntent = new Intent(context, AlarmMainActivity.class);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
