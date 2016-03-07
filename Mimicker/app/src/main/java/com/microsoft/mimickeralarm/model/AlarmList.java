@@ -88,6 +88,7 @@ public class AlarmList {
         }
         values.put(AlarmTable.Columns.DAYS, repeatingDays);
         values.put(AlarmTable.Columns.VIBRATE, alarm.shouldVibrate());
+        values.put(AlarmTable.Columns.SNOOZE, alarm.shouldSnooze());
         values.put(AlarmTable.Columns.TONGUE_TWISTER, alarm.isTongueTwisterEnabled());
         values.put(AlarmTable.Columns.COLOR_CAPTURE, alarm.isColorCaptureEnabled());
         values.put(AlarmTable.Columns.EXPRESS_YOURSELF, alarm.isExpressYourselfEnabled());
