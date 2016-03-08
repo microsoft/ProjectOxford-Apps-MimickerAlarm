@@ -33,33 +33,48 @@
  *
  */
 
-package com.microsoft.mimickeralarm.database;
+package com.microsoft.mimickeralarm.settings;
+
+import android.content.Context;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceViewHolder;
+import android.support.v7.preference.SwitchPreferenceCompat;
+import android.util.AttributeSet;
 
 /**
- * This static class defines the constants for the alarm database schema.
+ * This custom preference class handles the snooze setting for an alarm.
  */
-public class AlarmDbSchema {
-    public static final class AlarmTable {
-        public static final String NAME = "alarms";
+public class SnoozePreference extends SwitchPreferenceCompat {
 
-        public static final class Columns {
-            public static final String UUID = "uuid";
-            public static final String TITLE = "title";
-            public static final String HOUR = "hour";
-            public static final String MINUTE = "minute";
-            public static final String DAYS = "days";
-            public static final String TONE = "tone";
-            public static final String ENABLED = "enabled";
-            public static final String VIBRATE = "vibrate";
-            public static final String SNOOZE = "snooze";
-            public static final String TONGUE_TWISTER = "tongue_twister";
-            public static final String COLOR_CAPTURE = "color_capture";
-            public static final String EXPRESS_YOURSELF = "express_yourself";
-            public static final String NEW = "new";
-            public static final String SNOOZED = "snoozed";
-            public static final String SNOOZED_HOUR = "snoozed_hour";
-            public static final String SNOOZED_MINUTE = "snoozed_minute";
-            public static final String SNOOZED_SECONDS = "snoozed_seconds";
-        }
+    public boolean mChanged;
+    public boolean mInitiallyChecked;
+
+    public SnoozePreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public boolean hasChanged() {
+        return mChanged;
+    }
+
+    public void setChanged(boolean changed) {
+        mChanged = changed;
+    }
+
+    public void setInitialValue(boolean checked) {
+        setChecked(checked);
+        mInitiallyChecked = checked;
+    }
+
+    @Override
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
+        setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                setChanged(mInitiallyChecked != (boolean) o);
+                return true;
+            }
+        });
     }
 }

@@ -80,6 +80,7 @@ public class Alarm {
     private Uri     mAlarmTone;
     private boolean mIsEnabled;
     private boolean mVibrate;
+    private boolean mSnooze;
     private boolean mTongueTwisterEnabled;
     private boolean mColorCaptureEnabled;
     private boolean mExpressYourselfEnabled;
@@ -102,6 +103,7 @@ public class Alarm {
         mAlarmTone = GeneralUtilities.defaultRingtone();
         mIsEnabled = true;
         mVibrate = true;
+        mSnooze = true;
         mTongueTwisterEnabled = true;
         mColorCaptureEnabled = GeneralUtilities.deviceHasRearFacingCamera();
         mExpressYourselfEnabled = GeneralUtilities.deviceHasFrontFacingCamera();
@@ -243,8 +245,16 @@ public class Alarm {
         return mVibrate;
     }
 
+    public boolean shouldSnooze() {
+        return mSnooze;
+    }
+
     public void setVibrate(boolean vibrate) {
         mVibrate = vibrate;
+    }
+
+    public void setSnooze(boolean snooze) {
+        mSnooze = snooze;
     }
 
     public boolean isExpressYourselfEnabled() {
@@ -327,6 +337,7 @@ public class Alarm {
         try {
             json.put("Alarm Id", getId());
             json.put("Alarm Vibrate", shouldVibrate());
+            json.put("Alarm Snooze", shouldSnooze());
             json.put("Alarm Time Hour", getTimeHour());
             json.put("Alarm Time Minute", getTimeMinute());
 
