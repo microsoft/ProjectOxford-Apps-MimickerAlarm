@@ -157,27 +157,26 @@ public class OnboardingTutorialFragment extends Fragment {
             Integer titleResId = 0;
             Integer textResId = 0;
 
-            switch (args.getInt(POSITION)){
-                case 0:
-                    imageResId = R.drawable.onboarding_tutorial_1;
-                    titleResId = R.string.onboarding_tutorial_title_1;
-                    textResId = R.string.onboarding_tutorial_text_1;
-                    break;
-                case 1:
-                    imageResId = R.drawable.onboarding_tutorial_2;
-                    titleResId = R.string.onboarding_tutorial_title_2;
-                    textResId = R.string.onboarding_tutorial_text_2;
-                    break;
-                case 2:
-                    imageResId = R.drawable.onboarding_tutorial_game_animate1;
-                    titleResId = R.string.onboarding_tutorial_title_3;
-                    textResId = R.string.onboarding_tutorial_text_3;
-                    break;
-                case 3:
-                    imageResId = R.drawable.onboarding_tutorial_4;
-                    titleResId = R.string.onboarding_tutorial_title_4;
-                    textResId = R.string.onboarding_tutorial_text_4;
-                    break;
+            if (args.getInt(POSITION) == 0) {
+                imageResId = R.drawable.onboarding_tutorial_1;
+                titleResId = R.string.onboarding_tutorial_title_1;
+                textResId = R.string.onboarding_tutorial_text_1;
+
+            } else if (args.getInt(POSITION) == 1) {
+                imageResId = R.drawable.onboarding_tutorial_2;
+                titleResId = R.string.onboarding_tutorial_title_2;
+                textResId = R.string.onboarding_tutorial_text_2;
+
+            } else if (args.getInt(POSITION) == 2) {
+                imageResId = R.drawable.onboarding_tutorial_game_animate1;
+                titleResId = R.string.onboarding_tutorial_title_3;
+                textResId = R.string.onboarding_tutorial_text_3;
+
+            } else if (args.getInt(POSITION) == 3) {
+                imageResId = R.drawable.onboarding_tutorial_4;
+                titleResId = R.string.onboarding_tutorial_title_4;
+                textResId = R.string.onboarding_tutorial_text_4;
+
             }
 
             ((ImageView) rootView.findViewById(R.id.onboarding_image)).setImageResource(imageResId);
