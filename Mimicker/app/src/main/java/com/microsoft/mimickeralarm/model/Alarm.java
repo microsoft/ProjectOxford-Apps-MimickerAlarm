@@ -95,24 +95,34 @@ public class Alarm {
     }
 
     public Alarm(UUID id) {
+        //for testing, don't want hardware properties
+        if(id==null){
+            mAlarmTone = null;
+            mColorCaptureEnabled = true;
+            mExpressYourselfEnabled = false;
+            mTitle = "Test";
+        }
+
+        else{
+            mAlarmTone = GeneralUtilities.defaultRingtone();
+            mColorCaptureEnabled = GeneralUtilities.deviceHasRearFacingCamera();
+            mExpressYourselfEnabled = GeneralUtilities.deviceHasFrontFacingCamera();
+            mTitle = AlarmApplication.getAppContext().getString(R.string.app_name);
+        }
         mId = id;
         Calendar calendar = Calendar.getInstance();
         mTimeHour = calendar.get(Calendar.HOUR_OF_DAY);
         mTimeMinute = calendar.get(Calendar.MINUTE);
         mRepeatingDays = new boolean[]{ false, false, false, false, false, false, false };
-        mAlarmTone = GeneralUtilities.defaultRingtone();
         mIsEnabled = true;
         mVibrate = true;
         mSnooze = true;
         mTongueTwisterEnabled = true;
-        mColorCaptureEnabled = GeneralUtilities.deviceHasRearFacingCamera();
-        mExpressYourselfEnabled = GeneralUtilities.deviceHasFrontFacingCamera();
         mNew = false;
         mSnoozed = false;
         mSnoozeHour = 0;
         mSnoozeMinute = 0;
         mSnoozeSeconds = 0;
-        mTitle = AlarmApplication.getAppContext().getString(R.string.app_name);
     }
 
     public long schedule() {
