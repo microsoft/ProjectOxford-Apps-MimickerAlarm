@@ -131,22 +131,19 @@ public class AlarmRingingFragment extends Fragment {
         dismissButton.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
-                switch (event.getAction()) {
-                    case DragEvent.ACTION_DROP:
-                        dismissAlarm();
-                        break;
-                    case DragEvent.ACTION_DRAG_ENDED:
-                        if (mShowClockOnDragEnd) {
-                            mAlarmRingingClock.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mAlarmRingingClock.setVisibility(View.VISIBLE);
-                                }
-                            }, SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY);
-                        }
-                        break;
-                    default:
-                        break;
+                if (event.getAction() == DragEvent.ACTION_DROP) {
+                    dismissAlarm();
+
+                } else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED) {
+                    if (mShowClockOnDragEnd) {
+                        mAlarmRingingClock.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAlarmRingingClock.setVisibility(View.VISIBLE);
+                            }
+                        }, SHOW_CLOCK_AFTER_UNSUCCESSFUL_DRAG_DELAY);
+                    }
+
                 }
                 return true;
             }
@@ -161,46 +158,43 @@ public class AlarmRingingFragment extends Fragment {
         });
 
         ImageView snoozeButton = (ImageView) view.findViewById(R.id.alarm_ringing_snooze);
-        snoozeButton.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View v, DragEvent event) {
-                switch (event.getAction()) {
-                    case DragEvent.ACTION_DROP:
+        if (mAlarm.shouldSnooze()) {
+            snoozeButton.setOnDragListener(new View.OnDragListener() {
+                @Override
+                public boolean onDrag(View v, DragEvent event) {
+                    if (event.getAction() == DragEvent.ACTION_DROP) {
                         mCallback.onRingingSnooze();
-                        break;
-                    default:
-                        break;
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
 
-        // Snooze ringing if someone presses the snooze button directly
-        snoozeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCallback.onRingingSnooze();
-            }
-        });
+            // Snooze ringing if someone presses the snooze button directly
+            snoozeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mCallback.onRingingSnooze();
+                }
+            });
+        } else {
+            snoozeButton.setVisibility(View.GONE);
+        }
 
         // Allow the view to listen to the drag event to update arrow animations accordingly
         view.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
-                switch (event.getAction()) {
-                    case DragEvent.ACTION_DRAG_LOCATION:
-                        // Update the left/right arrow visibility based on the current drag location.
-                        onClockDragLocation(event.getX(), event.getY(), v.getWidth()/2);
-                        break;
-                    case DragEvent.ACTION_DROP:
-                        // The user has dropped the drag, but it is dropped within the view, instead of the target
-                        // drop zones to dismiss or snooze.
-                        // Restore to show both left arrow and right arrow animations.
-                        mDragZone = DragZone.NEAR_MIDDLE_OF_VIEW;
-                        updateArrowsBasedOnDragZone(mDragZone);
-                        break;
-                    default:
-                        break;
+                if (event.getAction() == DragEvent.ACTION_DRAG_LOCATION) {
+                    // Update the left/right arrow visibility based on the current drag location.
+                    onClockDragLocation(event.getX(), event.getY(), v.getWidth() / 2);
+
+                } else if (event.getAction() == DragEvent.ACTION_DROP) {
+                    // The user has dropped the drag, but it is dropped within the view, instead of the target
+                    // drop zones to dismiss or snooze.
+                    // Restore to show both left arrow and right arrow animations.
+                    mDragZone = DragZone.NEAR_MIDDLE_OF_VIEW;
+                    updateArrowsBasedOnDragZone(mDragZone);
+
                 }
                 return true;
             }
@@ -250,22 +244,26 @@ public class AlarmRingingFragment extends Fragment {
     }
 
     private void updateArrowsBasedOnDragZone(DragZone dragZone) {
-        switch (mDragZone) {
-            case NEAR_MIDDLE_OF_VIEW:
-                // Show both arrow animations
+        if (mDragZone == DragZone.NEAR_MIDDLE_OF_VIEW) {// Show both arrow animations
+            if (mAlarm.shouldSnooze()) {
                 mLeftArrowImage.setVisibility(View.VISIBLE);
-                mRightArrowImage.setVisibility(View.VISIBLE);
-                break;
-            case DRAGGING_TO_LEFT:
-                // Show only the left arrow animation to guide user to drag to the left
+            }
+            mRightArrowImage.setVisibility(View.VISIBLE);
+
+        } else if (mDragZone == DragZone.DRAGGING_TO_LEFT) {
+            // Show only the left arrow animation to guide user to drag to the left
+            if (mAlarm.shouldSnooze()) {
                 mLeftArrowImage.setVisibility(View.VISIBLE);
-                mRightArrowImage.setVisibility(View.INVISIBLE);
-                break;
-            case DRAGGING_TO_RIGHT:
-                // Show only the right arrow animation to guide user to drag to the left
+            }
+            mRightArrowImage.setVisibility(View.INVISIBLE);
+
+        } else if (mDragZone == DragZone.DRAGGING_TO_RIGHT) {
+            // Show only the right arrow animation to guide user to drag to the left
+            if (mAlarm.shouldSnooze()) {
                 mLeftArrowImage.setVisibility(View.INVISIBLE);
-                mRightArrowImage.setVisibility(View.VISIBLE);
-                break;
+            }
+            mRightArrowImage.setVisibility(View.VISIBLE);
+
         }
     }
 
@@ -303,7 +301,9 @@ public class AlarmRingingFragment extends Fragment {
 
         mAlarmRingingClock.setVisibility(View.VISIBLE);
         mClockAnimation.start();
-        mLeftArrowAnimation.start();
+        if (mAlarm.shouldSnooze()) {
+            mLeftArrowAnimation.start();
+        }
         mRightArrowAnimation.start();
 
         GeneralUtilities.registerCrashReport(getActivity());
@@ -316,7 +316,9 @@ public class AlarmRingingFragment extends Fragment {
         Log.d(TAG, "Entered onPause!");
 
         mClockAnimation.cancel();
-        mLeftArrowAnimation.stop();
+        if (mAlarm.shouldSnooze()) {
+            mLeftArrowAnimation.stop();
+        }
         mRightArrowAnimation.stop();
     }
 
@@ -345,6 +347,10 @@ public class AlarmRingingFragment extends Fragment {
 
         mLeftArrowAnimation = (AnimationDrawable) mLeftArrowImage.getBackground();
         mRightArrowAnimation = (AnimationDrawable) mRightArrowImage.getBackground();
+
+        if (!mAlarm.shouldSnooze()) {
+            mLeftArrowImage.setVisibility(View.INVISIBLE);
+        }
     }
 
     public interface RingingResultListener {

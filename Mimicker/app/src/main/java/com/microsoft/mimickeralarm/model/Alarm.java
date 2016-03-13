@@ -80,6 +80,7 @@ public class Alarm {
     private Uri     mAlarmTone;
     private boolean mIsEnabled;
     private boolean mVibrate;
+    private boolean mSnooze;
     private boolean mTongueTwisterEnabled;
     private boolean mColorCaptureEnabled;
     private boolean mExpressYourselfEnabled;
@@ -94,23 +95,34 @@ public class Alarm {
     }
 
     public Alarm(UUID id) {
+        //for testing, don't want hardware properties
+        if(id==null){
+            mAlarmTone = null;
+            mColorCaptureEnabled = true;
+            mExpressYourselfEnabled = false;
+            mTitle = "Test";
+        }
+
+        else{
+            mAlarmTone = GeneralUtilities.defaultRingtone();
+            mColorCaptureEnabled = GeneralUtilities.deviceHasRearFacingCamera();
+            mExpressYourselfEnabled = GeneralUtilities.deviceHasFrontFacingCamera();
+            mTitle = AlarmApplication.getAppContext().getString(R.string.app_name);
+        }
         mId = id;
         Calendar calendar = Calendar.getInstance();
         mTimeHour = calendar.get(Calendar.HOUR_OF_DAY);
         mTimeMinute = calendar.get(Calendar.MINUTE);
         mRepeatingDays = new boolean[]{ false, false, false, false, false, false, false };
-        mAlarmTone = GeneralUtilities.defaultRingtone();
         mIsEnabled = true;
         mVibrate = true;
+        mSnooze = true;
         mTongueTwisterEnabled = true;
-        mColorCaptureEnabled = GeneralUtilities.deviceHasRearFacingCamera();
-        mExpressYourselfEnabled = GeneralUtilities.deviceHasFrontFacingCamera();
         mNew = false;
         mSnoozed = false;
         mSnoozeHour = 0;
         mSnoozeMinute = 0;
         mSnoozeSeconds = 0;
-        mTitle = AlarmApplication.getAppContext().getString(R.string.app_name);
     }
 
     public long schedule() {
@@ -243,8 +255,16 @@ public class Alarm {
         return mVibrate;
     }
 
+    public boolean shouldSnooze() {
+        return mSnooze;
+    }
+
     public void setVibrate(boolean vibrate) {
         mVibrate = vibrate;
+    }
+
+    public void setSnooze(boolean snooze) {
+        mSnooze = snooze;
     }
 
     public boolean isExpressYourselfEnabled() {
@@ -327,6 +347,7 @@ public class Alarm {
         try {
             json.put("Alarm Id", getId());
             json.put("Alarm Vibrate", shouldVibrate());
+            json.put("Alarm Snooze", shouldSnooze());
             json.put("Alarm Time Hour", getTimeHour());
             json.put("Alarm Time Minute", getTimeMinute());
 

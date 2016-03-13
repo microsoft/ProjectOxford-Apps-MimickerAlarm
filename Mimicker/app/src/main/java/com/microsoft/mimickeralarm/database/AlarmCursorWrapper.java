@@ -63,6 +63,7 @@ public class AlarmCursorWrapper extends CursorWrapper {
         }
         String[] repeatingDays = getString(getColumnIndex(AlarmTable.Columns.DAYS)).split(",");
         boolean vibrate = (getInt(getColumnIndex(AlarmTable.Columns.VIBRATE)) != 0);
+        boolean snooze = (getInt(getColumnIndex(AlarmTable.Columns.SNOOZE)) != 0);
         boolean tongueTwister = (getInt(getColumnIndex(AlarmTable.Columns.TONGUE_TWISTER)) != 0);
         boolean colorCapture = (getInt(getColumnIndex(AlarmTable.Columns.COLOR_CAPTURE)) != 0);
         boolean expressYourself = (getInt(getColumnIndex(AlarmTable.Columns.EXPRESS_YOURSELF)) != 0);
@@ -82,6 +83,7 @@ public class AlarmCursorWrapper extends CursorWrapper {
             alarm.setRepeatingDay(i, !repeatingDays[i].equals("false"));
         }
         alarm.setVibrate(vibrate);
+        alarm.setSnooze(snooze);
         alarm.setTongueTwisterEnabled(tongueTwister);
         alarm.setColorCaptureEnabled(colorCapture);
         alarm.setExpressYourselfEnabled(expressYourself);
