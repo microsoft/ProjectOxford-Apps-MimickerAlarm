@@ -18,7 +18,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class AlarmRingingActivityTest {
+public class AlarmsSettingsActivityTest {
     @Rule
     public ActivityTestRule<AlarmMainActivity> mActivityRule = new ActivityTestRule<>(AlarmMainActivity.class);
 
