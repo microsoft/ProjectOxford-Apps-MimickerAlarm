@@ -109,9 +109,13 @@ public class AlarmNotificationManager {
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_no_bg);
         builder.setLargeIcon(icon);
 
+        AlarmList alarmList = AlarmList.get(context);
+        List<Alarm> alarms = alarmList.getAlarms();
+
         builder.setContentTitle(context.getString(R.string.notification_next_alarm_content_title));
+        builder.setSubText(AlarmList.get(context).getAlarm(alarmId).getTitle());
         builder.setContentText(DateTimeUtilities.getDayAndTimeAlarmDisplayString(context, alarmTime));
-        builder.setPriority(Notification.PRIORITY_MIN);
+        builder.setPriority(Notification.VISIBILITY_SECRET);
 
         Intent startIntent = new Intent(context, AlarmMainActivity.class);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
