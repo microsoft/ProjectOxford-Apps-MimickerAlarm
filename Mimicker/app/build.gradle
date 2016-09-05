@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "com.microsoft.mimickeralarm"
@@ -59,26 +59,30 @@ android {
     }
 }
 
+ext {
+    SUPPORT_VERSION = '24.2.0'
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
-    compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.android.support:support-v4:23.1.1'
-    compile 'com.android.support:preference-v7:23.1.1'
-    compile 'com.android.support:preference-v14:23.1.1'
-    compile 'com.microsoft.projectoxford:speechrecognition:0.5.0'
+    compile "com.android.support:appcompat-v7:$SUPPORT_VERSION"
+    compile "com.android.support:design:$SUPPORT_VERSION"
+    compile "com.android.support:recyclerview-v7:$SUPPORT_VERSION"
+    compile "com.android.support:support-v4:$SUPPORT_VERSION"
+    compile "com.android.support:preference-v7:$SUPPORT_VERSION"
+    compile "com.android.support:preference-v14:$SUPPORT_VERSION"
+    compile 'com.microsoft.projectoxford:speechrecognition:0.6.0'
     compile 'com.microsoft.projectoxford:vision:0.5.0'
-    compile 'com.microsoft.projectoxford:emotion:0.4.0'
-    compile 'net.hockeyapp.android:HockeySDK:3.7.0-beta.1'
+    compile 'com.microsoft.projectoxford:emotion:1.0.0'
+    compile 'net.hockeyapp.android:HockeySDK:4.1.1'
     compile 'com.ibm.icu:icu4j:56.1'
     compile 'org.apache.commons:commons-lang3:3.4'
 
-    compile "com.mixpanel.android:mixpanel-android:4.6.4"
+    compile "com.mixpanel.android:mixpanel-android:4.9.2"
     compile 'com.uservoice:uservoice-android-sdk:+'
 
-    compile files('libs/gson-2.3.1.jar')
+    compile 'com.google.code.gson:gson:2.6.2'
 }
 
 // The location of the HP Fortify sourceanalyzer tool needs to be added to the PATH variable
