@@ -64,17 +64,17 @@ import java.util.UUID;
  * This class handles the state of the Mimicker alarm notification.  It communicates with the
  * AlarmRingingService to display the alarm hosted by a foreground service.  The notification will
  * display the following:
- *
- *  The next alarm that is scheduled.  If the next alarm is a snoozed alarm, the notification will
- *  correctly reflect that case.  If the user taps the notification, the Mimicker app should
- *  launch at the correct alarm setting page.
- *
- *  If an alarm is ringing, the notification will display that an alarm is ringing. If the user
- *  taps on the notification, it should launch the alarm ringing screen if it is not already
- *  visible.
- *
- *  This class is a singleton which is called at boot and from various key points with the
- *  application lifetime.
+ * <p/>
+ * The next alarm that is scheduled.  If the next alarm is a snoozed alarm, the notification will
+ * correctly reflect that case.  If the user taps the notification, the Mimicker app should
+ * launch at the correct alarm setting page.
+ * <p/>
+ * If an alarm is ringing, the notification will display that an alarm is ringing. If the user
+ * taps on the notification, it should launch the alarm ringing screen if it is not already
+ * visible.
+ * <p/>
+ * This class is a singleton which is called at boot and from various key points with the
+ * application lifetime.
  */
 public class AlarmNotificationManager {
     public final static int NOTIFICATION_ID = 60653426;
@@ -104,18 +104,20 @@ public class AlarmNotificationManager {
     }
 
     public static Notification createNextAlarmNotification(Context context, UUID alarmId, long alarmTime) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.alarm_clock_notification);
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_no_bg);
-        builder.setLargeIcon(icon);
 
-        builder.setContentTitle(context.getString(R.string.notification_next_alarm_content_title));
-        builder.setContentText(DateTimeUtilities.getDayAndTimeAlarmDisplayString(context, alarmTime));
-        builder.setPriority(Notification.PRIORITY_MIN);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        builder.setSmallIcon(R.drawable.alarm_clock_notification)
+                .setLargeIcon(icon)
+                .setContentTitle(context.getString(R.string.notification_next_alarm_content_title))
+                .setSubText(AlarmList.get(context).getAlarm(alarmId).getTitle())
+                .setContentText(DateTimeUtilities.getDayAndTimeAlarmDisplayString(context, alarmTime))
+                .setPriority(Notification.PRIORITY_MIN);
 
         Intent startIntent = new Intent(context, AlarmMainActivity.class);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startIntent.putExtra(AlarmRingingService.ALARM_ID, alarmId);
+
         PendingIntent contentIntent = PendingIntent.getActivity(context,
                 (int) Math.abs(alarmId.getLeastSignificantBits()), startIntent, 0);
         builder.setContentIntent(contentIntent);
