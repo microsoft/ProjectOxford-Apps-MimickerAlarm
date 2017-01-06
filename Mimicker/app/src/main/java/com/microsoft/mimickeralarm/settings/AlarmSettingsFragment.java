@@ -83,6 +83,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     private MimicsPreference mMimicsPreference;
     private RingtonePreference mRingtonePreference;
     private VibratePreference mVibratePreference;
+    private SnoozePreference mSnoozePreference;
     private ButtonsPreference mButtonsPreference;
 
     public static AlarmSettingsFragment newInstance(String alarmId) {
@@ -131,6 +132,7 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         initializeMimicsPreference(enabledMimics);
         initializeRingtonePreference();
         initializeVibratePreference();
+        initializeSnoozePreference();
         initializeButtons();
     }
 
@@ -217,6 +219,11 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
     private void initializeVibratePreference() {
         mVibratePreference = (VibratePreference) findPreference(getString(R.string.pref_vibrate_key));
         mVibratePreference.setInitialValue(mAlarm.shouldVibrate());
+    }
+
+    private void initializeSnoozePreference() {
+        mSnoozePreference = (SnoozePreference) findPreference(getString(R.string.pref_snooze_key));
+        mSnoozePreference.setInitialValue(mAlarm.shouldSnooze());
     }
 
     private void initializeButtons() {
@@ -320,7 +327,8 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
                 mNamePreference.hasChanged() ||
                 mMimicsPreference.hasChanged() ||
                 mRingtonePreference.hasChanged() ||
-                mVibratePreference.hasChanged();
+                mVibratePreference.hasChanged() ||
+                mSnoozePreference.hasChanged();
     }
 
     private void populateUpdatedSettings() {
@@ -330,11 +338,18 @@ public class AlarmSettingsFragment extends PreferenceFragmentCompat {
         updateMimicsSetting();
         updateRingtoneSetting();
         updateVibrateSetting();
+        updateSnoozeSetting();
     }
 
     private void updateVibrateSetting() {
         if (mVibratePreference.hasChanged()) {
             mAlarm.setVibrate(mVibratePreference.isChecked());
+        }
+    }
+
+    private void updateSnoozeSetting() {
+        if (mSnoozePreference.hasChanged()) {
+            mAlarm.setSnooze(mSnoozePreference.isChecked());
         }
     }
 

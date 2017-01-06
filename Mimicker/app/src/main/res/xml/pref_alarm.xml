@@ -25,6 +25,10 @@
         android:key="@string/pref_vibrate_key"
         android:title="@string/pref_title_vibrate" />
 
+    <com.microsoft.mimickeralarm.settings.SnoozePreference
+        android:key="@string/pref_snooze_key"
+        android:title="@string/pref_title_snooze" />
+
     <com.microsoft.mimickeralarm.settings.ButtonsPreference
         android:key="@string/pref_buttons_key" />
 

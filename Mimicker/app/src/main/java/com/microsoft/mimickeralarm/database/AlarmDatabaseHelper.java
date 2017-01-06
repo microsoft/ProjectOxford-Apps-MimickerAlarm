@@ -69,6 +69,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper{
                 AlarmTable.Columns.DAYS + ", " +
                 AlarmTable.Columns.TONE + ", " +
                 AlarmTable.Columns.VIBRATE + ", " +
+                AlarmTable.Columns.SNOOZE + ", " +
                 AlarmTable.Columns.TONGUE_TWISTER + ", " +
                 AlarmTable.Columns.COLOR_CAPTURE + ", " +
                 AlarmTable.Columns.EXPRESS_YOURSELF + ", " +
