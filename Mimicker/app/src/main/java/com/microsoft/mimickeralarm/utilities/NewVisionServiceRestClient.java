@@ -16,12 +16,12 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 
-public class VisionServiceRestClientNew implements VisionServiceClient {
+public class NewVisionServiceRestClient implements VisionServiceClient {
     private static final String serviceHost = "https://api.projectoxford.ai/vision/v1.0";
     private WebServiceRequest restCall = null;
     private Gson gson = new Gson();
 
-    public VisionServiceRestClientNew(String subscriptKey) {
+    public NewVisionServiceRestClient(String subscriptKey) {
         this.restCall = new WebServiceRequest(subscriptKey);
     }
 
